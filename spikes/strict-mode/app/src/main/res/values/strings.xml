@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TimeJar spike</string>
+    <string name="a11y_desc">TimeJar strict-mode spike: notices which app is on screen so it can lock when the jar is empty.</string>
+</resources>

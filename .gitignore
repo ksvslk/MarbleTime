@@ -1,0 +1,16 @@
+# Local-only files
+.env.local
+.shots/
+.DS_Store
+node_modules/
+
+# Secrets never go in git
+*.pem
+*.key
+.aws/
+
+# Android builds outside tv/ (tv/ has its own .gitignore)
+**/.gradle/
+**/build/
+**/.kotlin/
+local.properties
