@@ -3,7 +3,7 @@
  * conditions, and every method's writes happen all at once or not at all. Values are copied in and out, so callers
  * can't change stored data by accident.
  */
-import type {Decision, GameCredit, Repo} from '../domain/repo';
+import type {ChildProfile, Decision, GameCredit, Repo} from '../domain/repo';
 import type {Chore, Child, Claim, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, Ref} from '../domain/types';
 
 interface FamilyData {
@@ -68,7 +68,7 @@ export class MemoryRepo implements Repo {
     this.stores.get(familyId)?.children.set(child.id, copy(child));
   }
 
-  async updateChildProfile(familyId: string, childId: string, profile: Partial<Pick<Child, 'name' | 'avatar' | 'color' | 'age' | 'games'>>) {
+  async updateChildProfile(familyId: string, childId: string, profile: ChildProfile) {
     const child = this.data(familyId).children.get(childId);
     if (!child) return undefined;
     Object.assign(child, copy(profile));
@@ -159,12 +159,12 @@ export class MemoryRepo implements Repo {
       .map(copy);
   }
 
-  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number} = {}) {
+  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number} = {}) {
     const data = this.data(familyId);
     const refKey = options.ref && `${entry.childId}#${options.ref.id}`;
     if (refKey && data.refs.has(refKey)) return 'duplicate' as const;
     const child = data.children.get(entry.childId);
-    if (!child) return 'no_child' as const;
+    if (!child || child.balanceSec < (options.minBalanceSec ?? 0)) return 'changed' as const;
     data.entries.set(entry.id, copy(entry));
     child.balanceSec += entry.deltaSec;
     child.debtSec += options.debtSec ?? 0;
@@ -201,6 +201,13 @@ export class MemoryRepo implements Repo {
 
   async pendingEntries(familyId: string, childId: string) {
     return [...this.data(familyId).entries.values()].filter(e => e.childId === childId && e.handoff === 'PENDING').map(copy);
+  }
+
+  async adjustments(familyId: string, since: number) {
+    return [...this.data(familyId).entries.values()]
+      .filter(e => (e.type === 'BONUS' || e.type === 'PENALTY') && e.createdAt >= since)
+      .sort(newestFirst)
+      .map(copy);
   }
 
   async settleEntries(familyId: string, childId: string, entries: LedgerEntry[], status: Exclude<HandoffStatus, 'PENDING'>, debtPaidSec: number) {

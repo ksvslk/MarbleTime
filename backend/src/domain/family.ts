@@ -2,7 +2,7 @@
 import type {Deps} from './deps';
 import {ApiError, busy, conflict, invalid, notFound} from './errors';
 import {hashPin, newId} from './secrets';
-import type {Chore, Child, Color, Family, GameSettings, Parent, Topic} from './types';
+import {type Chore, type Child, type Color, DAILY_BASE_MIN, type Family, type GameSettings, type Parent, type Topic} from './types';
 import type {ChildInput, ChildPatch, ChoreInput, ChorePatch, FamilyCreate, FamilyPatch} from './validate';
 import {byCreated, childView, choreView, deviceView, familyView} from './views';
 
@@ -73,6 +73,7 @@ const gameSettings = (games: {topics: Topic[]; dailyCapMarbles?: number}): GameS
 export async function addChild(deps: Deps, family: Family, input: ChildInput) {
   const child: Child = {
     id: newId(), name: input.name, avatar: input.avatar, color: input.color, age: input.age,
+    dailyBaseMin: input.dailyBaseMin ?? DAILY_BASE_MIN,
     games: input.games ? gameSettings(input.games) : defaultGames(input.age),
     createdAt: deps.now(), balanceSec: 0, debtSec: 0,
   };

@@ -2,6 +2,7 @@ import {useState, type FormEvent} from 'react';
 import {useApi} from '../api/ApiContext';
 import {ApiError} from '../api/client';
 import {useI18n} from '../i18n/I18n';
+import {usesAmazonKids} from '../lib/handoff';
 import {pinProblem} from '../lib/validate';
 import {Field, Group} from '../ui/controls';
 import {Art} from '../ui/Icon';
@@ -104,7 +105,8 @@ export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
         <form className="card form" onSubmit={saveKid}>
           <h1>{t('firstKid')}</h1>
           <p className="hint">{t('firstKidHint')}</p>
-          <KidFields value={kid} onChange={setKid} />
+          {/* No TV is paired yet, so Amazon Kids, the default mode, applies. */}
+          <KidFields value={kid} amazonKids={usesAmazonKids([])} onChange={setKid} />
           <button className="btn btn-gold btn-block" disabled={busy || !kid.name.trim()}>
             {t('start')}
           </button>

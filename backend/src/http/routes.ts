@@ -96,8 +96,8 @@ export const routes: Route[] = [
   open('GET', '/pairings/{code}', async ({deps, params}) => json(200, await pollPairing(deps, check.pairingCode(params.code)))),
 
   // TV (device token)
-  device('GET', '/device/state', async ({deps, family, req}) => {
-    const {etag, body} = await deviceState(deps, family);
+  device('GET', '/device/state', async ({deps, family, device, req}) => {
+    const {etag, body} = await deviceState(deps, family, device);
     return etagMatches(req.headers['if-none-match'], etag) ? {status: 304, headers: {etag}} : json(200, body, {etag});
   }),
   device('POST', '/device/claims', async ({deps, family, body}) => {

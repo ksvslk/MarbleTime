@@ -1,5 +1,6 @@
+import type {Child} from '../api/types';
 import {useI18n} from '../i18n/I18n';
-import {formatMinutes, marblesFor} from '../lib/format';
+import {dailyBaseText, earnedText, formatMinutes, marblesFor, minutesFromSec} from '../lib/format';
 import {colors, MARBLE_BASE} from '../tokens';
 
 /** One gold marble = 5 minutes of TV, drawn like the TV's: a darker base, the gold ball up-left, a shine. */
@@ -34,6 +35,24 @@ export function TimeLabel({minutes, signed = false, max}: {minutes: number; sign
     <span className="time">
       <Marbles count={marblesFor(Math.abs(minutes))} max={max} off={minutes < 0} />
       <span className="time-text">{formatMinutes(lang, minutes, signed)}</span>
+    </span>
+  );
+}
+
+/**
+ * A kid's TV time: the daily base (every day, not in the jar), then "+ 35 min earned" with its marbles.
+ * The two stay apart everywhere, since only earned time is in the balance and the hand-off. Words come
+ * first here, so on a narrow screen it's the marbles that wrap.
+ */
+export function KidTime({child, max}: {child: Child; max?: number}) {
+  const {lang} = useI18n();
+  return (
+    <span className="kid-time">
+      <span className="time-text">{dailyBaseText(lang, child.dailyBaseMin)}</span>
+      <span className="time">
+        <span className="time-text">+ {earnedText(lang, child.balanceSec)}</span>
+        <Marbles count={marblesFor(minutesFromSec(child.balanceSec))} max={max} />
+      </span>
     </span>
   );
 }

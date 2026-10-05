@@ -62,6 +62,17 @@ export function Switch({checked, label, onChange}: {checked: boolean; label: str
   );
 }
 
+/** "✓ Saved", shown for a moment after an autosave (useAutosave). */
+export function SavedNote() {
+  const {t} = useI18n();
+  return (
+    <span className="saved" role="status">
+      <Icon name="check" size={18} />
+      {t('saved')}
+    </span>
+  );
+}
+
 export function Chip({selected, onClick, label, children}: {selected: boolean; onClick: () => void; label?: string; children: ReactNode}) {
   return (
     <button type="button" className={`chip${selected ? ' chip-on' : ''}`} aria-pressed={selected} aria-label={label} onClick={onClick}>

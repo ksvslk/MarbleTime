@@ -4,6 +4,7 @@ import {useApi} from '../api/ApiContext';
 import type {Child} from '../api/types';
 import {useFamily} from '../family';
 import {useI18n} from '../i18n/I18n';
+import {usesAmazonKids} from '../lib/handoff';
 import {Confirm} from '../ui/Confirm';
 import {Icon} from '../ui/Icon';
 import {NotFound, Page} from '../ui/Page';
@@ -26,7 +27,9 @@ function KidForm({existing}: {existing?: Child}) {
   const navigate = useNavigate();
   const showError = useShowError();
   const [kid, setKid] = useState<KidDraft>(() =>
-    existing ? {name: existing.name, avatar: existing.avatar, color: existing.color, age: existing.age} : newKidDraft(bundle.children),
+    existing
+      ? {name: existing.name, avatar: existing.avatar, color: existing.color, age: existing.age, dailyBaseMin: existing.dailyBaseMin}
+      : newKidDraft(bundle.children),
   );
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
@@ -64,7 +67,7 @@ function KidForm({existing}: {existing?: Child}) {
   return (
     <Page title={existing ? existing.name : t('newKid')} back={existing ? `/kids/${existing.id}` : '/kids'}>
       <form className="card form" onSubmit={save}>
-        <KidFields value={kid} onChange={setKid} />
+        <KidFields value={kid} amazonKids={usesAmazonKids(bundle.devices)} onChange={setKid} />
         <button className="btn btn-gold btn-block" disabled={busy || !kid.name.trim()}>
           {t('save')}
         </button>

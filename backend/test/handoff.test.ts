@@ -44,12 +44,13 @@ describe('hand-off to Amazon Kids', () => {
   it('carries a debt bigger than what is pending over to the next hand-off, never below 0', async () => {
     const f = await family();
     await earn10(f);
-    await adjust(f, -20);
+    await settle(f, 'DONE'); // handed off; the jar keeps the 10 minutes
+    await earn10(f);
+    await adjust(f, -15); // the jar has 20, so all 15 are taken
     expect((await handoff(f)).pendingMinutes).toBe(0);
-    await settle(f, 'DONE'); // 10 of the 20 are paid
+    await settle(f, 'DONE'); // 10 of the 15 are paid
     await earn10(f);
-    await earn10(f);
-    expect((await handoff(f)).pendingMinutes).toBe(10);
+    expect((await handoff(f)).pendingMinutes).toBe(5);
   });
 
   it('pays no debt with SKIPPED entries (no time was added for them)', async () => {
@@ -73,37 +74,3 @@ describe('hand-off to Amazon Kids', () => {
   });
 });
 
-describe('bonus and penalty', () => {
-  it('adds a BONUS (pending hand-off) or a PENALTY (none), and returns the balance', async () => {
-    const f = await family();
-    const bonus = await adjust(f, 15);
-    expect(bonus.status).toBe(200);
-    expect(bonus.body.balanceSec).toBe(900);
-    expect(bonus.body.entry).toMatchObject({type: 'BONUS', deltaSec: 900, reason: 'Helped grandma', createdBy: 'parent:mom', handoff: 'PENDING'});
-    const penalty = await adjust(f, -20);
-    expect(penalty.body.balanceSec).toBe(-300); // balances can go below zero; the TV shows an empty jar
-    expect(penalty.body.entry.type).toBe('PENALTY');
-    expect(penalty.body.entry.handoff).toBeUndefined();
-  });
-
-  it('ignores a repeat with the same client id', async () => {
-    const f = await family();
-    const id = randomUUID();
-    const first = await adjust(f, 10, id);
-    const again = await adjust(f, 10, id);
-    expect(again.body).toEqual(first.body);
-    expect(await f.balance(f.mia.id)).toBe(600);
-    expect((await f.mom.get(`/children/${f.mia.id}/ledger`)).body.entries).toHaveLength(1);
-  });
-
-  it('lists the ledger newest first, with a limit', async () => {
-    const f = await family();
-    for (const delta of [5, 10, 15]) {
-      await adjust(f, delta);
-      f.clock.now += 1000;
-    }
-    const {body} = await f.mom.get(`/children/${f.mia.id}/ledger?limit=2`);
-    expect(body.entries.map((e: {deltaSec: number}) => e.deltaSec)).toEqual([900, 600]);
-    expect((await f.mom.get('/children/nobody/ledger')).status).toBe(404);
-  });
-});

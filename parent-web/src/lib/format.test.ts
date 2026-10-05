@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {formatMinutes, marblesFor, minutesFromSec, repeatSummary, timeAgo, weekdayName} from './format';
+import {dailyBaseText, earnedText, formatMinutes, marblesFor, minutesFromSec, repeatSummary, timeAgo, weekdayName} from './format';
 
 describe('marbles and minutes', () => {
   it('counts whole marbles of 5 minutes, none for zero or less', () => {
@@ -23,6 +23,20 @@ describe('marbles and minutes', () => {
     expect(formatMinutes('en', 15, true)).toBe('+15 min');
     expect(formatMinutes('en', -10, true)).toBe('−10 min');
     expect(formatMinutes('es', -10)).toBe('−10 min');
+  });
+});
+
+describe('daily base and earned time, kept apart', () => {
+  it('writes the base as minutes every day', () => {
+    expect(dailyBaseText('en', 30)).toBe('30 min every day');
+    expect(dailyBaseText('de', 45)).toBe('45 Min. jeden Tag');
+    expect(dailyBaseText('et', 0)).toBe('0 min iga päev');
+  });
+
+  it('writes earned time from the balance in seconds, in whole minutes', () => {
+    expect(earnedText('en', 15 * 60)).toBe('15 min earned');
+    expect(earnedText('es', 15 * 60 + 59)).toBe('15 min ganados');
+    expect(earnedText('en', 0)).toBe('0 min earned');
   });
 });
 

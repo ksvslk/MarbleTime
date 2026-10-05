@@ -95,7 +95,9 @@ TV="Device $token"
 ok "TV paired with code $code; token handed out once"
 
 call GET /device/state "" "$TV"; expect 200 "the TV's state"
+[ "$(jget "$BODY" .device.name)" = "Smoke TV" ] || fail "the TV should see its own name: $(jget "$BODY" .device)"
 [ "$(jfind "$BODY" .children "$child" balanceSec)" = 0 ] || fail "the new kid should start at 0"
+[ "$(jfind "$BODY" .children "$child" dailyBaseMin)" = 30 ] || fail "the new kid should get the default daily base (30 min)"
 
 # The kid says "I did it!" on the TV (the outbox may send it twice).
 claim=$(uuid)
@@ -117,6 +119,14 @@ balance=$(jfind "$BODY" .children "$child" balanceSec)
 [ "$balance" = 600 ] || fail "expected 600 s on the TV, got $balance"
 [ "$(jfind "$BODY" .claims "$claim" status)" = approved ] || fail "the TV doesn't see the approval"
 ok "TV: balance 600 s (10 min = 2 marbles)"
+
+# The parent takes 5 minutes away, with a reason; the TV can say why the jar changed.
+call POST "/children/$child/adjust" '{"deltaMin":-5,"reason":"Smoke test"}' "$PARENT"; expect 200 "take 5 minutes away"
+call GET /device/state "" "$TV"; expect 200 "the TV's state after the minus"
+[ "$(jfind "$BODY" .children "$child" balanceSec)" = 300 ] || fail "expected 300 s after the minus"
+[ "$(jget "$BODY" .adjustments[0].childId)" = "$child" ] && [ "$(jget "$BODY" .adjustments[0].deltaMin)" = -5 ] ||
+  fail "the TV doesn't see the minus: $(jget "$BODY" .adjustments)"
+ok "parent: 5 min taken away; the TV sees it with its reason"
 
 etag=$(curl -sS -o /dev/null -D - -H "authorization: $TV" "$API/device/state" | tr -d '\r' | awk -F': ' 'tolower($1) == "etag" {print $2}')
 [ "$(curl -sS -o /dev/null -w '%{http_code}' -H "authorization: $TV" -H "if-none-match: $etag" "$API/device/state")" = 304 ] ||

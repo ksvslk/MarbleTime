@@ -1,4 +1,4 @@
-import type {ServerState} from './api';
+import type {ServerAdjustment, ServerState} from './api';
 import {DAILY_GAME_MARBLES, DEMO_PIN, Family, Game, Job, KidId, SAMPLE_FAMILY} from './data';
 import {Lang, LANGS} from './i18n';
 import {sha256Hex} from './sha256';
@@ -26,12 +26,14 @@ export interface Claim {
 }
 
 /** Why marbles arrived; the screen turns it into words in the family language. */
-export type Why = {kind: 'job'; jobId: string} | {kind: 'game'; gameId: string} | {kind: 'cap'};
+export type Why = {kind: 'job'; jobId: string} | {kind: 'game'; gameId: string} | {kind: 'cap'} | {kind: 'bonus'; reason: string};
 
+/** Good news that came while the kid was away: shown as "Yay!" when they open their board, one at a time. */
 export interface Celebration {
+  id: string;
   kidId: KidId;
   marbles: number;
-  jobId: string;
+  why: Why;
 }
 
 /** Set once a parent paired this TV with the phone app; the backend is then the source of truth. */
@@ -68,6 +70,9 @@ export interface State {
   gameDay: string;
   /** Approvals made while the kid was away; shown as "Yay!" when the kid opens the board. */
   celebrations: Celebration[];
+  /** Bonuses and taken-away minutes from the phone (last 7 days), and which of them the TV has already shown. */
+  adjustments: ServerAdjustment[];
+  seenAdjustments: string[];
   /** The backend (a test link can point it elsewhere: marbletime://open?api=…). */
   apiUrl: string;
   link: Link | null;
@@ -84,7 +89,7 @@ export type Action =
   | {type: 'setCaps'; caps: boolean}
   | {type: 'setVoice'; voice: boolean}
   | {type: 'setFamily'; family: Family; balances?: Record<KidId, number>}
-  | {type: 'celebrated'; kidId: KidId}
+  | {type: 'celebrated'; id: string}
   | {type: 'restore'; saved: unknown}
   | {type: 'setApi'; url: string}
   | {type: 'linked'; link: Link}
@@ -103,6 +108,8 @@ export const initialState: State = {
   gameMarblesToday: {mia: 0, leo: 0},
   gameDay: '',
   celebrations: [],
+  adjustments: [],
+  seenAdjustments: [],
   apiUrl: DEFAULT_API_URL,
   link: null,
   outbox: [],
@@ -156,7 +163,7 @@ export function reducer(state: State, action: Action): State {
         claims,
         outbox,
         balances: {...state.balances, [claim.kidId]: balanceOf(state, claim.kidId) + action.minutes},
-        celebrations: [...state.celebrations, {kidId: claim.kidId, marbles: action.minutes / MIN_PER_MARBLE, jobId: claim.jobId}],
+        celebrations: [...state.celebrations, {id: claim.id, kidId: claim.kidId, marbles: action.minutes / MIN_PER_MARBLE, why: {kind: 'job', jobId: claim.jobId}}],
       };
     }
     case 'gameDone': {
@@ -182,13 +189,14 @@ export function reducer(state: State, action: Action): State {
     case 'setFamily':
       return {...state, family: action.family, balances: action.balances ?? {}, claims: [], celebrations: [], gameMarblesToday: {}, gameDay: '', screen: {name: 'who'}};
     case 'celebrated':
-      return {...state, celebrations: state.celebrations.filter(c => c.kidId !== action.kidId)};
+      return {...state, celebrations: state.celebrations.filter(c => c.id !== action.id)};
     case 'restore':
       return restore(state, action.saved);
     case 'setApi':
       return {...state, apiUrl: action.url};
     case 'linked':
-      return {...state, link: action.link, outbox: []};
+      // A fresh pairing: old news on the backend (bonuses, approvals) isn't replayed as celebrations.
+      return {...state, link: action.link, outbox: [], celebrations: [], adjustments: [], seenAdjustments: []};
     case 'unlink':
       // Back to a TV on its own: sample family, demo PIN.
       return {...initialState, lang: state.lang, caps: state.caps, voice: state.voice, apiUrl: state.apiUrl, screen: {name: 'who'}};
@@ -211,7 +219,7 @@ export function familyFromServer(server: ServerState, now: number): Family {
   const weekday = ((new Date(now).getDay() + 6) % 7) + 1; // ISO: Monday = 1
   const due = (repeat: ServerState['chores'][number]['repeat']) => repeat.kind !== 'weekdays' || repeat.days.includes(weekday);
   return {
-    kids: server.children.map(c => ({id: c.id, name: c.name, avatar: c.avatar, avatarBg: COLORS[c.color] ?? colors.sky, age: c.age})),
+    kids: server.children.map(c => ({id: c.id, name: c.name, avatar: c.avatar, avatarBg: COLORS[c.color] ?? colors.sky, age: c.age, dailyBaseMin: c.dailyBaseMin ?? 30})),
     jobs: Object.fromEntries(
       server.children.map(child => [
         child.id,
@@ -244,6 +252,11 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
   ];
   const waitingHere = new Set(state.claims.filter(c => c.status === 'waiting').map(c => c.id));
   const approvedElsewhere = server.claims.filter(c => c.status === 'approved' && waitingHere.has(c.id) && !decided.has(c.id));
+  // Bonuses given on the phone since the last sync are celebrated; on the first sync after pairing, nothing is new.
+  const adjustments = server.adjustments ?? [];
+  const firstSync = state.link?.familyName === '';
+  const seen = new Set(state.seenAdjustments);
+  const newBonuses = firstSync ? [] : adjustments.filter(a => a.deltaMin > 0 && !seen.has(a.id));
   return {
     ...state,
     lang: server.family.lang,
@@ -254,7 +267,13 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
     claims,
     gameMarblesToday: server.gameMarblesToday,
     gameDay: localDay(now),
-    celebrations: [...state.celebrations, ...approvedElsewhere.map(c => ({kidId: c.childId, marbles: c.minutes / MIN_PER_MARBLE, jobId: c.choreId}))],
+    celebrations: [
+      ...state.celebrations,
+      ...approvedElsewhere.map(c => ({id: c.id, kidId: c.childId, marbles: c.minutes / MIN_PER_MARBLE, why: {kind: 'job', jobId: c.choreId} as Why})),
+      ...newBonuses.map(a => ({id: a.id, kidId: a.childId, marbles: Math.round(a.deltaMin / MIN_PER_MARBLE), why: {kind: 'bonus', reason: a.reason} as Why})),
+    ],
+    adjustments,
+    seenAdjustments: adjustments.map(a => a.id),
     link: state.link && {...state.link, familyName: server.family.name, pin: server.family.pin},
   };
 }
@@ -263,6 +282,18 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
 export function isDone(state: State, kidId: KidId, job: Job, now = Date.now()): boolean {
   const today = localDay(now);
   return state.claims.some(c => c.kidId === kidId && c.jobId === job.id && c.status === 'approved' && (job.once || localDay(c.at) === today));
+}
+
+/** Minutes taken away today, with the parent's reason: shown calmly on the kid's board. */
+export function takenToday(state: State, kidId: KidId, now = Date.now()): ServerAdjustment[] {
+  const today = localDay(now);
+  return state.adjustments.filter(a => a.childId === kidId && a.deltaMin < 0 && localDay(a.at) === today);
+}
+
+/** TV time in the jar: the daily base plus what was earned. */
+export function timeToday(state: State, kidId: KidId): number {
+  const base = state.family.kids.find(k => k.id === kidId)?.dailyBaseMin ?? 0;
+  return base + balanceOf(state, kidId);
 }
 
 /** The grown-ups PIN: the family's own once paired, the demo PIN before. */
@@ -304,10 +335,13 @@ export function restore(state: State, saved: unknown): State {
     claims: Array.isArray(saved.claims) ? (saved.claims as Claim[]) : state.claims,
     gameMarblesToday: isRecord(saved.gameMarblesToday) ? (saved.gameMarblesToday as Record<KidId, number>) : state.gameMarblesToday,
     gameDay: typeof saved.gameDay === 'string' ? saved.gameDay : state.gameDay,
-    celebrations: Array.isArray(saved.celebrations) ? (saved.celebrations as Celebration[]) : state.celebrations,
+    // Celebrations saved before they had an id and a reason are dropped rather than shown wrong.
+    celebrations: Array.isArray(saved.celebrations) ? (saved.celebrations as Celebration[]).filter(c => isRecord(c) && typeof c.id === 'string' && isRecord(c.why)) : state.celebrations,
     apiUrl: typeof saved.apiUrl === 'string' ? saved.apiUrl : state.apiUrl,
     link: isRecord(saved.link) && typeof saved.link.token === 'string' ? (saved.link as unknown as Link) : saved.link === null ? null : state.link,
     outbox: Array.isArray(saved.outbox) ? (saved.outbox as Outbox[]) : state.outbox,
+    adjustments: Array.isArray(saved.adjustments) ? (saved.adjustments as ServerAdjustment[]) : state.adjustments,
+    seenAdjustments: Array.isArray(saved.seenAdjustments) ? (saved.seenAdjustments as string[]) : state.seenAdjustments,
   };
 }
 

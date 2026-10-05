@@ -15,7 +15,17 @@ export interface ServerChild {
   color: ColorName;
   age: number;
   balanceSec: number;
+  dailyBaseMin?: number;
   games: {topics: Topic[]; dailyCapMarbles: number};
+}
+
+/** A bonus (+) or taken-away (−) minutes, with the parent's reason. */
+export interface ServerAdjustment {
+  id: string;
+  childId: string;
+  deltaMin: number;
+  reason: string;
+  at: number;
 }
 
 export type Repeat = {kind: 'daily'} | {kind: 'weekdays'; days: number[]} | {kind: 'once'};
@@ -47,6 +57,8 @@ export interface ServerState {
   children: ServerChild[];
   chores: ServerChore[];
   claims: ServerClaim[];
+  adjustments?: ServerAdjustment[];
+  device?: {id: string; name: string; mode: 'amazon_kids' | 'strict' | 'api_mock'};
   gameMarblesToday: Record<string, number>;
   today: string;
   serverTime: number;

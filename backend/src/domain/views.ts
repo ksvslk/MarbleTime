@@ -2,14 +2,14 @@
  * Stored records → API shapes (openapi.yaml components). Fields are listed one by one, in a fixed order, so
  * internal fields never leak and the same data always serialises the same way (the TV's ETag relies on it).
  */
-import type {Chore, Child, Claim, Device, Family, LedgerEntry, Repeat} from './types';
+import {type Chore, type Child, type Claim, DAILY_BASE_MIN, type Device, type Family, type LedgerEntry, type Repeat} from './types';
 
 export const familyView = (f: Family) => ({
   id: f.id, name: f.name, lang: f.lang, timezone: f.timezone, caps: f.caps, voice: f.voice, hasPin: f.pin !== null, createdAt: f.createdAt,
 });
 
 export const childView = (c: Child) => ({
-  id: c.id, name: c.name, avatar: c.avatar, color: c.color, age: c.age, balanceSec: c.balanceSec,
+  id: c.id, name: c.name, avatar: c.avatar, color: c.color, age: c.age, balanceSec: c.balanceSec, dailyBaseMin: c.dailyBaseMin ?? DAILY_BASE_MIN,
   games: {topics: [...c.games.topics], dailyCapMarbles: c.games.dailyCapMarbles},
 });
 
@@ -31,6 +31,9 @@ export const entryView = (e: LedgerEntry) => ({
   createdBy: e.createdBy, createdAt: e.createdAt,
   ...(e.handoff !== undefined && {handoff: e.handoff}),
 });
+
+/** A bonus (+) or minutes taken away (−, what was actually taken), so the TV can say why a jar changed. */
+export const adjustmentView = (e: LedgerEntry) => ({id: e.id, childId: e.childId, deltaMin: e.deltaSec / 60, reason: e.reason, at: e.createdAt});
 
 export const deviceView = (d: Device) => ({
   id: d.id, name: d.name, platform: d.platform, mode: d.mode,

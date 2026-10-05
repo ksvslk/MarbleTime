@@ -241,7 +241,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Bonus (+) or penalty (−) minutes, with a reason */
+        /**
+         * Bonus (+) or taken-away (−) minutes, with a reason
+         * @description Minus only takes earned minutes and never goes below an empty jar: the entry records what was
+         *     actually taken. With nothing earned, it's 409 `empty_jar`. The TV shows both kinds with the reason
+         *     (a bonus as a celebration, minus as a calm line on the child's board).
+         */
         post: {
             parameters: {
                 query?: never;
@@ -271,6 +276,7 @@ export interface paths {
                         "application/json": components["schemas"]["Balance"];
                     };
                 };
+                409: components["responses"]["Error"];
             };
         };
         delete?: never;
@@ -880,7 +886,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Everything the TV needs (the poll target; ~3 s on screen). Supports If-None-Match → 304. */
+        /** Everything the TV needs (the poll target; ~3 s on screen). Supports If-None-Match → 304; the ETag covers everything except serverTime. */
         get: {
             parameters: {
                 query?: never;
@@ -1253,15 +1259,24 @@ export interface components {
             avatar: components["schemas"]["Avatar"];
             color: components["schemas"]["Color"];
             age: number;
-            /** @description earned minutes × 60 */
+            /** @description earned minutes × 60 (never below 0) */
             balanceSec: number;
+            dailyBaseMin: components["schemas"]["DailyBase"];
             games: components["schemas"]["GameSettings"];
         };
+        /**
+         * @description Screen time every day, before anything is earned, so TV isn't only a prize. Not in the ledger and
+         *     not handed off: in Amazon Kids mode the parent sets the same daily limit there; in strict mode the
+         *     TV starts each day with it.
+         * @default 30
+         */
+        DailyBase: number;
         ChildInput: {
             name: string;
             avatar: components["schemas"]["Avatar"];
             color: components["schemas"]["Color"];
             age: number;
+            dailyBaseMin?: components["schemas"]["DailyBase"];
             games?: components["schemas"]["GameSettings"];
         };
         ChildPatch: {
@@ -1269,6 +1284,7 @@ export interface components {
             avatar?: components["schemas"]["Avatar"];
             color?: components["schemas"]["Color"];
             age?: number;
+            dailyBaseMin?: components["schemas"]["DailyBase"];
             games?: components["schemas"]["GameSettings"];
         };
         /** @description How often a job can be done. Every kind can be done at most once per day per child. */
@@ -1374,9 +1390,24 @@ export interface components {
                     hash: string;
                 };
             };
+            device: {
+                id: string;
+                name: string;
+                mode: components["schemas"]["DeviceMode"];
+            };
             children: components["schemas"]["Child"][];
             /** @description only jobs assigned to someone */
             chores: components["schemas"]["Chore"][];
+            /** @description bonuses and taken-away minutes from the last 7 days, newest first, so the TV can say why a jar changed */
+            adjustments: {
+                /** @description the ledger entry id */
+                id: string;
+                childId: string;
+                /** @description positive = bonus, negative = taken away (what was actually taken) */
+                deltaMin: number;
+                reason: string;
+                at: number;
+            }[];
             /** @description waiting, plus decided in the last 7 days */
             claims: components["schemas"]["Claim"][];
             /** @description childId → game marbles earned today */

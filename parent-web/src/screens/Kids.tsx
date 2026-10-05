@@ -2,13 +2,12 @@ import {useEffect} from 'react';
 import {Link} from 'react-router';
 import {useFamily} from '../family';
 import {useI18n} from '../i18n/I18n';
-import {minutesFromSec} from '../lib/format';
 import {Avatar} from '../ui/Avatar';
 import {Icon} from '../ui/Icon';
-import {TimeLabel} from '../ui/Marbles';
+import {KidTime} from '../ui/Marbles';
 import {Empty, Page} from '../ui/Page';
 
-/** Every kid with the time in their jar. */
+/** Every kid with their TV time: the daily base, plus what they earned. */
 export function Kids() {
   const {bundle, refresh} = useFamily();
   const {t} = useI18n();
@@ -34,7 +33,7 @@ export function Kids() {
                 <Avatar avatar={child.avatar} color={child.color} size={56} />
                 <span className="grow">
                   <span className="row-title">{child.name}</span>
-                  <TimeLabel minutes={minutesFromSec(child.balanceSec)} max={8} />
+                  <KidTime child={child} max={4} />
                 </span>
                 <Icon name="chevron" />
               </Link>

@@ -1,5 +1,7 @@
 import type {Chore, Child, Claim, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, Ref} from './types';
 
+export type ChildProfile = Partial<Pick<Child, 'name' | 'avatar' | 'color' | 'age' | 'dailyBaseMin' | 'games'>>;
+
 /** How a claim gets decided: everything in it happens at once, or not at all. */
 export interface Decision {
   /** The claim after the decision. It must still be waiting when this is written. */
@@ -38,8 +40,8 @@ export interface Repo {
   listChildren(familyId: string): Promise<Child[]>;
   getChild(familyId: string, childId: string): Promise<Child | undefined>;
   putChild(familyId: string, child: Child): Promise<void>;
-  /** Name, avatar, colour, age and games only: balances and counters are never overwritten. */
-  updateChildProfile(familyId: string, childId: string, profile: Partial<Pick<Child, 'name' | 'avatar' | 'color' | 'age' | 'games'>>): Promise<Child | undefined>;
+  /** Name, avatar, colour, age, daily base and games only: balances and counters are never overwritten. */
+  updateChildProfile(familyId: string, childId: string, profile: ChildProfile): Promise<Child | undefined>;
   /** The child and everything about them: ledger, claims, slots, refs. (Jobs are updated by the caller.) */
   deleteChild(familyId: string, childId: string): Promise<void>;
 
@@ -59,13 +61,18 @@ export interface Repo {
   /** Claims decided at or after `since`, the most recently decided first, at most `limit`. */
   decidedClaims(familyId: string, since: number, limit: number): Promise<Claim[]>;
 
-  /** Appends the entry and adds it to the child's balance (and `debtSec` to the penalty debt). */
-  addEntry(familyId: string, entry: LedgerEntry, options?: {ref?: {id: string; value: Ref}; debtSec?: number}): Promise<'ok' | 'duplicate' | 'no_child'>;
+  /**
+   * Appends the entry and adds it to the child's balance (and `debtSec` to the penalty debt). With `minBalanceSec`,
+   * only if the balance is at least that much. "changed": the child is gone, or the balance is below it.
+   */
+  addEntry(familyId: string, entry: LedgerEntry, options?: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number}): Promise<'ok' | 'duplicate' | 'changed'>;
   creditGame(familyId: string, ref: string, credit: GameCredit): Promise<'ok' | 'duplicate' | 'changed'>;
   getRef(familyId: string, childId: string, id: string): Promise<Ref | undefined>;
   /** The newest `limit` entries, newest first. */
   entries(familyId: string, childId: string, limit: number): Promise<LedgerEntry[]>;
   pendingEntries(familyId: string, childId: string): Promise<LedgerEntry[]>;
+  /** BONUS and PENALTY entries of all the family's kids made at or after `since`, newest first. */
+  adjustments(familyId: string, since: number): Promise<LedgerEntry[]>;
   /** Marks PENDING entries done or skipped and takes `debtPaidSec` off the debt; false if one wasn't PENDING. At most 99 entries. */
   settleEntries(familyId: string, childId: string, entries: LedgerEntry[], status: Exclude<HandoffStatus, 'PENDING'>, debtPaidSec: number): Promise<boolean>;
 

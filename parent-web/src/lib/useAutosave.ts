@@ -1,15 +1,16 @@
-import {useEffect, useRef} from 'react';
+import {useEffect, useRef, useState} from 'react';
 
 /**
  * Saves `value` a moment after the last change, so a run of taps on a stepper is one request. A save still
  * waiting when the screen closes goes out then. Values equal (as JSON) to the last saved one are skipped,
- * including the one the screen opened with.
+ * including the one the screen opened with. Returns true for a moment after each save, for a "Saved" note.
  */
-export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, delayMs = 600) {
+export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, delayMs = 600): boolean {
   const json = JSON.stringify(value);
   const savedJson = useRef(json);
   const pending = useRef<T | null>(null);
   const latestSave = useRef(save);
+  const [justSaved, setJustSaved] = useState(false);
   useEffect(() => {
     latestSave.current = save;
   });
@@ -19,7 +20,13 @@ export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, dela
     pending.current = null;
     if (next === null) return;
     const nextJson = JSON.stringify(next);
-    latestSave.current(next).then(() => (savedJson.current = nextJson), () => undefined);
+    latestSave.current(next).then(
+      () => {
+        savedJson.current = nextJson;
+        setJustSaved(true);
+      },
+      () => undefined,
+    );
   });
 
   useEffect(() => {
@@ -30,4 +37,12 @@ export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, dela
   }, [json, delayMs]);
 
   useEffect(() => () => flush.current(), []);
+
+  useEffect(() => {
+    if (!justSaved) return;
+    const timer = setTimeout(() => setJustSaved(false), 1600);
+    return () => clearTimeout(timer);
+  }, [justSaved]);
+
+  return justSaved;
 }

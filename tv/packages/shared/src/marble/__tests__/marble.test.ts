@@ -4,7 +4,7 @@ import {bank, DAILY_GAME_MARBLES, isQuestionValid, JOB_ICONS, Question, question
 import {LANGS, STRINGS} from '../i18n';
 import {CAPS_WIDTH, fitFontSize, linesNeeded} from '../fit';
 import type {ServerState} from '../api';
-import {applyServer, checkPin, initialState, isDone, Link, localDay, marblesIn, reducer, restore, State, toSaved} from '../logic';
+import {applyServer, checkPin, initialState, isDone, Link, localDay, marblesIn, reducer, restore, State, takenToday, timeToday, toSaved} from '../logic';
 import {sha256Hex} from '../sha256';
 import {spokenLines, voiceKey} from '../voiceLines';
 import {VOICES} from '../voices';
@@ -71,7 +71,7 @@ describe('jar and approvals', () => {
     const s = claimed(initialState);
     const yes = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10});
     expect(yes.balances.mia).toBe(initialState.balances.mia + 10);
-    expect(yes.celebrations).toEqual([{kidId: 'mia', marbles: 2, jobId: 'toys'}]);
+    expect(yes.celebrations).toEqual([{id: s.claims[0].id, kidId: 'mia', marbles: 2, why: {kind: 'job', jobId: 'toys'}}]);
     const no = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: false, minutes: 0});
     expect(no.balances.mia).toBe(initialState.balances.mia);
     expect(no.celebrations).toHaveLength(0);
@@ -197,7 +197,7 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
 
   it('takes in the family, time and settings from the backend', () => {
     const s = applyServer(paired, server, now);
-    expect(s.family.kids).toEqual([{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', avatarBg: expect.any(String), age: 6}]);
+    expect(s.family.kids).toEqual([{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', avatarBg: expect.any(String), age: 6, dailyBaseMin: 30}]);
     expect(s.family.jobs.k1.map(j => j.id)).toEqual(['c1', 'c2']);
     expect(s.family.games.k1.map(g => g.topic)).toEqual(['numbers']);
     expect(s.balances).toEqual({k1: 25});
@@ -211,9 +211,32 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     s = reducer(s, {type: 'sent', id});
     const approved = {...server, claims: [{id, childId: 'k1', choreId: 'c1', status: 'approved' as const, minutes: 10, createdAt: now, decidedBy: 'parent' as const}]};
     s = applyServer(applyServer(s, {...approved, claims: [{...approved.claims[0], status: 'waiting'}]}, now), approved, now);
-    expect(s.celebrations).toEqual([{kidId: 'k1', marbles: 2, jobId: 'c1'}]);
+    expect(s.celebrations).toEqual([{id, kidId: 'k1', marbles: 2, why: {kind: 'job', jobId: 'c1'}}]);
     // A TV paired after the approval doesn't replay old news.
     expect(applyServer(paired, approved, now).celebrations).toEqual([]);
+  });
+
+  it('celebrates a bonus from the phone once, and explains minutes taken away today', () => {
+    const bonus = {id: 'b1', childId: 'k1', deltaMin: 10, reason: 'Helped grandma', at: now};
+    const taken = {id: 'p1', childId: 'k1', deltaMin: -5, reason: 'Left the toys out', at: now};
+    let s = applyServer(paired, server, now); // the first sync after pairing
+    expect(applyServer(paired, {...server, adjustments: [bonus]}, now).celebrations).toEqual([]); // old news isn't replayed
+    s = applyServer(s, {...server, adjustments: [taken, bonus]}, now);
+    expect(s.celebrations).toEqual([{id: 'b1', kidId: 'k1', marbles: 2, why: {kind: 'bonus', reason: 'Helped grandma'}}]);
+    expect(applyServer(s, {...server, adjustments: [taken, bonus]}, now).celebrations).toHaveLength(1); // not twice
+    expect(takenToday(s, 'k1', now)).toEqual([taken]);
+    expect(takenToday(s, 'k1', now + 86400000)).toEqual([]);
+  });
+
+  it('the jar holds the daily base plus what was earned', () => {
+    const s = applyServer(paired, {...server, children: [{...server.children[0], dailyBaseMin: 30}]}, now);
+    expect(timeToday(s, 'k1')).toBe(30 + 25);
+    expect(applyServer(paired, server, now).family.kids[0].dailyBaseMin).toBe(30); // an older backend: the default
+  });
+
+  it('drops celebrations saved in the old shape instead of showing them wrong', () => {
+    const old = {...toSaved(initialState), celebrations: [{kidId: 'mia', marbles: 2, jobId: 'toys'}]};
+    expect(restore(initialState, old).celebrations).toEqual([]);
   });
 
   it('a job approved today is off the board until tomorrow; a one-off job for good', () => {

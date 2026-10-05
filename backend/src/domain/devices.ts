@@ -3,10 +3,10 @@ import {recentClaims} from './claims';
 import type {Deps} from './deps';
 import {ApiError, busy, conflict, notFound} from './errors';
 import {newDeviceToken, newId, newPairingCode, sha256Hex} from './secrets';
-import {localDay, MINUTE} from './time';
+import {localDay, MINUTE, WEEK} from './time';
 import type {Device, Family, Pairing} from './types';
 import type {ConfirmInput, DevicePatch} from './validate';
-import {byCreated, childView, choreView, claimView, deviceView} from './views';
+import {adjustmentView, byCreated, childView, choreView, claimView, deviceView, newestFirst} from './views';
 
 const PAIRING_TIME = 10 * MINUTE;
 /** Ordinary requests write `lastSeen` at most this often (the TV polls every few seconds); heartbeats always do. */
@@ -97,14 +97,14 @@ export async function heartbeat(deps: Deps, family: Family, device: Device, appV
 }
 
 /**
- * Everything the TV shows (DeviceState). The ETag covers everything except `serverTime`, which changes on every
- * call: an unchanged board answers If-None-Match with 304.
+ * Everything the calling TV shows (DeviceState). The ETag covers everything except `serverTime`, which changes on
+ * every call: an unchanged board answers If-None-Match with 304.
  */
-export async function deviceState(deps: Deps, family: Family) {
+export async function deviceState(deps: Deps, family: Family, device: Device) {
   const now = deps.now();
   const today = localDay(now, family.timezone);
-  const [children, chores, claims] = await Promise.all([
-    deps.repo.listChildren(family.id), deps.repo.listChores(family.id), recentClaims(deps, family.id, now),
+  const [children, chores, claims, adjustments] = await Promise.all([
+    deps.repo.listChildren(family.id), deps.repo.listChores(family.id), recentClaims(deps, family.id, now), deps.repo.adjustments(family.id, now - WEEK),
   ]);
   children.sort(byCreated);
   const state = {
@@ -112,8 +112,11 @@ export async function deviceState(deps: Deps, family: Family) {
       id: family.id, name: family.name, lang: family.lang, caps: family.caps, voice: family.voice,
       pin: family.pin && {salt: family.pin.salt, hash: family.pin.hash},
     },
+    device: {id: device.id, name: device.name, mode: device.mode},
     children: children.map(childView),
     chores: chores.filter(k => k.childIds.length > 0).sort(byCreated).map(choreView),
+    // Bonuses and taken-away minutes of the last 7 days, so the TV can say why a jar changed.
+    adjustments: adjustments.sort(newestFirst).map(adjustmentView),
     claims: claims.map(claimView),
     gameMarblesToday: Object.fromEntries(children.map(c => [c.id, c.gameDay === today ? (c.gameMarbles ?? 0) : 0])),
     today,

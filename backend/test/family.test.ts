@@ -43,7 +43,35 @@ describe('kids', () => {
     expect(f.mia.games).toEqual({topics: ['numbers', 'puzzles'], dailyCapMarbles: 4});
     expect(f.leo.games).toEqual({topics: ['numbers', 'words', 'puzzles'], dailyCapMarbles: 4});
     const {body: ann} = await f.mom.post('/children', {name: 'Ann', avatar: 'bunny', color: 'mint', age: 3, games: {topics: ['words']}});
-    expect(ann).toEqual({id: expect.any(String), name: 'Ann', avatar: 'bunny', color: 'mint', age: 3, balanceSec: 0, games: {topics: ['words'], dailyCapMarbles: 4}});
+    expect(ann).toEqual({
+      id: expect.any(String), name: 'Ann', avatar: 'bunny', color: 'mint', age: 3, balanceSec: 0, dailyBaseMin: 30, games: {topics: ['words'], dailyCapMarbles: 4},
+    });
+  });
+
+  it('gives every kid a daily base (default 30 min) that the parent sets; it is not in the ledger or the hand-off', async () => {
+    const f = await family();
+    expect(f.mia.dailyBaseMin).toBe(30);
+    const {body: none} = await f.mom.post('/children', {name: 'Ann', avatar: 'bunny', color: 'mint', age: 3, dailyBaseMin: 0});
+    expect(none.dailyBaseMin).toBe(0);
+    const {body: changed} = await f.mom.patch(`/children/${f.mia.id}`, {dailyBaseMin: 240});
+    expect(changed).toMatchObject({dailyBaseMin: 240, balanceSec: 0});
+    expect((await f.tv.get('/device/state')).body.children[0].dailyBaseMin).toBe(240);
+    expect((await f.mom.get(`/children/${f.mia.id}/ledger`)).body.entries).toEqual([]);
+    expect((await f.mom.get(`/children/${f.mia.id}/handoff`)).body.pendingMinutes).toBe(0);
+    for (const dailyBaseMin of [-5, 245, 7, 2.5, '30']) {
+      const res = await f.mom.patch(`/children/${f.mia.id}`, {dailyBaseMin});
+      expect(res.status).toBe(400);
+      expect(res.body.error.message).toMatch(/^dailyBaseMin /);
+    }
+  });
+
+  it('reads kids stored before the daily base existed as 30 min', async () => {
+    const f = await family();
+    const {body: bundle} = await f.mom.get('/family');
+    const {dailyBaseMin: _, ...stored} = (await f.repo.getChild(bundle.family.id, f.leo.id))!;
+    await f.repo.deleteChild(bundle.family.id, f.leo.id);
+    await f.repo.putChild(bundle.family.id, stored);
+    expect((await f.mom.get('/family')).body.children[1]).toEqual({...f.leo, dailyBaseMin: 30});
   });
 
   it('edits a kid without touching the balance', async () => {

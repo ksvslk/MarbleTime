@@ -25,7 +25,7 @@ npm run dev -- --seed       # … with the demo family (below)
 npx cdk synth               # CloudFormation template in cdk.out/; needs no AWS account
 ```
 
-**Dev server.** Parents sign in with `Authorization: Bearer dev-<name>` (parent id `dev-<name>`); only the dev server accepts this. CORS is `*`. `PWA_URL` (default `http://192.168.0.100:5173`) is where pairing links point. `--seed` creates the family of parent `dev-demo`: English, Europe/Tallinn, PIN 1234, Mia (5, bear, gold, numbers + puzzles, 35 min) and Leo (8, bunny, sky, words + numbers, 20 min), daily cap 4, and the sample jobs from `data.ts`. It also creates a paired TV whose token is `dev-tv`, so a TV build can use `Authorization: Device dev-tv` without pairing.
+**Dev server.** Parents sign in with `Authorization: Bearer dev-<name>` (parent id `dev-<name>`); only the dev server accepts this. CORS is `*`. `PWA_URL` (default `http://192.168.0.100:5173`) is where pairing links point. `--seed` creates the family of parent `dev-demo`: English, Europe/Tallinn, PIN 1234, Mia (5, bear, gold, numbers + puzzles, 35 min) and Leo (8, bunny, sky, words + numbers, 20 min), daily base 30 min, daily cap 4, and the sample jobs from `data.ts`. It also creates a paired TV whose token is `dev-tv`, so a TV build can use `Authorization: Device dev-tv` without pairing.
 
 **Smoke test** (repo root): `scripts/api-smoke.sh` runs pair → claim on the TV → approve as parent → new balance on the TV against `API` (default `http://localhost:8787`), then cleans up. For a deployed API: `API=<ApiUrl> PARENT_TOKEN=<Cognito token> scripts/api-smoke.sh`.
 
@@ -51,6 +51,7 @@ One table, `PK`/`SK`, GSI1 (`GSI1PK`/`GSI1SK`), TTL attribute `ttl`. The full ke
 - **"Once per day"** is a slot item, `SLOT#<child>#<job>#<day>` (or `#once`), taken in the same transaction as the claim, so two TVs can't both claim the same job at once.
 - **Idempotency** records, `REF#<child>#<client id>`, store what an adjust or game result produced, so a repeat returns it (TTL 30 days).
 - **Today's game marbles** are a counter on the child (`gameDay`, `gameMarbles`), updated with the GAME entry and the balance in one transaction. The update is conditional, so parallel results can't pass the cap.
+- **Bonuses and taken-away minutes** (BONUS and PENALTY entries) are also on GSI1 (`ADJ#<family>` / `<createdAt>#<id>`), so the TV's 7-day list is one small query per poll.
 - **Tokens:** GSI1 `TOKEN#<sha256>` sits on the device item. The token is made when the TV first polls after the parent confirmed, and only its hash is stored. GSI reads are eventually consistent, so a miss looks once more after 300 ms; a just-paired TV isn't turned away.
 
 ## Decisions on points the contract leaves open
@@ -60,16 +61,18 @@ One table, `PK`/`SK`, GSI1 (`GSI1PK`/`GSI1SK`), TTL attribute `ttl`. The full ke
 - **One-off jobs** ("gone once approved"). When a kid's claim is approved, the kid comes off the job; the job is deleted when nobody is left. A kid can't have a second waiting claim on it. Claiming a job you're not on is `409 not_on_board`.
 - **Deleting a kid** deletes their ledger, claims and idempotency records and takes them off their jobs; a job left with nobody is deleted, so `Chore.childIds` never goes empty.
 - **DELETE is idempotent:** 204 even when already gone (kids, jobs, TVs, claims).
-- **Hand-off debt** is a running `debtSec` on the child. A PENALTY adds to it. Marking entries DONE pays the debt from those entries' minutes, because the parent added that much less; SKIPPED pays nothing.
+- **Taking minutes away never goes below an empty jar.** A minus takes `min(asked, minutes in the jar)`, and the PENALTY records what was actually taken. With nothing in the jar it's `409 empty_jar` and nothing is written. The write checks the jar still holds that much, so two minuses at once can't overdraw it. Balances are never negative.
+- **Hand-off debt** is a running `debtSec` on the child. A PENALTY adds what it took. Marking entries DONE pays the debt from those entries' minutes, because the parent added that much less; SKIPPED pays nothing.
   - `pendingMinutes = max(0, floor((Σ PENDING − debt) / 60))`.
   - CHORE, GAME and BONUS entries are PENDING whatever the TV's mode; the parent app decides when to show the hand-off.
   - Penalties are not hand-off entries (the PWA can show the debt as Σ entries − pendingMinutes).
-  - Balances can go below zero.
+- **Daily base** (`dailyBaseMin`, default 30, 0–240 in steps of 5) is a setting on the kid: not in the ledger, not in the hand-off, not in the balance. Kids stored before it existed read as 30.
 - **Games.** Every posted result is a finished game: 2 marbles, capped by `dailyCapMarbles` minus the GAME marbles of the family's current local day (server time). `correct`/`total` are checked but don't change the reward. The topic isn't checked against the kid's topics, so a TV with stale settings doesn't lose marbles. The entry's `reason` is the topic.
 - **Pairing.** After the token has been handed out, polls say `paired` without it. If the parent removed the TV before it fetched its token, the poll says `expired`. A waiting code past 10 minutes is `expired` (poll) or `410` (confirm). Codes are kept a day past expiry, then 404.
   - Confirming again from the same family returns the same TV with `200`; another family gets `409 already_paired`.
   - Codes are case-insensitive; a malformed one is `400`.
-- **ETag** covers everything in DeviceState except `serverTime`, which changes every call and would make a 304 impossible.
+- **ETag** covers everything in DeviceState except `serverTime`, which changes every call and would make a 304 impossible. That includes the calling TV's `device` (name, mode) and `adjustments`.
+- **`adjustments`** in DeviceState are the BONUS and PENALTY entries of all the family's kids from the last 7 days (by `createdAt`), newest first; `deltaMin` is what was applied (a clamped minus shows what was taken).
 - **Lists.** The TV's claims are all waiting ones plus those decided in the last 7 days (by `decidedAt`). `GET /claims` returns every waiting claim plus the 200 most recently decided (then filtered by `status`), newest first. Kids, jobs and TVs come oldest first.
 - **lastSeen** is written by ordinary TV requests at most once a minute, and by every heartbeat (`appVersion` is stored, not exposed).
 - **PIN on the TV.** After 5 wrong PINs within a minute on one TV, the next try gets `429 too_many_tries` with `Retry-After`, even with the right PIN. A family without a PIN gets `403 no_pin`.
@@ -89,16 +92,21 @@ One table, `PK`/`SK`, GSI1 (`GSI1PK`/`GSI1SK`), TTL attribute `ttl`. The full ke
   - `wrong_pin`, `no_pin` (403)
   - `not_found`, `no_family` (404)
   - `method_not_allowed` (405)
-  - `family_exists`, `already_claimed`, `not_on_board`, `not_today`, `already_decided`, `already_paired`, `id_in_use`, `busy` (409)
+  - `family_exists`, `already_claimed`, `not_on_board`, `not_today`, `already_decided`, `already_paired`, `empty_jar`, `id_in_use`, `busy` (409)
   - `expired` (410), `too_many_tries` (429, `Retry-After`)
 - **TV:**
   - Send `Authorization: Device <token>`. Poll `GET /device/state` with `If-None-Match: <last ETag>`; a `304` has no body.
   - `401` means unpaired: start pairing again. If a pairing poll says `paired` without a token, the token was already handed out: start over.
   - Outbox: drop a request on 4xx other than 401 and 429; retry on 5xx and network errors.
-  - Claims may name jobs that were deleted (use the claim's `choreTitle` and `minutes`). A balance can be negative (show an empty jar).
+  - Claims may name jobs that were deleted (use the claim's `choreTitle` and `minutes`).
+  - `device.mode` is this TV's enforcement mode, and `device.name` its name; both follow changes in the parent app.
+  - `adjustments` say why a jar changed: a positive `deltaMin` is a bonus to celebrate, a negative one a calm line with the reason. Use `id` to show each one once.
+  - `dailyBaseMin` is each kid's daily screen time before earning; it isn't in `balanceSec`.
 - **Parent app:**
   - Send `Authorization: Bearer <Cognito access or ID token>` for this app client.
   - Callback URLs `/` and `/callback`, logout `/`, on `http://localhost:5173` and the CloudFront URL.
   - After deploy, `GET /config.json` on the app's own origin has the API and Cognito settings.
   - Pair page `/pair/:code` → `POST /pairings/{code}/confirm`: `201` new TV, `200` already yours, `404`, `410` expired, `409` someone else's.
+  - A minus may take less than asked: show `entry.deltaSec` from the answer (what was taken). `409 empty_jar` means there was nothing to take.
+  - `dailyBaseMin` is set on POST/PATCH `/children` (default 30).
   - CORS allows `authorization`, `content-type`, `if-none-match` and exposes `etag`.

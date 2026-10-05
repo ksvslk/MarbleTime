@@ -21,27 +21,32 @@ async function balance(deps: Deps, familyId: string, entry: LedgerEntry) {
   return {balanceSec: child.balanceSec, entry: entryView(entry)};
 }
 
-/** Bonus (+) or penalty (−) minutes. With a client `id`, a repeat returns the first answer and changes nothing. */
+/**
+ * Bonus (+) or minutes taken away (−), with a reason. Taking away stops at an empty jar: it takes at most the
+ * minutes in the jar, the PENALTY records what was actually taken, and an empty jar is 409 empty_jar.
+ * With a client `id`, a repeat returns the first answer and changes nothing.
+ */
 export async function adjust(deps: Deps, family: Family, parent: Parent, childId: string, input: AdjustInput) {
-  const earlier = await previousAdjust(deps, family.id, childId, input.id);
-  if (earlier) return balance(deps, family.id, earlier);
-  const deltaSec = input.deltaMin * 60;
-  const entry: LedgerEntry = {
-    id: newId(), childId, deltaSec, type: deltaSec > 0 ? 'BONUS' : 'PENALTY', reason: input.reason,
-    createdBy: `parent:${parent.sub}`, createdAt: deps.now(), ...(deltaSec > 0 && {handoff: 'PENDING' as const}),
-  };
-  const result = await deps.repo.addEntry(family.id, entry, {
-    ...(input.id !== undefined && {ref: {id: input.id, value: {kind: 'adjust', entry}}}),
-    debtSec: Math.max(0, -deltaSec),
-  });
-  if (result === 'no_child') throw notFound('child');
-  if (result === 'duplicate') {
-    // The same request landed at the same moment; answer like it did.
-    const first = await previousAdjust(deps, family.id, childId, input.id);
-    if (!first) throw busy();
-    return balance(deps, family.id, first);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const earlier = await previousAdjust(deps, family.id, childId, input.id);
+    if (earlier) return balance(deps, family.id, earlier);
+    const child = await requireChild(deps, family.id, childId);
+    const deltaMin = input.deltaMin > 0 ? input.deltaMin : -Math.min(-input.deltaMin, Math.floor(child.balanceSec / 60));
+    if (deltaMin === 0) throw conflict('empty_jar', 'The jar is empty: there are no minutes to take away');
+    const deltaSec = deltaMin * 60;
+    const entry: LedgerEntry = {
+      id: newId(), childId, deltaSec, type: deltaSec > 0 ? 'BONUS' : 'PENALTY', reason: input.reason,
+      createdBy: `parent:${parent.sub}`, createdAt: deps.now(), ...(deltaSec > 0 && {handoff: 'PENDING' as const}),
+    };
+    const result = await deps.repo.addEntry(family.id, entry, {
+      ...(input.id !== undefined && {ref: {id: input.id, value: {kind: 'adjust', entry}}}),
+      // What was taken adds to the hand-off debt, and the jar must still hold it when this is written.
+      ...(deltaSec < 0 && {debtSec: -deltaSec, minBalanceSec: -deltaSec}),
+    });
+    if (result === 'ok') return balance(deps, family.id, entry);
+    // The same request landed at the same moment, or the jar changed (or the kid is gone): look again.
   }
-  return balance(deps, family.id, entry);
+  throw busy();
 }
 
 /** The entry an earlier request with this client id made, if any. */

@@ -4,12 +4,11 @@ import {ApiError, busy, conflict, notFound} from './errors';
 import {bumped, withoutChild} from './family';
 import type {Decision} from './repo';
 import {newId, pinMatches} from './secrets';
-import {DAY, isoWeekday, localDay, MINUTE} from './time';
+import {isoWeekday, localDay, MINUTE, WEEK} from './time';
 import type {Claim, ClaimStatus, Device, Family, LedgerEntry} from './types';
 import type {ClaimInput, DecideInput} from './validate';
 import {claimView, newestFirst} from './views';
 
-const WEEK = 7 * DAY;
 /** GET /claims shows every waiting claim and at most this many decided ones, the latest first. */
 const HISTORY = 200;
 /** Wrong grown-ups PINs allowed per TV per minute; the next try gets 429. */

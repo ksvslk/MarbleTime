@@ -1,6 +1,6 @@
 import {createHash} from 'node:crypto';
 import {describe, expect, it} from 'vitest';
-import {DAY, family, MONDAY_NOON} from './helpers';
+import {DAY, family, MONDAY_NOON, pairTv} from './helpers';
 
 describe('GET /device/state', () => {
   it('has everything the TV needs', async () => {
@@ -9,12 +9,14 @@ describe('GET /device/state', () => {
     const res = await f.tv.get('/device/state');
     expect(res.status).toBe(200);
     const state = res.body;
-    expect(Object.keys(state)).toEqual(['family', 'children', 'chores', 'claims', 'gameMarblesToday', 'today', 'serverTime']);
+    expect(Object.keys(state)).toEqual(['family', 'device', 'children', 'chores', 'adjustments', 'claims', 'gameMarblesToday', 'today', 'serverTime']);
     expect(state.family).toEqual({id: expect.any(String), name: 'Test family', lang: 'en', caps: false, voice: true, pin: {salt: expect.any(String), hash: expect.any(String)}});
     // The TV checks the PIN offline: hex(sha256(salt + ":" + pin)).
     expect(createHash('sha256').update(`${state.family.pin.salt}:1234`).digest('hex')).toBe(state.family.pin.hash);
+    expect(state.device).toEqual({id: f.deviceId, name: 'Living room', mode: 'amazon_kids'});
     expect(state.children).toEqual([f.mia, f.leo]);
     expect(state.chores).toEqual([f.toys, f.teeth]);
+    expect(state.adjustments).toEqual([]);
     expect(state.claims).toEqual([claim]);
     expect(state.gameMarblesToday).toEqual({[f.mia.id]: 0, [f.leo.id]: 0});
     expect(state.today).toBe('2026-10-05');
@@ -55,6 +57,45 @@ describe('GET /device/state', () => {
     expect((await f.tv.get('/device/state')).body.claims.map((c: {id: string}) => c.id)).toEqual([waiting.id, old.id]);
     f.clock.now += 1;
     expect((await f.tv.get('/device/state')).body.claims.map((c: {id: string}) => c.id)).toEqual([waiting.id]);
+  });
+
+  it('tells each TV which TV it is, with its mode (and a new ETag when that changes)', async () => {
+    const f = await family();
+    const {tv: kitchen, deviceId: kitchenId} = await pairTv(f, f.mom, 'Kitchen');
+    expect((await kitchen.get('/device/state')).body.device).toEqual({id: kitchenId, name: 'Kitchen', mode: 'amazon_kids'});
+    const before = await f.tv.get('/device/state');
+    await f.mom.patch(`/devices/${f.deviceId}`, {name: 'Den', mode: 'strict'});
+    const after = await f.tv.get('/device/state', {'if-none-match': before.headers.etag});
+    expect(after.status).toBe(200);
+    expect(after.body.device).toEqual({id: f.deviceId, name: 'Den', mode: 'strict'});
+  });
+
+  it('lists bonuses and taken-away minutes of the last 7 days, newest first, as applied', async () => {
+    const f = await family();
+    const adjust = (deltaMin: number, reason: string) => f.mom.post(`/children/${f.mia.id}/adjust`, {deltaMin, reason});
+    const {body: bonus} = await adjust(15, 'Helped grandma');
+    f.clock.now += 1000;
+    const before = await f.tv.get('/device/state');
+    const {body: minus} = await adjust(-10, 'Hit her brother');
+    f.clock.now += 1000;
+    const {body: clamped} = await adjust(-20, 'Still hitting'); // only 5 minutes were left
+    // Jobs and games change jars too, but they are not adjustments.
+    const {body: claim} = await f.claim(f.leo.id, f.teeth.id);
+    await f.mom.post(`/claims/${claim.id}/approve`);
+
+    const after = await f.tv.get('/device/state', {'if-none-match': before.headers.etag});
+    expect(after.status).toBe(200);
+    expect(after.body.adjustments).toEqual([
+      {id: clamped.entry.id, childId: f.mia.id, deltaMin: -5, reason: 'Still hitting', at: MONDAY_NOON + 2000},
+      {id: minus.entry.id, childId: f.mia.id, deltaMin: -10, reason: 'Hit her brother', at: MONDAY_NOON + 1000},
+      {id: bonus.entry.id, childId: f.mia.id, deltaMin: 15, reason: 'Helped grandma', at: MONDAY_NOON},
+    ]);
+    expect(after.body.children[0].balanceSec).toBe(0);
+
+    f.clock.now = MONDAY_NOON + 7 * DAY;
+    expect((await f.tv.get('/device/state')).body.adjustments).toHaveLength(3);
+    f.clock.now += 1;
+    expect((await f.tv.get('/device/state')).body.adjustments.map((a: {deltaMin: number}) => a.deltaMin)).toEqual([-5, -10]);
   });
 
   it('shows new balances right after an approval', async () => {

@@ -23,6 +23,8 @@ export type EntryType = 'ALLOWANCE' | 'CHORE' | 'GAME' | 'BONUS' | 'PENALTY' | '
 export type HandoffStatus = 'PENDING' | 'DONE' | 'SKIPPED';
 
 export const MARBLE_SEC = 300;
+/** Screen time a kid gets every day before earning anything (DailyBase in the contract). */
+export const DAILY_BASE_MIN = 30;
 
 /** A signed-in parent: the Cognito `sub` (the dev server: "dev-<name>"). */
 export interface Parent {
@@ -61,8 +63,10 @@ export interface Child {
   age: number;
   games: GameSettings;
   createdAt: number;
-  /** Earned time. Penalties can take it below zero. */
+  /** Earned time; never below 0 (taking minutes away stops at an empty jar). */
   balanceSec: number;
+  /** Minutes every day before anything is earned: a setting, not in the ledger, not handed off. Missing on kids stored before it existed (= DAILY_BASE_MIN). */
+  dailyBaseMin?: number;
   /** Penalty time not yet netted against an Amazon Kids hand-off (ledger.ts). */
   debtSec: number;
   /** Game marbles earned on `gameDay` (the family's local date), for the daily cap. */

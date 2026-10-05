@@ -544,6 +544,12 @@ input::placeholder {
   font-size: 18px;
   color: var(--ink);
 }
+/* A kid's time: the daily base on one line, "+ marbles earned" on the next. */
+.kid-time {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 
 .avatar {
   display: inline-flex;
@@ -689,6 +695,30 @@ input::placeholder {
 .kid-hero .time-text {
   font-size: 20px;
   color: var(--white);
+}
+
+/* Taking minutes away: smaller than giving, below it (positive first). */
+.take-away {
+  padding-top: 16px;
+  border-top: 1px solid var(--tile-off);
+}
+.take-away .row {
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+.sub-title {
+  font-size: 18px;
+  font-weight: 650;
+}
+.text-link {
+  color: var(--ink);
+  font-weight: 600;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+}
+.text-link .icon {
+  margin-left: 3px;
+  vertical-align: -2px;
 }
 
 .history {

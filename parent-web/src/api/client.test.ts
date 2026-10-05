@@ -49,6 +49,12 @@ describe('API client', () => {
     expect(error).toMatchObject({status: 410, code: 'expired', message: 'The code expired'});
   });
 
+  it('passes on the server’s code, e.g. 409 empty_jar when there is nothing earned to take away', async () => {
+    const {fetch} = fakeFetch(json(409, {error: {code: 'empty_jar', message: 'Nothing earned'}}));
+    const error = await api(fetch).adjust('k1', {id: 'req-2', deltaMin: -10, reason: 'Kept watching'}).catch(e => e);
+    expect(error).toMatchObject({status: 409, code: 'empty_jar'});
+  });
+
   it('copes with an error page that is not JSON', async () => {
     const {fetch} = fakeFetch(new Response('<html>Bad gateway</html>', {status: 502, statusText: 'Bad Gateway'}));
     const error = await api(fetch).family().catch(e => e);

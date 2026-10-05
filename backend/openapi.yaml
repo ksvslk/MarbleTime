@@ -67,7 +67,11 @@ paths:
   /children/{childId}/adjust:
     parameters: [{$ref: '#/components/parameters/childId'}]
     post:
-      summary: Bonus (+) or penalty (−) minutes, with a reason
+      summary: Bonus (+) or taken-away (−) minutes, with a reason
+      description: |
+        Minus only takes earned minutes and never goes below an empty jar: the entry records what was
+        actually taken. With nothing earned, it's 409 `empty_jar`. The TV shows both kinds with the reason
+        (a bonus as a celebration, minus as a calm line on the child's board).
       requestBody:
         required: true
         content:
@@ -81,6 +85,7 @@ paths:
                 reason: {type: string, maxLength: 80}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Balance'}}}}
+        '409': {$ref: '#/components/responses/Error'}
   /children/{childId}/ledger:
     parameters: [{$ref: '#/components/parameters/childId'}]
     get:
@@ -255,7 +260,7 @@ paths:
   # ---------- TV (device token) ----------
   /device/state:
     get:
-      summary: Everything the TV needs (the poll target; ~3 s on screen). Supports If-None-Match → 304.
+      summary: Everything the TV needs (the poll target; ~3 s on screen). Supports If-None-Match → 304; the ETag covers everything except serverTime.
       security: [{device: []}]
       responses:
         '200': {description: OK, headers: {ETag: {schema: {type: string}}}, content: {application/json: {schema: {$ref: '#/components/schemas/DeviceState'}}}}
@@ -450,15 +455,26 @@ components:
         dailyCapMarbles: {type: integer, minimum: 0, maximum: 12, default: 4}
     Child:
       type: object
-      required: [id, name, avatar, color, age, balanceSec, games]
+      required: [id, name, avatar, color, age, balanceSec, dailyBaseMin, games]
       properties:
         id: {type: string}
         name: {type: string, maxLength: 24}
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
-        balanceSec: {type: integer, description: earned minutes × 60}
+        balanceSec: {type: integer, minimum: 0, description: earned minutes × 60 (never below 0)}
+        dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
         games: {$ref: '#/components/schemas/GameSettings'}
+    DailyBase:
+      type: integer
+      minimum: 0
+      maximum: 240
+      multipleOf: 5
+      default: 30
+      description: |
+        Screen time every day, before anything is earned, so TV isn't only a prize. Not in the ledger and
+        not handed off: in Amazon Kids mode the parent sets the same daily limit there; in strict mode the
+        TV starts each day with it.
     ChildInput:
       type: object
       required: [name, avatar, color, age]
@@ -467,6 +483,7 @@ components:
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
+        dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
         games: {$ref: '#/components/schemas/GameSettings'}
     ChildPatch:
       type: object
@@ -475,6 +492,7 @@ components:
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
+        dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
         games: {$ref: '#/components/schemas/GameSettings'}
 
     Repeat:
@@ -569,7 +587,7 @@ components:
     DeviceState:
       type: object
       description: Small on purpose; the TV replaces its local copy with it (claims it has not uploaded yet stay local).
-      required: [family, children, chores, claims, gameMarblesToday, today, serverTime]
+      required: [family, device, children, chores, claims, adjustments, gameMarblesToday, today, serverTime]
       properties:
         family:
           type: object
@@ -585,8 +603,27 @@ components:
               oneOf:
                 - {type: 'null'}
                 - {type: object, required: [salt, hash], properties: {salt: {type: string}, hash: {type: string}}}
+        device:
+          type: object
+          required: [id, name, mode]
+          properties:
+            id: {type: string}
+            name: {type: string}
+            mode: {$ref: '#/components/schemas/DeviceMode'}
         children: {type: array, items: {$ref: '#/components/schemas/Child'}}
         chores: {type: array, items: {$ref: '#/components/schemas/Chore'}, description: only jobs assigned to someone}
+        adjustments:
+          type: array
+          description: bonuses and taken-away minutes from the last 7 days, newest first, so the TV can say why a jar changed
+          items:
+            type: object
+            required: [id, childId, deltaMin, reason, at]
+            properties:
+              id: {type: string, description: the ledger entry id}
+              childId: {type: string}
+              deltaMin: {type: integer, description: 'positive = bonus, negative = taken away (what was actually taken)'}
+              reason: {type: string}
+              at: {type: integer}
         claims: {type: array, items: {$ref: '#/components/schemas/Claim'}, description: 'waiting, plus decided in the last 7 days'}
         gameMarblesToday: {type: object, additionalProperties: {type: integer}, description: childId → game marbles earned today}
         today: {type: string, description: 'the family''s local date, YYYY-MM-DD'}

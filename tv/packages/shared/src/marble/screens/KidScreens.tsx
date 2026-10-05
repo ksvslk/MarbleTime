@@ -3,7 +3,7 @@ import {Image, ScrollView, StyleSheet, View} from 'react-native';
 import {Avatar, ART, Button, FitText, Focusable, Icon, Jar, Marble, MarbleRow, Sparkle, T} from '../components';
 import {KidId, textOf} from '../data';
 import {t} from '../i18n';
-import {balanceOf, isDone, marblesIn, State, useStore, Why} from '../state';
+import {isDone, marblesIn, State, takenToday, timeToday, useStore, Why} from '../state';
 import {colors, MIN_PER_MARBLE, s} from '../theme';
 import {Sound} from '../sound';
 import {Appear, Flip, Twinkle} from '../motion';
@@ -64,11 +64,12 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
   const kid = kidOf(state, kidId);
   const [focused, setFocused] = useState<string | null>(null);
 
+  // Good news from while the kid was away, one "Yay!" at a time.
   useEffect(() => {
-    const mine = state.celebrations.filter(c => c.kidId === kidId);
-    if (mine.length) {
-      dispatch({type: 'celebrated', kidId});
-      dispatch({type: 'go', screen: {name: 'yay', kidId, marbles: mine.reduce((a, c) => a + c.marbles, 0), why: {kind: 'job', jobId: mine[mine.length - 1].jobId}}});
+    const next = state.celebrations.find(c => c.kidId === kidId);
+    if (next) {
+      dispatch({type: 'celebrated', id: next.id});
+      dispatch({type: 'go', screen: {name: 'yay', kidId, marbles: next.marbles, why: next.why}});
     }
   }, [state.celebrations, kidId, dispatch]);
 
@@ -82,7 +83,9 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
     ...(state.family.games[kidId] ?? []).map(g => ({id: `game:${g.id}`, kind: 'game' as const, title: t(lang, g.title), color: g.color, icon: g.topic === 'puzzles' ? ('shapes' as const) : undefined, label: g.label, marbles: g.marbles, waiting: false, go: () => dispatch({type: 'go', screen: {name: 'game', kidId, gameId: g.id}})})),
   ];
   const preferredId = focusId ? (cards.find(c => c.id.endsWith(`:${focusId}`))?.id ?? cards[0]?.id) : cards[0]?.id;
-  const minutes = balanceOf(state, kidId);
+  const minutes = timeToday(state, kidId);
+  // Taken-away minutes are explained, calmly, for the rest of the day.
+  const taken = takenToday(state, kidId);
 
   // Real-life jobs and TV games are both cards; two labelled groups (home, games) tell them apart.
   const groups = [
@@ -137,7 +140,20 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
     <View style={styles.screen}>
       <View style={styles.header}>
         <Avatar art={kid.avatar} bg={kid.avatarBg} size={s(104)} />
-        <FitText text={kid.name} caps={caps} width={s(1400)} max={s(80)} min={s(44)} style={{marginLeft: s(28)}} />
+        <FitText text={kid.name} caps={caps} width={taken.length ? s(560) : s(1400)} max={s(80)} min={s(44)} style={{marginLeft: s(28)}} />
+        {taken.length ? (
+          <View style={[styles.smallChip, {marginLeft: s(40)}]}>
+            <Icon name="clock" size={s(34)} color={colors.soft} />
+            <FitText
+              text={t(lang, 'tookAway', {n: -taken.reduce((sum, a) => sum + a.deltaMin, 0), reason: taken[0].reason})}
+              caps={caps}
+              width={s(820)}
+              max={s(32)}
+              min={s(22)}
+              style={{color: colors.soft, marginLeft: s(14), fontWeight: '500'}}
+            />
+          </View>
+        ) : null}
       </View>
       <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
         <View style={{width: s(460), alignItems: 'center'}}>
@@ -211,7 +227,7 @@ export function ClaimedScreen({kidId, jobId}: {kidId: KidId; jobId: string}) {
         </Appear>
       </View>
       <View style={{width: s(460), alignItems: 'center', marginRight: s(40)}}>
-        <Jar marbles={marblesIn(balanceOf(state, kidId))} />
+        <Jar marbles={marblesIn(timeToday(state, kidId))} />
       </View>
     </View>
   );
@@ -223,7 +239,7 @@ export function YayScreen({kidId, marbles, why}: {kidId: KidId; marbles: number;
   useEffect(() => Sound.play(marbles > 0 ? 'yay' : 'tryAgain'), [marbles]);
   const {lang} = state;
   const caps = capsOf(state);
-  const total = balanceOf(state, kidId);
+  const total = timeToday(state, kidId);
   // The minutes under the jar count up as each new marble lands: one marble, five more minutes.
   const [shown, setShown] = useState(Math.max(0, total - marbles * MIN_PER_MARBLE));
   const job = why.kind === 'job' ? (state.family.jobs[kidId] ?? []).find(j => j.id === why.jobId) : undefined;
@@ -233,7 +249,9 @@ export function YayScreen({kidId, marbles, why}: {kidId: KidId; marbles: number;
       ? t(lang, 'grownupSaidYes', {job: job ? textOf(job.title, lang) : ''})
       : why.kind === 'game'
         ? t(lang, 'finishedGame', {game: t(lang, game?.title ?? 'gameNumbers')})
-        : t(lang, 'capReached');
+        : why.kind === 'bonus'
+          ? t(lang, 'bonusGiven', {reason: why.reason})
+          : t(lang, 'capReached');
   const title = marbles > 0 ? t(lang, 'yay') : t(lang, 'wellDone');
   const say = useSay();
   useEffect(() => {

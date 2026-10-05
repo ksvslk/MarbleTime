@@ -17,8 +17,8 @@ export async function seedDemo(repo: Repo, now: number): Promise<void> {
   );
 
   const kids: [Child, number][] = [
-    [{id: 'mia', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, games: {topics: ['numbers', 'puzzles'], dailyCapMarbles: 4}, createdAt: now, balanceSec: 0, debtSec: 0}, 35],
-    [{id: 'leo', name: 'Leo', avatar: 'bunny', color: 'sky', age: 8, games: {topics: ['words', 'numbers'], dailyCapMarbles: 4}, createdAt: now + 1, balanceSec: 0, debtSec: 0}, 20],
+    [{id: 'mia', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, dailyBaseMin: 30, games: {topics: ['numbers', 'puzzles'], dailyCapMarbles: 4}, createdAt: now, balanceSec: 0, debtSec: 0}, 35],
+    [{id: 'leo', name: 'Leo', avatar: 'bunny', color: 'sky', age: 8, dailyBaseMin: 30, games: {topics: ['words', 'numbers'], dailyCapMarbles: 4}, createdAt: now + 1, balanceSec: 0, debtSec: 0}, 20],
   ];
   for (const [child, minutes] of kids) {
     await repo.putChild(familyId, child);

@@ -57,7 +57,8 @@ A build without them shows "This app isn't set up yet" with the missing names.
   `config.json`: no-cache. `assets/*`: immutable.
 - **Status codes the app acts on:** 401 → renew the token once (refresh token), then sign in again; 404 / 410 from
   `POST /pairings/{code}/confirm` → "This code doesn't work" / "This code has expired"; 409 from approve/reject →
-  "Someone already decided"; 409 from `POST /family` → the family exists, onboarding carries on.
+  "Someone already decided"; 409 `empty_jar` from `POST /children/{id}/adjust` → "Nothing earned to take away" (and
+  the kid's time is fetched again); 409 from `POST /family` → the family exists, onboarding carries on.
 - **Load:** `GET /claims?status=waiting` every 3 s while the approvals page is visible (paused when the phone hides
   the page), and `GET /children/{id}/handoff` per kid on that page (on load, after decisions, every 30 s).
 - `GET /me` may leave out `parent.email` (Cognito access tokens don't carry it); Settings then shows the email from
@@ -74,10 +75,19 @@ A build without them shows "This app isn't set up yet" with the missing names.
   changed but not reset to auto (`ChorePatch` can't unset it). New jobs take turns through peach, mint, sky and lilac.
   "Some days" starts as Mon–Fri.
 - **TV mode** can be changed per TV; `strict` is offered only for `fireos` (the Kotlin module exists only there).
+- **Daily base** (`dailyBaseMin`, 0–240 in 5-minute steps, 30 for a new kid): set in onboarding's first-kid step, the
+  kid form, and its own card on the kid's page (saved as the grown-up taps). The text under it says it's TV time every
+  day before anything is earned; in Amazon Kids mode it adds that Amazon Kids needs the same daily limit, with a link
+  to parents.amazon.com. A kid's time always shows the base apart from what was earned: "30 min every day" and
+  "+ 35 min earned" (the marbles are only the earned part, as in the TV's jar).
+- **Positive first:** "Give minutes" is the main card with the gold button. "Take away minutes" is a smaller button
+  under it that opens its own form. It can take at most what was earned, in whole 5-minute steps (less than 5 earned
+  minutes can't be taken), and is greyed out with "Nothing earned to take away" when the jar is empty. Both need a
+  reason; the take-away form says the TV shows the kid the reason. The toast reports what the server actually took.
 - **± time** sends a client UUID `id`; a retry of the same change after a network error keeps it, so it counts once.
-  The reason is required (trimmed, ≤ 80).
+  The reason is trimmed, ≤ 80 characters.
 - **Not yet** = `POST /claims/{id}/reject`.
-- **History** shows the last 50 ledger entries; minutes are whole (a part-minute of debt shows as a minute owed).
+- **History** shows the last 50 ledger entries in whole minutes (a part-minute taken counts as a minute).
 - **Language:** the family's (from the server) once signed in; before that the browser's first supported one.
 - Docs mention per-kid "read aloud" and a preview of the day's questions; neither is in the contract yet, so the app
   has only the family-wide "Read aloud" switch.

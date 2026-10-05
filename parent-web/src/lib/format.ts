@@ -6,7 +6,7 @@ import {MIN_PER_MARBLE} from '../tokens';
 /** Whole marbles in some minutes (a part-marble isn't shown, as on the TV); none for zero or less. */
 export const marblesFor = (minutes: number) => (minutes > 0 ? Math.floor(minutes / MIN_PER_MARBLE) : 0);
 
-/** Whole minutes in a balance. A part-minute of debt still counts as a minute owed. */
+/** Whole minutes. A balance (never below 0) rounds down; a part-minute taken (a negative change) counts as a minute. */
 export const minutesFromSec = (sec: number) => (sec >= 0 ? Math.floor(sec / 60) : -Math.ceil(-sec / 60));
 
 const MINUS = '−';
@@ -17,6 +17,12 @@ export function formatMinutes(lang: Lang, minutes: number, signed = false): stri
   if (minutes < 0) return MINUS + text;
   return signed ? `+${text}` : text;
 }
+
+/** The daily base, which isn't in the jar: "30 min every day". */
+export const dailyBaseText = (lang: Lang, minutes: number) => translate(lang, 'perDay', {min: formatMinutes(lang, minutes)});
+
+/** What the kid earned on top of the daily base (the marbles in the jar): "15 min earned". */
+export const earnedText = (lang: Lang, balanceSec: number) => translate(lang, 'earned', {min: formatMinutes(lang, minutesFromSec(balanceSec))});
 
 /** ISO weekday (1 = Monday … 7 = Sunday) as a short name in the language. */
 export function weekdayName(lang: Lang, isoDay: number): string {

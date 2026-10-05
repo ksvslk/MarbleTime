@@ -53,7 +53,7 @@ flowchart TB
 
 | | Amazon Kids mode | Strict mode | API mode (mock) |
 |---|---|---|---|
-| Daily base allowance | Amazon Kids daily limit | `ALLOWANCE` ledger entry | the API |
+| Daily base (each child's `dailyBaseMin`, default 30) | set the same daily limit in Amazon Kids | each day starts with it | the API |
 | After approval | PWA shows **"Add 15 min in Amazon Kids"**, which opens `parents.amazon.com`; the parent marks it done | balance goes up → unlock | backend calls the mocked `grantBonusTime` |
 | Penalty | netted against the next hand-off ("debt") | balance goes down (may go negative) | the API |
 | TV shows | minutes earned today / this week, pending hand-offs | minutes remaining (live) | minutes remaining |
@@ -187,6 +187,7 @@ flowchart LR
 
 - **Append-only ledger.** Each entry is `{id, childId, deltaSec, type, reason, refId, createdBy, createdAt, handoff?}`. The type is one of `ALLOWANCE | CHORE | GAME | BONUS | PENALTY | USAGE | ADJUST`.
 - **Atomic balance.** The balance is stored on the child item and updated **in the same DynamoDB transaction** as the ledger write. Client-generated UUIDs + conditional puts make retries harmless.
+- **Daily base, positive first** (decided Oct 5, after reading the research on screen time as reward/punishment): every child has a daily base (`dailyBaseMin`) so TV isn't only a prize; jobs and games earn extra on top. The base is a setting, not a ledger entry. Taking minutes away only takes *earned* minutes and never goes below an empty jar (409 `empty_jar` when nothing is earned); the TV explains it with the parent's reason. Bonuses are celebrated on the TV.
 - **Hand-off (Amazon Kids mode).**
   - Positive entries get `handoff: PENDING → DONE | SKIPPED`.
   - `GET /children/{id}/handoff` returns *pending minutes minus outstanding penalty debt*. That is what the PWA suggests adding in Amazon Kids.
@@ -329,6 +330,7 @@ The [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh) has all 1
 - **Type and layout:** Fredoka; text at least 24 px at 1080p; 5% overscan-safe margins.
 - **Any text must fit, and look good.** Names and jobs come from parents, questions from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines (and in the box's height, where it has one, like a card title above the marbles), and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
 - **Languages:** English, Estonian, German, Spanish (a family setting). Optional **CAPITAL LETTERS** for kid-facing text.
+- **Positive first.** The jar shows the daily base plus what was earned. A bonus from the phone is a "Yay!" with the parent's reason; minutes taken away show as a calm line with the reason on the kid's board for the rest of the day. No red, no sad sounds.
 - **Motion marks the moments that matter, briefly** (`tv/packages/shared/src/marble/motion.tsx`): screens fade in; cards and answers arrive one after another; the selected item springs up and squishes on OK; "I did it!" pops the job in and turns the hourglass over; a wrong answer shakes gently, then fades; a right one grows, gets a check and counts the apples; each marble lands with a clink and adds its 5 minutes to the clock as it lands. Transform and opacity only, on the native driver, so it stays smooth on the stick. Animations never block the remote: everything stays focusable and pressable while it moves.
 - **Sounds** are short game effects (Android SoundPool via our `marble-audio` module), never a media session, so the remote's play/pause stays with the video apps.
 - **Read-aloud** plays recorded clips only (`scripts/make-voices.py`: Polly for en/de/es, Neurokõne for Estonian), one line after another; a line without a clip stays silent rather than using a robot voice. On by default; grown-ups can turn it off.

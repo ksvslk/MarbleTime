@@ -78,6 +78,7 @@ const timezone: Check<string> = (value, path) => {
   return value;
 };
 const minutes = integer(5, 120, 5);
+const dailyBase = integer(0, 240, 5);
 const time = integer(0, Number.MAX_SAFE_INTEGER);
 
 const repeat: Check<Repeat> = (value, path) => {
@@ -93,7 +94,7 @@ const games = object({topics: list(oneOf(TOPICS), 0, TOPICS.length, true), daily
 export const familyCreate = object({name: text(1, 40), lang: oneOf(LANGS), timezone, pin}, ['name', 'lang', 'timezone', 'pin']);
 export const familyPatch = object({name: text(1, 40), lang: oneOf(LANGS), timezone, caps: boolean, voice: boolean, pin});
 
-const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), games};
+const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), dailyBaseMin: dailyBase, games};
 export const childInput = object(child, ['name', 'avatar', 'color', 'age']);
 export const childPatch = object(child);
 

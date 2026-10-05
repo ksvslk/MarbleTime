@@ -65,6 +65,8 @@ export interface Kid {
   avatar: 'bear' | 'bunny';
   avatarBg: string;
   age: number;
+  /** TV time every day before anything is earned, so TV isn't only a prize (a parent setting). */
+  dailyBaseMin: number;
 }
 
 /** A real-life job, written by a parent (any length, any language; screens must fit it). */
@@ -118,8 +120,8 @@ export interface Family {
 export const textOf = (value: string | Localized, lang: Lang) => (typeof value === 'string' ? value : value[lang]);
 
 const KIDS: Kid[] = [
-  {id: 'mia', name: 'Mia', avatar: 'bear', avatarBg: colors.gold, age: 5},
-  {id: 'leo', name: 'Leo', avatar: 'bunny', avatarBg: colors.sky, age: 8},
+  {id: 'mia', name: 'Mia', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30},
+  {id: 'leo', name: 'Leo', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 30},
 ];
 
 // Sample jobs. Real ones are written by parents in the parent app, in their own language.
@@ -159,9 +161,9 @@ export const SAMPLE_FAMILY: Family = {kids: KIDS, jobs: JOBS, games: GAMES};
 /** Worst-case user content for layout checks (marbletime://open?stress=1): long names, long jobs, 3 kids, 4 languages. */
 export const STRESS_FAMILY: Family = {
   kids: [
-    {id: 'max', name: 'Maximilian-Alexander', avatar: 'bear', avatarBg: colors.gold, age: 5},
-    {id: 'onnela', name: 'Õnnela-Mai Kristiina', avatar: 'bunny', avatarBg: colors.sky, age: 8},
-    {id: 'jo', name: 'Jo', avatar: 'bear', avatarBg: colors.mint, age: 6},
+    {id: 'max', name: 'Maximilian-Alexander', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30},
+    {id: 'onnela', name: 'Õnnela-Mai Kristiina', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 30},
+    {id: 'jo', name: 'Jo', avatar: 'bear', avatarBg: colors.mint, age: 6, dailyBaseMin: 0},
   ],
   jobs: {
     max: [
