@@ -90,3 +90,43 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Actual:** a high-severity `brace-expansion` advisory inside aws-cdk-lib's bundled dependencies, which users can't update. It only runs at synth time and isn't in the Lambda bundle.
 - **Severity:** low (noise, but it fails "no high vulnerabilities" checks).
 - **Suggestion:** refresh the bundled dependency, or mark it as not affecting runtime.
+
+## 2026-10-05 · Amazon Kids on Fire TV isn't offered in Estonia, so the hand-off can't be tested
+
+- **Task:** test MarbleTime's Amazon Kids mode (a kids profile with a daily limit, bonus time from the Parent Dashboard) on a Fire TV Stick 4K Plus bought and registered in Estonia.
+- **Steps:** Settings → Account & Profile Settings → Add Profile; the Amazon Kids app (`com.amazon.tahoe`) is installed.
+- **Expected:** a "kids profile" option, as in Amazon's docs.
+- **Actual:** no kids-profile option and no Amazon Kids entry anywhere (Fire OS 8.1.8.2). Public reports say Amazon Kids on Fire TV is offered only in a few countries; the docs don't say which, and nothing on the device explains it.
+- **Severity:** high for a family app in an international hackathon: the platform's own parental-control path, which our design builds on, can't be tried outside those countries.
+- **Workaround:** strict mode (sideload) for our own tests; Amazon Kids mode is built to the docs and untested.
+- **Suggestion:** list the countries in the Amazon Kids and Fire TV developer docs; a developer/test switch (or a VVD profile) to try Amazon Kids anywhere.
+
+## 2026-10-05 · `am start -W` hangs while the Fire TV screensaver is on
+
+- **Task:** open our app on the stick from a script (`adb shell am start -W -d marbletime://…`) for automated checks.
+- **Steps:** leave the stick idle ~5 min (the screensaver starts: wakefulness `Dreaming`), then `am start -W …`.
+- **Expected:** the screensaver ends and the activity starts, as when a person presses a key.
+- **Actual:** `am start -W` never returns (our script hit its 10-minute timeout); the intent waits behind the dream.
+- **Severity:** medium for CI-style testing on Fire TV.
+- **Workaround:** `adb shell input keyevent KEYCODE_WAKEUP` first, and no `-W` (in `scripts/fire.sh open`).
+- **Suggestion:** end the dream for `am start` from ADB, or document the wake-up step in the Fire TV ADB guide.
+
+## 2026-10-05 · Vega has no simple player for an app's own short sounds
+
+- **Task:** play our own sound effects (MP3 clinks, a "yay", ~0.1–1.5 s) and read-aloud clips in the Vega build, as SoundPool does on Fire OS.
+- **Steps:** the docs point brief, low-latency sounds at `com.amazon.audio.system` ("SoundPlayer or SystemSound APIs"); installed `@amazon-devices/keplerscript-audio-lib` 2.0.18 to find them.
+- **Expected:** a small API: load a bundled file, play it (several at once), set the volume.
+- **Actual:** the library offers only built-in system sounds (`playSystemSoundAsync`) and raw PCM streams (`AudioPlaybackStream`); the README page has no SoundPlayer details. App sound files need the W3C media player (`react-native-w3cmedia`), which is built for media playback, not overlapping effects.
+- **Severity:** medium (every game-like app needs this).
+- **Workaround:** pending: W3C media `AudioPlayer` per sound (M3).
+- **Suggestion:** a SoundPool-like API in the audio library, with an example for bundled assets.
+
+## 2026-10-05 · Screenshots of a video app on Fire TV are black
+
+- **Task:** check from a script that our test video app (Demo Cartoons) really plays on the stick.
+- **Steps:** `adb exec-out screencap -p` and `adb shell screenrecord` while the video plays.
+- **Expected:** the video frame in the image.
+- **Actual:** a black screen (the hardware video layer isn't captured), so playback can only be checked through `dumpsys audio` / `dumpsys media.player` states.
+- **Severity:** low.
+- **Workaround:** check the player state in `dumpsys`; verify by eye on the TV.
+- **Suggestion:** a developer option to include video layers in screen captures of non-DRM content.

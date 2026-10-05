@@ -5,7 +5,8 @@ The lines come from the app itself (spokenLines in voiceLines.ts, via scripts/vo
 recorded always matches what is shown. Nothing is synthesised on the TV.
 
   English, German, Spanish: Amazon Polly neural voices (AWS CLI; credentials from `aws login`).
-  Estonian: TartuNLP Neurokõne (api.tartunlp.ai), a free research API. Ask TartuNLP before a commercial launch.
+  Estonian: Polly has no Estonian voice (FEATURE_REQUESTS.md), so TartuNLP Neurokõne (api.tartunlp.ai),
+  a free research API. Ask TartuNLP before a commercial launch.
 
 Only new or changed lines are recorded; clips that no line uses any more are deleted.
 
@@ -29,6 +30,8 @@ MAP = SHARED / "src/marble/voices.ts"
 POLLY = {"en": "Ruth", "de": "Vicki", "es": "Lucia"}
 POLLY_RATE = "92%"
 NEUROKONE = {"speaker": "mari", "speed": 0.95}
+# Bump when finish() changes, so every clip is made again.
+PROCESSING = "v2: lead trim, natural tail + 300 ms pad"
 # Maths is shown with symbols ("7 + 5 = 12") but said with words.
 MATHS = {"en": ("plus", "is"), "et": ("pluss", "on"), "de": ("plus", "ist"), "es": ("más", "es")}
 
@@ -46,7 +49,7 @@ def spoken(lang: str, text: str) -> str:
 
 def clip_name(lang: str, text: str) -> str:
     voice = POLLY.get(lang, json.dumps(NEUROKONE, sort_keys=True))
-    return hashlib.sha1(f"{lang}|{voice}|{POLLY_RATE}|{text}".encode()).hexdigest()[:12] + ".mp3"
+    return hashlib.sha1(f"{lang}|{voice}|{POLLY_RATE}|{PROCESSING}|{text}".encode()).hexdigest()[:12] + ".mp3"
 
 
 def polly(lang: str, text: str, raw: pathlib.Path) -> None:
@@ -66,11 +69,12 @@ def neurokone(text: str, raw: pathlib.Path) -> None:
 
 
 def finish(raw: pathlib.Path, out: pathlib.Path) -> None:
-    """Trim the silence at both ends, even out loudness across both voice services, mono MP3."""
-    trim = "silenceremove=start_periods=1:start_threshold=-45dB"
+    """Trim the silence before the first word (a quick start), keep the last word's natural fade and add
+    300 ms of silence after it (trimming the end, and some players, clipped the last syllable), even out
+    loudness across both voice services, mono MP3."""
     subprocess.run(
         ["ffmpeg", "-loglevel", "error", "-y", "-i", str(raw),
-         "-af", f"{trim},areverse,{trim},areverse,loudnorm=I=-16:TP=-1.5:LRA=11",
+         "-af", "silenceremove=start_periods=1:start_threshold=-50dB:start_silence=0.05,loudnorm=I=-16:TP=-1.5:LRA=11,apad=pad_dur=0.3",
          "-ac", "1", "-ar", "24000", "-b:a", "48k", str(out)],
         check=True)
 
