@@ -1,0 +1,34 @@
+{
+  "name": "marbletime-parent-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "MarbleTime parent web app (PWA): approvals, kids, jobs, TVs and the Amazon Kids hand-off",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "gen:api": "openapi-typescript ../backend/openapi.yaml -o src/api/schema.ts --enum-values",
+    "icons": "node scripts/make-pwa-icons.ts"
+  },
+  "dependencies": {
+    "oidc-client-ts": "^3.5.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "^7.18.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.3.2",
+    "vitest": "^5.0.3"
+  }
+}

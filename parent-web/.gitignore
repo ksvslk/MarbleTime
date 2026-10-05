@@ -1,0 +1,2 @@
+# Local env overrides (real stage settings for a build live here or in the shell, never in git)
+.env*.local

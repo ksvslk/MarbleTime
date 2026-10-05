@@ -1,0 +1,982 @@
+/*
+ * MarbleTime parent app. Looks like the TV's grown-ups screens (docs/03 §12): deep blue, white cards,
+ * gold only for time (marbles) and the main button, the white ring only for focus.
+ * Colours are CSS variables set from src/tokens.ts at startup (main.tsx): --bg-grownups, --gold, --ink, …
+ */
+
+/* ---------- Base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--bg-grownups);
+  color: var(--white);
+  /* Rounded system faces where there are some (iOS, macOS); the TV app uses the system font too. */
+  font-family: ui-rounded, 'SF Pro Rounded', 'Nunito', 'Quicksand', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+/* The white ring means only one thing: focus. On white cards and dialogs it is ink instead. */
+:focus-visible {
+  outline: 3px solid var(--white);
+  outline-offset: 3px;
+}
+.card :focus-visible,
+.dialog :focus-visible {
+  outline-color: var(--ink);
+}
+
+/* ---------- Layout ---------- */
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+}
+.app-with-tabs {
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: calc(14px + env(safe-area-inset-top)) 16px 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+}
+.page-header h1 {
+  flex: 1;
+  min-width: 0;
+  font-size: 28px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.center-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: calc(24px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom));
+  text-align: center;
+}
+.center-screen h1 {
+  font-size: 26px;
+  font-weight: 650;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.section-title {
+  font-size: 18px;
+  font-weight: 650;
+  margin-top: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.grow {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.button-row {
+  display: flex;
+  gap: 10px;
+}
+.button-row .btn {
+  flex: 1;
+}
+
+/* ---------- Text ---------- */
+
+.brand {
+  font-size: 36px;
+  font-weight: 650;
+}
+.brand-small {
+  font-size: 20px;
+  font-weight: 650;
+}
+.lead {
+  font-size: 18px;
+}
+.small {
+  font-size: 14px;
+}
+.muted {
+  color: var(--muted);
+}
+.muted-ink {
+  color: var(--grey-ink);
+}
+.meta {
+  font-size: 15px;
+  color: var(--muted);
+}
+.hint {
+  font-size: 14px;
+  color: var(--muted);
+}
+.card .meta,
+.card .hint {
+  color: var(--grey-ink);
+}
+.row-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 19px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.error-text {
+  color: var(--gold-light);
+  font-weight: 600;
+}
+.banner {
+  padding: 12px 16px;
+  border-radius: 16px;
+  background: var(--chip);
+  font-weight: 600;
+}
+
+/* ---------- Cards ---------- */
+
+.card {
+  padding: 18px;
+  border-radius: 28px;
+  background: var(--white);
+  color: var(--ink);
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 650;
+}
+.link-card {
+  min-height: 76px;
+  text-decoration: none;
+  transition: transform 0.12s;
+}
+.link-card:active {
+  transform: scale(0.98);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.inline-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.inline-form .field {
+  flex: 1;
+}
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.btn-gold {
+  background: var(--gold);
+  color: var(--ink);
+}
+.btn-soft {
+  background: var(--tile-off);
+  color: var(--ink);
+}
+.btn-glass {
+  background: var(--chip);
+  color: var(--white);
+}
+.btn-coral {
+  background: var(--coral);
+  color: var(--ink);
+}
+.btn-block {
+  width: 100%;
+}
+.btn-small {
+  min-height: 44px;
+  padding: 0 16px;
+  font-size: 16px;
+}
+.btn-round {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-round:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- Form fields ---------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.card .field-label {
+  color: var(--grey-ink);
+}
+.field-counter {
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.7;
+}
+.field-hint {
+  font-size: 14px;
+  color: var(--muted);
+}
+.card .field-hint {
+  color: var(--grey-ink);
+}
+.field-error {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold-light);
+}
+.card .field-error {
+  color: var(--error-ink);
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 2px solid var(--soft);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: 18px; /* 16px or more, so iOS doesn't zoom in */
+}
+input::placeholder {
+  color: var(--placeholder);
+}
+.code-input {
+  font-weight: 650;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+.pin-input {
+  font-size: 22px;
+  letter-spacing: 0.4em;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tile-off);
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chip .avatar {
+  margin-left: -8px;
+}
+/* Selected = filled, never a ring (the ring means focus). */
+.chip-on {
+  background: var(--ink);
+  color: var(--white);
+}
+.days .chip {
+  justify-content: center;
+  min-width: 52px;
+  padding: 0 10px;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.stepper-value {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  font-weight: 600;
+}
+.stepper-number {
+  min-width: 2ch;
+  font-size: 28px;
+  font-weight: 650;
+  text-align: center;
+}
+
+.switch {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 6px 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tile-off);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+.switch-knob {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+/* Off: the knob sits on the left; on: dark, knob on the right. */
+.switch:not(.switch-on) {
+  flex-direction: row-reverse;
+  padding: 0 16px 0 6px;
+}
+.switch-on {
+  background: var(--ink);
+  color: var(--white);
+}
+.setting-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.pick-row {
+  display: flex;
+  gap: 12px;
+}
+.pick {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--tile-off);
+  color: var(--ink);
+  font-weight: 600;
+  cursor: pointer;
+}
+.pick-on {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ---------- Marbles, avatars, job tiles ---------- */
+
+.marble {
+  flex-shrink: 0;
+}
+.marbles {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.marbles-off {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+.marbles-more {
+  margin-left: 4px;
+  font-size: 14px;
+  font-weight: 650;
+}
+.time {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+/* Minutes are small, for grown-ups; the marbles carry the meaning (docs/03 §12). */
+.time-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.card .time-text {
+  color: var(--grey-ink);
+}
+.stepper .time-text {
+  font-size: 18px;
+  color: var(--ink);
+}
+
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.avatar-stack {
+  display: flex;
+}
+.avatar-stack .avatar {
+  box-shadow: 0 0 0 2px var(--white);
+}
+.avatar-stack .avatar + .avatar {
+  margin-left: -8px;
+}
+
+.job-tile {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 28%;
+  color: var(--ink);
+}
+.tile-badge {
+  position: absolute;
+  right: -8px;
+  bottom: -8px;
+  display: flex;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px var(--white);
+}
+
+/* The job as the TV shows it (a smaller copy of the board card). */
+.job-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 160px;
+  margin: 0 auto;
+  padding: 16px 12px 14px;
+  border-radius: 28px;
+  color: var(--ink);
+}
+.job-card-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+}
+.job-card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 17px;
+  font-weight: 650;
+  text-align: center;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.marble-pill {
+  display: inline-flex;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: var(--white);
+}
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+  gap: 8px;
+}
+.icon-pick {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border: 0;
+  border-radius: 14px;
+  background: var(--tile-off);
+  color: var(--ink);
+  cursor: pointer;
+}
+.icon-pick[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ---------- Approvals ---------- */
+
+.claim {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition:
+    opacity 0.26s,
+    transform 0.26s;
+}
+/* A decided card lifts away, as on the TV. */
+.claim.leaving {
+  opacity: 0;
+  transform: translateY(-16px) scale(0.97);
+}
+.claim-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+}
+.claim-title {
+  font-size: 20px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.claim .btn-gold {
+  flex: 1.4;
+}
+
+.handoff {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.ask {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* ---------- Kids ---------- */
+
+.kid-hero {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.kid-hero .time-text {
+  font-size: 20px;
+  color: var(--white);
+}
+
+.history {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.history-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--tile-off);
+}
+.history-row:first-child {
+  border-top: 0;
+}
+.history-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--tile-off);
+}
+.history-reason {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.delta {
+  font-weight: 650;
+  white-space: nowrap;
+}
+.delta-minus {
+  color: var(--grey-ink);
+}
+.handoff-tag {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--tile-off);
+  font-size: 13px;
+  font-weight: 600;
+}
+/* Time still to hand off: gold, because it is time. */
+.handoff-pending {
+  background: var(--gold-light);
+}
+.saved {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey-ink);
+}
+
+/* ---------- Jobs and TVs ---------- */
+
+.job-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.device-head {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.device-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: var(--tile-off);
+}
+.device-edit {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--tile-off);
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.big-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--ink);
+}
+.big-badge-glass {
+  background: var(--chip);
+  color: var(--white);
+}
+.pair-form {
+  width: 100%;
+  text-align: left;
+}
+
+/* ---------- Sign in and onboarding ---------- */
+
+.sign-in {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+.onboarding-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.steps {
+  display: flex;
+  gap: 8px;
+}
+.steps span {
+  width: 28px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--chip);
+}
+.steps .step-on {
+  background: var(--white);
+}
+.onboarding h1 {
+  font-size: 26px;
+  font-weight: 650;
+}
+
+.splash-logo {
+  animation: breathe 1.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+/* ---------- Empty states, tab bar, toast, dialog ---------- */
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 16px;
+  text-align: center;
+}
+.empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--chip);
+}
+.empty-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.tabbar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  padding: 6px max(4px, calc((100% - 560px) / 2)) calc(6px + env(safe-area-inset-bottom));
+  background: var(--ink);
+  border-top: 1px solid var(--glass);
+}
+.tab {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  min-height: 56px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tab span {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tab .icon {
+  width: 56px;
+  height: 30px;
+  padding: 2px 0;
+  border-radius: 999px;
+}
+.tab.active {
+  color: var(--white);
+}
+.tab.active .icon {
+  background: var(--chip);
+}
+
+.toast-region {
+  position: fixed;
+  right: 0;
+  bottom: calc(88px + env(safe-area-inset-bottom));
+  left: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.toast {
+  max-width: 480px;
+  padding: 12px 20px;
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  animation: toast-in 0.2s ease-out;
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.dialog {
+  width: min(420px, calc(100vw - 32px));
+  padding: 22px;
+  border: 0;
+  border-radius: 28px;
+  background: var(--white);
+  color: var(--ink);
+}
+.dialog::backdrop {
+  background: rgba(10, 16, 60, 0.6);
+}
+.dialog h2 {
+  margin-bottom: 8px;
+  font-size: 22px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.dialog p {
+  margin-bottom: 20px;
+  color: var(--grey-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
