@@ -30,3 +30,15 @@ id = "/com.amazon.kepler.lottie_3@ILottie_0"
 
 [[needs.module]]
 id = "/com.amazon.kepler.keplerscript_4@IKeplerScript_0"
+
+[[needs.module]]
+id = "/com.amazon.kepler.async_storage__async_storage_2@IAsyncStorage__AsyncStorage_1"
+
+[wants]
+# Brief low-latency sounds (SoundPlayer/SystemSound), incl. the system's click on OK.
+[[wants.service]]
+id = "com.amazon.audio.system"
+
+# Audio focus and volume (AudioManager/AudioFocus), which the system click also asks for.
+[[wants.service]]
+id = "com.amazon.audio.control"

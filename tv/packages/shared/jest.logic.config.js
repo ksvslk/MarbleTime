@@ -4,4 +4,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'json'],
   testMatch: ['<rootDir>/src/marble/__tests__/**/*.test.ts'],
   testEnvironment: 'node',
+  // Sounds and pictures are just ids to the logic.
+  moduleNameMapper: {'\\.(mp3|png)$': '<rootDir>/src/marble/__tests__/asset.js'},
 };

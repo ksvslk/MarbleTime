@@ -40,3 +40,53 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Severity:** medium (silent; easy to "verify" an old build on the device).
 - **Workaround:** `./gradlew :app:createBundleReleaseJsAndAssets --rerun assembleRelease` (wrapped in `scripts/fire.sh build`).
 - **Suggestion:** have the starter's Expo TV build declare `packages/shared` as a bundle input (or document the `--rerun` step next to the release-build instructions).
+
+## 2026-10-05 · `vda` stops working when a Fire TV stick is also connected
+
+- **Task:** send remote keys to the Vega Virtual Device while a Fire TV stick is connected over Wi-Fi ADB (the normal setup for an app that ships on both Fire OS and Vega).
+- **Steps:** `vega exec vda shell "inputd-cli button_press KEY_ENTER"`.
+- **Expected:** the key goes to the Virtual Device (the only Vega device).
+- **Actual:** `vda: more than one device/emulator`. `vda` lists the Fire TV stick too, and `vega exec vda` doesn't pick the Vega device the way `vega run-app -d VirtualDevice` does.
+- **Severity:** low.
+- **Workaround:** `vega exec vda -s emulator-5554 shell …` (now in `scripts/vega.sh`).
+- **Suggestion:** have `vda` ignore non-Vega devices by default, or let `vega exec vda` take `-d VirtualDevice` like the other commands.
+
+## 2026-10-05 · OK on the remote never reaches `onPress` until the app asks for the audio services
+
+- **Task:** press a button (`TouchableOpacity`, `Pressable`) with OK on the Vega Virtual Device, in an app made from the multi-TV starter.
+- **Steps:** focus the button with the D-pad, press OK on the on-screen remote, or `inputd-cli button_press KEY_ENTER`.
+- **Expected:** `onPressIn`, `onPressOut`, `onPress`, with the system's click sound.
+- **Actual:** only `onPressIn` fires; nothing happens. The system log shows the key-down as `Consumed key:Return`, then on key-up the click sound fails (`UISoundManager … IPC link unsuccessful`, `com.amazon.audio.system … Failed to bind to service`) and the key-up is never consumed, so there is no `onPressOut` or `onPress`. Arrow keys and focus work, so it looks like a broken app, not a missing permission. A plain `TouchableOpacity` and a `Pressable` behave the same.
+- **Cause:** the starter's `manifest.toml` has no `[wants]` for `com.amazon.audio.system` and `com.amazon.audio.control`, which the system click on OK needs.
+- **Severity:** high: no button works, and nothing in the error points to the manifest.
+- **Workaround:** add both services under `[wants]` (done in `tv/packages/vega/manifest.toml`). Key-down and key-up then both reach the app. A scripted `KEY_ENTER` arrives as `enter`, not `select`, so it still gives only `onPressIn`/`onPressOut`; `KEY_SELECT` and `KEY_OK` don't map at all, so scripts can't press buttons.
+- **Suggestion:** don't let a failed click sound swallow the key-up; put the two services in the starter's manifest; log a clear "missing manifest service" error; document the `inputd-cli` key names, including one that sends `select`.
+
+## 2026-10-05 · CDK: `HttpLambdaIntegration` adds one Lambda permission per route
+
+- **Task:** one Lambda behind an HTTP API with 29 routes (aws-cdk-lib 2.272.0).
+- **Steps:** `new HttpLambdaIntegration('Api', fn)` reused for every `httpApi.addRoutes(...)`.
+- **Expected:** one invoke permission for the API.
+- **Actual:** 29 `AWS::Lambda::Permission` resources, one per route, which grows the function's resource policy toward its 20 KB limit as routes are added.
+- **Severity:** low (fine at 29 routes, a cliff later).
+- **Workaround:** `scopePermissionToRoute: false` gives one API-wide permission.
+- **Suggestion:** make the API-wide permission the default when one integration is shared, or warn near the policy limit.
+
+## 2026-10-05 · Cognito managed login (v2) shows an empty page without a branding resource
+
+- **Task:** a Cognito hosted sign-in page for the parent web app, from CDK.
+- **Steps:** user pool + app client + a managed-login domain (version 2).
+- **Expected:** a default sign-in page.
+- **Actual:** the v2 managed login needs a `ManagedLoginBranding` resource per app client; without it the page is empty.
+- **Severity:** medium (silent: deploy succeeds, sign-in is broken).
+- **Workaround:** add a `CfnManagedLoginBranding` with `useCognitoProvidedValues: true` for the client.
+- **Suggestion:** create default branding automatically, or fail the deploy with a clear message.
+
+## 2026-10-05 · `npm audit` flags aws-cdk-lib's bundled `brace-expansion` as high
+
+- **Task:** a clean dependency audit for the backend.
+- **Steps:** `npm install aws-cdk-lib@2.272.0` → `npm audit`.
+- **Expected:** no high findings from the CDK itself.
+- **Actual:** a high-severity `brace-expansion` advisory inside aws-cdk-lib's bundled dependencies, which users can't update. It only runs at synth time and isn't in the Lambda bundle.
+- **Severity:** low (noise, but it fails "no high vulnerabilities" checks).
+- **Suggestion:** refresh the bundled dependency, or mark it as not affecting runtime.

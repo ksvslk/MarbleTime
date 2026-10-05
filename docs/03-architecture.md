@@ -322,10 +322,13 @@ The [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh) has all 1
 - **The white ring** means only "selected" (D-pad focus).
 - **Card colours mean nothing.** They only help kids tell cards apart.
 - **Waiting for a grown-up** is shown only by an hourglass on the card.
-- **One row.** Jobs, games and answers sit in one row, so left/right and OK are enough. Picking the kid is its own screen ("Who's here?").
+- **One row, two groups.** Jobs, games and answers sit in one row, so left/right and OK are enough. On the board, real-life jobs come first under a house icon ("Jobs"), then a divider, then TV games under a game-controller icon ("Games"), so kids can tell a thing to do at home from a game on the TV. Picking the kid is its own screen ("Who's here?").
 - **Few words, spoken.** 1–3 word labels, questions read out loud, one big action per screen.
 - **The label under the selected card says what OK does:** "I did it!" for a job (a grown-up checks) or "Let's play!" for a game (the app checks).
 - **Words:** the UI says "job" and "grown-up"; docs and code say "chore" and "parent".
 - **Type and layout:** Fredoka; text at least 24 px at 1080p; 5% overscan-safe margins.
-- **Any text must fit, and look good.** Names and jobs come from parents, questions from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines, and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
+- **Any text must fit, and look good.** Names and jobs come from parents, questions from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines (and in the box's height, where it has one, like a card title above the marbles), and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
 - **Languages:** English, Estonian, German, Spanish (a family setting). Optional **CAPITAL LETTERS** for kid-facing text.
+- **Motion marks the moments that matter, briefly** (`tv/packages/shared/src/marble/motion.tsx`): screens fade in; cards and answers arrive one after another; the selected item springs up and squishes on OK; "I did it!" pops the job in and turns the hourglass over; a wrong answer shakes gently, then fades; a right one grows, gets a check and counts the apples; each marble lands with a clink and adds its 5 minutes to the clock as it lands. Transform and opacity only, on the native driver, so it stays smooth on the stick. Animations never block the remote: everything stays focusable and pressable while it moves.
+- **Sounds** are short game effects (Android SoundPool via our `marble-audio` module), never a media session, so the remote's play/pause stays with the video apps.
+- **Read-aloud** plays recorded clips only (`scripts/make-voices.py`: Polly for en/de/es, Neurokõne for Estonian), one line after another; a line without a clip stays silent rather than using a robot voice. On by default; grown-ups can turn it off.

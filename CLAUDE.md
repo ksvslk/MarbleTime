@@ -29,3 +29,4 @@ amazon_kids (Appstore, Fire OS + Vega) · strict (Fire OS sideload, Kotlin modul
 - Ledger/hand-off/strict-engine/brain-game-checker changes need unit tests. Contract changes: openapi.yaml first.
 - Log every tool/doc snag in FRICTION_LOG.md as it happens. No secrets or real kids' photos in git.
 - Never copy code from bageshwar/screentamer-tv (no license).
+- Third-party code, icons or sounds: permissive licences only, each listed in THIRD_PARTY_NOTICES.md.

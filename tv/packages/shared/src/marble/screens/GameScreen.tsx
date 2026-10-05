@@ -1,5 +1,5 @@
-import React, {useEffect, useMemo, useState} from 'react';
-import {Image, View} from 'react-native';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
+import {Animated, Image, View} from 'react-native';
 import {ART, FitText, Focusable, Icon, MarbleRow, ShapeView, Sparkle, T} from '../components';
 import {Choice, KidId, Picture, questionsFor} from '../data';
 import {CAPS_WIDTH, CHAR_WIDTH, fitFontSize} from '../fit';
@@ -7,6 +7,9 @@ import {useStore} from '../state';
 import {t} from '../i18n';
 import {colors, s} from '../theme';
 import {capsOf, styles} from './KidScreens';
+import {Sound} from '../sound';
+import {Appear, Shake, Twinkle} from '../motion';
+import {useSay} from '../speech';
 
 /**
  * Screen 10–13 · the one template every brain game uses (docs/03 §11):
@@ -23,6 +26,13 @@ export function GameScreen({kidId, gameId}: {kidId: KidId; gameId: string}) {
   const [result, setResult] = useState<{choice: number; right: boolean} | null>(null);
   const [wrong, setWrong] = useState<number[]>([]);
   const q = questions[index];
+  const say = useSay();
+
+  // Each question is read out once it has come in.
+  useEffect(() => {
+    const timer = setTimeout(() => say([q.say]), 450);
+    return () => clearTimeout(timer);
+  }, [q.say, say]);
 
   useEffect(() => {
     if (!result?.right) return;
@@ -32,7 +42,7 @@ export function GameScreen({kidId, gameId}: {kidId: KidId; gameId: string}) {
         setResult(null);
         setWrong([]);
       } else {
-        dispatch({type: 'gameDone', kidId, marbles: game.marbles, gameId: game.id});
+        dispatch({type: 'gameDone', kidId, marbles: game.marbles, gameId: game.id, total: questions.length});
       }
     }, 1600);
     return () => clearTimeout(t);
@@ -41,6 +51,8 @@ export function GameScreen({kidId, gameId}: {kidId: KidId; gameId: string}) {
   const pick = (i: number) => {
     if (result?.right || wrong.includes(i)) return;
     const right = i === q.answer;
+    Sound.play(right ? 'right' : 'tryAgain');
+    say(right ? [t(lang, 'yes'), q.praise] : [t(lang, 'tryAgain')]);
     setResult({choice: i, right});
     if (!right) setWrong([...wrong, i]);
   };
@@ -65,41 +77,38 @@ export function GameScreen({kidId, gameId}: {kidId: KidId; gameId: string}) {
       </View>
 
       <View style={[styles.row, {marginTop: s(36)}]}>
-        <Focusable label={t(lang, 'sayAgain')} style={{width: s(124), height: s(124), borderRadius: s(62), backgroundColor: colors.chip, alignItems: 'center', justifyContent: 'center'}}>
+        <Focusable label={t(lang, 'sayAgain')} onPress={() => say([q.say])} style={{width: s(124), height: s(124), borderRadius: s(62), backgroundColor: colors.chip, alignItems: 'center', justifyContent: 'center'}}>
           <Icon name="speaker" size={s(54)} color={colors.white} />
         </Focusable>
-        <PromptLine lead={result?.right ? t(lang, 'yes') : ''} text={result?.right ? q.praise : result && !result.right ? t(lang, 'tryAgain') : q.prompt} caps={caps} />
+        {/* New words come in each time: the question, "Try again!", "Yes! …". */}
+        <Appear key={`${index}-${result?.right ? 'yes' : wrong.length}`} from="up" distance={s(16)}>
+          <PromptLine lead={result?.right ? t(lang, 'yes') : ''} text={result?.right ? q.praise : result && !result.right ? t(lang, 'tryAgain') : q.prompt} caps={caps} />
+        </Appear>
       </View>
 
       <View style={{flex: 1, alignSelf: 'stretch', marginVertical: s(36), borderRadius: s(56), backgroundColor: 'rgba(255,255,255,0.08)', alignItems: 'center', justifyContent: 'center'}}>
-        <PictureView picture={q.picture} counted={!!result?.right} caps={caps} />
+        <Appear key={index} from="right" distance={s(80)}>
+          <PictureView picture={q.picture} counted={!!result?.right} caps={caps} />
+        </Appear>
       </View>
 
       <View key={index} style={[styles.row, {paddingBottom: s(20)}]}>
-        {q.choices.map((choice, i) => {
-          const isRight = result?.right && result.choice === i;
-          const faded = wrong.includes(i) || (result?.right && !isRight);
-          return (
-            <Focusable
-              key={i}
-              preferred={i === 0}
-              label={choice.kind === 'text' ? choice.text : choice.shape}
-              onPress={() => pick(i)}
-              // The ring sits on the Focusable; the white tile is inside with a gap, so the ring shows on white.
-              style={{borderRadius: s(66), padding: s(8), marginHorizontal: s(16), opacity: faded ? 0.35 : 1}}>
-              <View style={{width: s(380), height: s(210), borderRadius: s(48), backgroundColor: colors.tile, alignItems: 'center', justifyContent: 'center'}}>
-                <ChoiceView choice={choice} caps={caps} />
-              </View>
-              {isRight ? (
-                <View style={{position: 'absolute', top: s(-30), right: s(-30), width: s(92), height: s(92), borderRadius: s(46), backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center'}}>
-                  <Icon name="check" size={s(52)} color={colors.white} />
-                </View>
-              ) : null}
-            </Focusable>
-          );
-        })}
+        {q.choices.map((choice, i) => (
+          <ChoiceTile
+            key={i}
+            index={i}
+            choice={choice}
+            caps={caps}
+            look={result?.right ? (result.choice === i ? 'right' : 'faded') : wrong.includes(i) ? 'wrong' : 'idle'}
+            onPress={() => pick(i)}
+          />
+        ))}
       </View>
-      {result?.right ? <Sparkle size={s(44)} style={{position: 'absolute', bottom: s(160), left: s(780)}} /> : null}
+      {result?.right ? (
+        <Twinkle style={{position: 'absolute', bottom: s(160), left: s(780)}}>
+          <Sparkle size={s(44)} />
+        </Twinkle>
+      ) : null}
     </View>
   );
 }
@@ -117,6 +126,43 @@ function PromptLine({lead, text, caps}: {lead: string; text: string; caps: strin
   );
 }
 
+/** One answer: comes in, shakes ("not that one") and fades when wrong, grows a little and gets a check when right. */
+function ChoiceTile({choice, index, caps, look, onPress}: {choice: Choice; index: number; caps: string | false; look: 'idle' | 'right' | 'wrong' | 'faded'; onPress: () => void}) {
+  const fade = useRef(new Animated.Value(1)).current;
+  const grow = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    const dim = look === 'wrong' || look === 'faded';
+    // A wrong pick shakes first, then fades.
+    Animated.timing(fade, {toValue: dim ? 0.35 : 1, duration: 300, delay: look === 'wrong' ? 420 : 0, useNativeDriver: true}).start();
+    Animated.spring(grow, {toValue: look === 'right' ? 1.08 : 1, speed: 14, bounciness: 12, useNativeDriver: true}).start();
+  }, [look, fade, grow]);
+  return (
+    <Appear from="up" distance={s(60)} delay={120 + index * 90}>
+      <Shake trigger={look === 'wrong'}>
+        <Animated.View style={{opacity: fade, transform: [{scale: grow}]}}>
+          <Focusable
+            preferred={index === 0}
+            label={choice.kind === 'text' ? choice.text : choice.shape}
+            onPress={onPress}
+            // The ring sits on the Focusable; the white tile is inside with a gap, so the ring shows on white.
+            style={{borderRadius: s(66), padding: s(8), marginHorizontal: s(16)}}>
+            <View style={{width: s(380), height: s(210), borderRadius: s(48), backgroundColor: colors.tile, alignItems: 'center', justifyContent: 'center'}}>
+              <ChoiceView choice={choice} caps={caps} />
+            </View>
+            {look === 'right' ? (
+              <Appear from="pop" style={{position: 'absolute', top: s(-30), right: s(-30)}}>
+                <View style={{width: s(92), height: s(92), borderRadius: s(46), backgroundColor: colors.ink, alignItems: 'center', justifyContent: 'center'}}>
+                  <Icon name="check" size={s(52)} color={colors.white} />
+                </View>
+              </Appear>
+            ) : null}
+          </Focusable>
+        </Animated.View>
+      </Shake>
+    </Appear>
+  );
+}
+
 function ChoiceView({choice, caps}: {choice: Choice; caps: string | false}) {
   if (choice.kind === 'shape') return <ShapeView shape={choice.shape} size={s(124)} color={colors.ink} />;
   // Numbers stay big; words shrink to fit the tile, whatever the language or the AI wrote.
@@ -130,7 +176,11 @@ function PictureView({picture, counted, caps}: {picture: Picture; counted: boole
         {Array.from({length: picture.n}).map((_, i) => (
           <View key={i} style={{alignItems: 'center', marginHorizontal: s(36)}}>
             <Image source={ART.apple} style={{width: s(170), height: s(170)}} />
-            {counted ? <T style={{fontSize: s(64), marginTop: s(6)}}>{i + 1}</T> : null}
+            {counted ? (
+              <Appear from="pop" delay={i * 260}>
+                <T style={{fontSize: s(64), marginTop: s(6)}}>{i + 1}</T>
+              </Appear>
+            ) : null}
           </View>
         ))}
       </View>

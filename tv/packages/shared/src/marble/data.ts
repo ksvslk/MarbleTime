@@ -3,9 +3,61 @@ import {colors} from './tokens';
 
 /** Kids, names and jobs are user content (parents type them), so ids are plain strings. */
 export type KidId = string;
+
+/**
+ * Job icons, each with a few words that say when it fits. When a parent adds a job, the AI picks the icon
+ * from this list by the title, in any language (M2); the parent can change it. Drawn by scripts/make-icons.py.
+ */
+export const JOB_ICONS = [
+  {name: 'toys', hint: 'tidy up toys, put things away'},
+  {name: 'cat', hint: 'cat, feed or brush the cat, pets'},
+  {name: 'tooth', hint: 'brush teeth'},
+  {name: 'moon', hint: 'bedtime, pajamas, go to sleep'},
+  {name: 'broom', hint: 'sweep, clean the floor, tidy a room'},
+  {name: 'bed', hint: 'make the bed'},
+  {name: 'shirt', hint: 'get dressed, put clothes away, fold clothes'},
+  {name: 'laundry', hint: 'laundry, washing machine, sort socks'},
+  {name: 'trash', hint: 'take out the trash, empty the bin'},
+  {name: 'recycle', hint: 'recycling, sort bottles and paper'},
+  {name: 'table', hint: 'set or clear the table, dishes, dishwasher, eat dinner'},
+  {name: 'cook', hint: 'help cook, bake, make breakfast'},
+  {name: 'wash', hint: 'wash hands, wash something'},
+  {name: 'shower', hint: 'take a shower, wash hair'},
+  {name: 'bath', hint: 'take a bath'},
+  {name: 'dog', hint: 'dog, walk or feed the dog'},
+  {name: 'fish', hint: 'feed the fish, aquarium'},
+  {name: 'bird', hint: 'bird, feed the birds'},
+  {name: 'rabbit', hint: 'rabbit, hamster, guinea pig, small pets'},
+  {name: 'plant', hint: 'water the plants, garden'},
+  {name: 'leaf', hint: 'rake leaves, outdoor work, nature'},
+  {name: 'snow', hint: 'shovel snow, winter clothes'},
+  {name: 'book', hint: 'read a book, reading'},
+  {name: 'pencil', hint: 'homework, writing, practise letters'},
+  {name: 'backpack', hint: 'pack the school bag, get ready for school'},
+  {name: 'music', hint: 'practise an instrument, sing, music lesson'},
+  {name: 'paint', hint: 'draw, paint, art'},
+  {name: 'puzzle', hint: 'puzzle, board game, play quietly'},
+  {name: 'bike', hint: 'ride a bike, sport, exercise'},
+  {name: 'shoes', hint: 'put shoes away, go for a walk'},
+  {name: 'car', hint: 'wash the car, get in the car'},
+  {name: 'shopping', hint: 'help with shopping, unpack the shopping'},
+  {name: 'spray', hint: 'clean windows or the bathroom, wipe'},
+  {name: 'sofa', hint: 'tidy the living room, cushions'},
+  {name: 'lamp', hint: 'turn off the lights, save energy'},
+  {name: 'baby', hint: 'help with a baby or a younger sibling'},
+  {name: 'heart', hint: 'be kind, help someone, say thank you'},
+  {name: 'water', hint: 'drink water'},
+  {name: 'fruit', hint: 'eat fruit, healthy snack'},
+  {name: 'veggie', hint: 'eat vegetables'},
+  {name: 'sun', hint: 'play outside, fresh air, sunscreen'},
+  {name: 'mail', hint: 'get the mail, write a card or letter'},
+  {name: 'star', hint: 'anything else'},
+] as const;
+
+export type JobIconName = (typeof JOB_ICONS)[number]['name'];
 export type IconName =
-  | 'toys' | 'cat' | 'tooth' | 'moon' | 'hourglass' | 'thumbs' | 'play' | 'speaker' | 'check'
-  | 'lock' | 'lockopen' | 'undo' | 'broom' | 'clock' | 'shapes' | 'message' | 'sparkle';
+  | JobIconName
+  | 'hourglass' | 'thumbs' | 'play' | 'speaker' | 'check' | 'lock' | 'lockopen' | 'undo' | 'clock' | 'shapes' | 'message' | 'sparkle' | 'home' | 'games';
 
 export interface Kid {
   id: KidId;
@@ -19,9 +71,11 @@ export interface Kid {
 export interface Job {
   id: string;
   title: string | Localized;
-  icon: IconName;
+  icon: JobIconName;
   color: string;
   minutes: number;
+  /** A one-off job: gone once approved (others come back the next day). */
+  once?: boolean;
 }
 
 export type Topic = 'numbers' | 'words' | 'puzzles';
@@ -83,7 +137,7 @@ const JOBS: Record<KidId, Job[]> = {
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
   leo: [
-    {id: 'table', title: TABLE, icon: 'toys', color: colors.peach, minutes: 15},
+    {id: 'table', title: TABLE, icon: 'table', color: colors.peach, minutes: 15},
     {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 5},
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
@@ -111,17 +165,17 @@ export const STRESS_FAMILY: Family = {
   ],
   jobs: {
     max: [
-      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'toys', color: colors.peach, minutes: 15},
+      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 15},
       {id: 'lego', title: 'Put all the LEGO back in the big blue box under the bed', icon: 'toys', color: colors.mint, minutes: 10},
-      {id: 'et', title: 'Tühjenda nõudepesumasin ja pühi köögilaud puhtaks', icon: 'cat', color: colors.sky, minutes: 10},
-      {id: 'es', title: 'Recoger los juguetes del salón antes de cenar', icon: 'moon', color: colors.lilac, minutes: 5},
-      {id: 'x', title: 'X', icon: 'tooth', color: colors.peach, minutes: 5},
+      {id: 'et', title: 'Tühjenda nõudepesumasin ja pühi köögilaud puhtaks', icon: 'table', color: colors.sky, minutes: 10},
+      {id: 'es', title: 'Recoger los juguetes del salón antes de cenar', icon: 'toys', color: colors.lilac, minutes: 5},
+      {id: 'x', title: 'X', icon: 'star', color: colors.peach, minutes: 5},
     ],
     onnela: [
-      {id: 'long', title: 'Supercalifragilisticexpialidocious', icon: 'moon', color: colors.lilac, minutes: 20},
-      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'toys', color: colors.peach, minutes: 15},
+      {id: 'long', title: 'Supercalifragilisticexpialidocious', icon: 'star', color: colors.lilac, minutes: 20},
+      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 15},
     ],
-    jo: [{id: 'bed', title: 'Bed', icon: 'moon', color: colors.sky, minutes: 5}],
+    jo: [{id: 'bed', title: 'Bed', icon: 'bed', color: colors.sky, minutes: 5}],
   },
   games: {max: GAMES.mia, onnela: GAMES.leo, jo: GAMES.mia},
 };
@@ -154,7 +208,7 @@ const next = (lang: Lang, shapes: Shape[], answer: Shape, choices: Shape[]): Que
 
 const fill = (lang: Lang, before: string, after: string, choices: string[], answer: string): Question => ({
   prompt: t(lang, 'whichWord'),
-  say: `${before} … ${after}`,
+  say: `${t(lang, 'whichWord')} ${before} … ${after}`,
   picture: {kind: 'sentence', before, after},
   choices: choices.map(text),
   answer: choices.indexOf(answer),

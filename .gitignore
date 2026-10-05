@@ -14,3 +14,8 @@ node_modules/
 **/build/
 **/.kotlin/
 local.properties
+
+# Web and CDK build output
+dist/
+cdk.out/
+*.tsbuildinfo

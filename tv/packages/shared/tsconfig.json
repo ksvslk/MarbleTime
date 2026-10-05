@@ -3,11 +3,29 @@
     "target": "ES2020",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "lib": ["ES2020"],
+    "lib": [
+      "ES2020"
+    ],
     "jsx": "react-native",
     "paths": {
-      "react-native": ["../vega/node_modules/react-native"],
-      "react": ["../vega/node_modules/@types/react"]
+      "react-native": [
+        "../vega/node_modules/react-native"
+      ],
+      "react": [
+        "../vega/node_modules/@types/react"
+      ],
+      "@amazon-devices/react-native-w3cmedia": [
+        "../vega/node_modules/@amazon-devices/react-native-w3cmedia"
+      ],
+      "expo-modules-core": [
+        "../expotv/node_modules/expo-modules-core"
+      ],
+      "@react-native-async-storage/async-storage": [
+        "../expotv/node_modules/@react-native-async-storage/async-storage"
+      ],
+      "@amazon-devices/react-native-async-storage__async-storage": [
+        "../vega/node_modules/@amazon-devices/react-native-async-storage__async-storage"
+      ]
     },
     "strict": true,
     "esModuleInterop": true,
@@ -17,6 +35,11 @@
     "isolatedModules": true,
     "noEmit": true
   },
-  "include": ["index.ts", "src/**/*"],
-  "exclude": ["node_modules"]
+  "include": [
+    "index.ts",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

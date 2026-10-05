@@ -1,14 +1,57 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Easing, Image, ImageStyle, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle} from 'react-native';
 import {IconName, Shape} from './data';
-import {CAPS_WIDTH, CHAR_WIDTH, fitFontSize} from './fit';
+import {CAPS_WIDTH, CHAR_WIDTH, fitFontSize, LINE_HEIGHT, linesAllowed} from './fit';
+import {Sound} from './sound';
+import {JAR, JAR_CAPACITY, jarDrops} from './physics';
 import {colors, s} from './theme';
 
 const ICONS: Record<IconName, number> = {
+  // Job icons (JOB_ICONS in data.ts).
   toys: require('../assets/icons/toys.png'),
   cat: require('../assets/icons/cat.png'),
   tooth: require('../assets/icons/tooth.png'),
   moon: require('../assets/icons/moon.png'),
+  broom: require('../assets/icons/broom.png'),
+  bed: require('../assets/icons/bed.png'),
+  shirt: require('../assets/icons/shirt.png'),
+  laundry: require('../assets/icons/laundry.png'),
+  trash: require('../assets/icons/trash.png'),
+  recycle: require('../assets/icons/recycle.png'),
+  table: require('../assets/icons/table.png'),
+  cook: require('../assets/icons/cook.png'),
+  wash: require('../assets/icons/wash.png'),
+  shower: require('../assets/icons/shower.png'),
+  bath: require('../assets/icons/bath.png'),
+  dog: require('../assets/icons/dog.png'),
+  fish: require('../assets/icons/fish.png'),
+  bird: require('../assets/icons/bird.png'),
+  rabbit: require('../assets/icons/rabbit.png'),
+  plant: require('../assets/icons/plant.png'),
+  leaf: require('../assets/icons/leaf.png'),
+  snow: require('../assets/icons/snow.png'),
+  book: require('../assets/icons/book.png'),
+  pencil: require('../assets/icons/pencil.png'),
+  backpack: require('../assets/icons/backpack.png'),
+  music: require('../assets/icons/music.png'),
+  paint: require('../assets/icons/paint.png'),
+  puzzle: require('../assets/icons/puzzle.png'),
+  bike: require('../assets/icons/bike.png'),
+  shoes: require('../assets/icons/shoes.png'),
+  car: require('../assets/icons/car.png'),
+  shopping: require('../assets/icons/shopping.png'),
+  spray: require('../assets/icons/spray.png'),
+  sofa: require('../assets/icons/sofa.png'),
+  lamp: require('../assets/icons/lamp.png'),
+  baby: require('../assets/icons/baby.png'),
+  heart: require('../assets/icons/heart.png'),
+  water: require('../assets/icons/water.png'),
+  fruit: require('../assets/icons/fruit.png'),
+  veggie: require('../assets/icons/veggie.png'),
+  sun: require('../assets/icons/sun.png'),
+  mail: require('../assets/icons/mail.png'),
+  star: require('../assets/icons/star.png'),
+  // Interface icons.
   hourglass: require('../assets/icons/hourglass.png'),
   thumbs: require('../assets/icons/thumbs.png'),
   play: require('../assets/icons/play.png'),
@@ -17,11 +60,12 @@ const ICONS: Record<IconName, number> = {
   lock: require('../assets/icons/lock.png'),
   lockopen: require('../assets/icons/lockopen.png'),
   undo: require('../assets/icons/undo.png'),
-  broom: require('../assets/icons/broom.png'),
   clock: require('../assets/icons/clock.png'),
   shapes: require('../assets/icons/shapes.png'),
   message: require('../assets/icons/message.png'),
   sparkle: require('../assets/icons/sparkle.png'),
+  home: require('../assets/icons/home.png'),
+  games: require('../assets/icons/games.png'),
 };
 
 export const ART = {
@@ -41,37 +85,39 @@ export function T({style, children, numberOfLines}: {style?: StyleProp<TextStyle
 }
 
 /**
- * Text that always fits its box: the largest size (≤ max) at which it fits `width` in `lines` lines;
- * only at `min` does it cut off with "…". Use it for anything a parent, the AI or a translation can make long.
- * Sizes and width are device px (pass s(designPx)).
+ * Text that always fits its box: the largest size (≤ max) at which it fits `width` in `lines` lines (and, with
+ * `height`, in that height too); only at `min` does it cut off with "…". Use it for anything a parent, the AI or
+ * a translation can make long. Sizes, width and height are device px (pass s(designPx)).
  */
-export function FitText({text: raw, width, max, min, lines = 1, caps, style}: {text: string; width: number; max: number; min?: number; lines?: number; caps?: string | false; style?: StyleProp<TextStyle>}) {
+export function FitText({text: raw, width, height, max, min, lines = 1, caps, style}: {text: string; width: number; height?: number; max: number; min?: number; lines?: number; caps?: string | false; style?: StyleProp<TextStyle>}) {
   // caps = the language tag when kid text is shown in CAPITALS (locale-aware: ß → SS, etc.)
   const text = caps ? raw.toLocaleUpperCase(caps) : raw;
+  // Android won't wrap after a hyphen in a long name ("MAXIMILIAN-ALEXA / NDER"); a zero-width space lets it.
+  const shownText = text.replace(/-(?=\S)/g, '-\u200B');
   const minSize = min ?? Math.round(max * 0.45);
-  const estimate = useMemo(() => fitFontSize(text, width, max, minSize, lines, caps ? CAPS_WIDTH : CHAR_WIDTH), [text, width, max, minSize, lines, caps]);
+  const estimate = useMemo(() => fitFontSize(text, width, max, minSize, lines, caps ? CAPS_WIDTH : CHAR_WIDTH, height), [text, width, max, minSize, lines, caps, height]);
   const [size, setSize] = useState(estimate);
   useEffect(() => setSize(estimate), [estimate]);
   return (
     <Text
-      style={[styles.text, style, {fontSize: size, lineHeight: Math.round(size * 1.15), maxWidth: width}]}
-      numberOfLines={lines}
+      style={[styles.text, style, {fontSize: size, lineHeight: Math.round(size * LINE_HEIGHT), maxWidth: width}]}
+      numberOfLines={linesAllowed(size, lines, height)}
       ellipsizeMode="tail"
       onTextLayout={e => {
         // Where the platform reports real layout: if the visible lines lost text, step the size down.
         const shown = e.nativeEvent.lines.map(l => l.text).join('');
-        if (shown.replace(/\s/g, '').length < text.replace(/\s/g, '').length && size > minSize) {
+        if (shown.replace(/\s/g, '').length < shownText.replace(/\s/g, '').length && size > minSize) {
           setSize(Math.max(minSize, Math.floor(size * 0.9)));
         }
       }}>
-      {text}
+      {shownText}
     </Text>
   );
 }
 
 /**
- * A D-pad focusable element. Focus = the white ring (docs/03 §12: the white ring only ever means "selected").
- * `children` can be a function of the focus state.
+ * A D-pad focusable element. Focus = the white ring (docs/03 §12: the white ring only ever means "selected"),
+ * and it springs up a little; pressing squishes it. `children` can be a function of the focus state.
  */
 export function Focusable(props: {
   onPress?: () => void;
@@ -84,26 +130,37 @@ export function Focusable(props: {
   children: React.ReactNode | ((focused: boolean) => React.ReactNode);
 }) {
   const [focused, setFocused] = useState(false);
+  const scale = useRef(new Animated.Value(1)).current;
+  const springTo = (toValue: number, quick = false) =>
+    Animated.spring(scale, {toValue, speed: quick ? 40 : 20, bounciness: quick ? 0 : 9, useNativeDriver: true}).start();
   const change = (f: boolean) => {
     setFocused(f);
+    springTo(f ? FOCUS_SCALE : 1);
     props.onFocusChange?.(f);
   };
   return (
     <TouchableOpacity
       // 1 = no dimming: on TV builds TouchableOpacity also fades on *focus*, which made selected cards look washed out.
       activeOpacity={1}
-      onPress={props.onPress}
+      onPress={() => {
+        Sound.play('tap', 0.5);
+        props.onPress?.();
+      }}
+      onPressIn={() => springTo(0.94, true)}
+      onPressOut={() => springTo(focused ? FOCUS_SCALE : 1)}
       onFocus={() => change(true)}
       onBlur={() => change(false)}
       hasTVPreferredFocus={props.preferred}
       accessibilityRole="button"
       accessibilityLabel={props.label}
       disabled={props.disabled}
-      style={[styles.ringOff, props.style, focused && styles.ringOn, focused && props.focusedStyle]}>
+      style={[styles.ringOff, props.style, focused && styles.ringOn, focused && props.focusedStyle, {transform: [{scale}]}]}>
       {typeof props.children === 'function' ? props.children(focused) : props.children}
     </TouchableOpacity>
   );
 }
+
+const FOCUS_SCALE = 1.04;
 
 /** Big pill button: gold = the main action, glass = secondary. */
 export function Button({title, icon, onPress, primary, preferred, size = 1}: {title: string; icon?: IconName; onPress: () => void; primary?: boolean; preferred?: boolean; size?: number}) {
@@ -140,37 +197,76 @@ export function MarbleRow({count, size}: {count: number; size: number}) {
   );
 }
 
-const JAR_INNER = 384; // design px inside the glass
-const PILE_JITTER = [0, 2, -1, 1, -2, 1, -1, 2];
-
-function pile(n: number) {
-  const out: {left: number; bottom: number}[] = [];
-  for (let i = 0; i < n; i++) {
-    const row = Math.floor(i / 4);
-    const col = i % 4;
-    const inRow = Math.min(4, n - row * 4);
-    const width = (inRow - 1) * 78 + 72;
-    const shift = inRow === 4 ? (row % 2 === 0 ? -20 : 20) : 0;
-    out.push({left: (JAR_INNER - width) / 2 + col * 78 + shift, bottom: 14 + row * 70 + PILE_JITTER[i % PILE_JITTER.length]});
-  }
-  return out;
-}
-
-/** The marble jar. `fresh` marbles (the newest) drop in from above with a bounce. */
-export function Jar({marbles, fresh = 0, k = 1}: {marbles: number; fresh?: number; k?: number}) {
-  const shown = Math.min(marbles, 24);
-  const spots = useMemo(() => pile(shown), [shown]);
-  const drops = useRef(Array.from({length: Math.max(fresh, 0)}, () => new Animated.Value(-s(560 * k)))).current;
-  useEffect(() => {
-    Animated.stagger(
-      280,
-      drops.map(v => Animated.timing(v, {toValue: 0, duration: 900, easing: Easing.bounce, useNativeDriver: true})),
-    ).start();
-  }, [drops]);
+/**
+ * The marble jar. Marbles sit where the physics put them (physics.ts). `fresh` marbles (the newest)
+ * are played back falling in: the lid pops open, each marble drops through the neck, bounces and
+ * rolls into place with a clink at every knock, then the lid closes. All native-driver animation.
+ * `onLand(landed, of)` fires as each fresh marble lands.
+ */
+export function Jar({marbles, fresh = 0, k = 1, onLand}: {marbles: number; fresh?: number; k?: number; onLand?: (landed: number, of: number) => void}) {
   const d = (px: number) => s(px * k);
+  const count = Math.min(marbles, JAR_CAPACITY);
+  const drops = useMemo(() => jarDrops(count), [count]);
+  const freshCount = Math.max(0, Math.min(fresh, count));
+  const firstFresh = count - freshCount;
+  const lid = useRef(new Animated.Value(0)).current;
+  const progress = useRef(Array.from({length: freshCount}, () => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    if (!freshCount) return;
+    const OPEN = 280;
+    const stagger = freshCount <= 3 ? 650 : 420;
+    const mine = drops.slice(firstFresh);
+    const starts = mine.map((_, i) => OPEN + i * stagger);
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    Sound.play('lidOpen');
+    Animated.timing(lid, {toValue: 1, duration: 240, easing: Easing.out(Easing.back(2)), useNativeDriver: true}).start();
+    Animated.parallel(
+      progress.map((p, i) =>
+        Animated.sequence([
+          Animated.delay(starts[i]),
+          Animated.timing(p, {toValue: 1, duration: mine[i].duration * 1000, easing: Easing.linear, useNativeDriver: true}),
+        ]),
+      ),
+    ).start();
+    mine.forEach((drop, i) => {
+      drop.impacts.forEach(hit => timers.push(setTimeout(() => Sound.play('clink', 0.35 + 0.65 * hit.strength), starts[i] + hit.t * 1000)));
+      // "Lands" = its first knock on the pile or the glass.
+      timers.push(setTimeout(() => onLand?.(i + 1, mine.length), starts[i] + (drop.impacts[0]?.t ?? drop.duration) * 1000));
+    });
+    // Close the lid once the last marble is through the neck (its first knock), not while it's still in it.
+    const last = mine[mine.length - 1];
+    const closeAt = starts[starts.length - 1] + ((last.impacts[0]?.t ?? 0.4) * 1000) + 160;
+    timers.push(setTimeout(() => {
+      Sound.play('lidClose');
+      Animated.timing(lid, {toValue: 0, duration: 200, easing: Easing.in(Easing.quad), useNativeDriver: true}).start();
+    }, closeAt));
+    return () => timers.forEach(clearTimeout);
+    // The animation plays once per mount (the Yay screen mounts a fresh jar).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const r = JAR.radius;
+  // Marbles are drawn in an overlay above the glass (so falling ones are visible in the neck);
+  // the overlay origin is the inside of the glass: 60 lid + 20 neck + 8 border down, 8 border in.
+  const originTop = 88;
+  const originLeft = 8;
   return (
-    <View style={{alignItems: 'center'}}>
-      <View style={{width: d(300), height: d(60), borderRadius: d(22), backgroundColor: colors.coral, zIndex: 2}} />
+    <View style={{alignItems: 'center', width: d(400)}}>
+      <Animated.View
+        style={{
+          width: d(300),
+          height: d(60),
+          borderRadius: d(22),
+          backgroundColor: colors.coral,
+          zIndex: 3,
+          transform: [
+            {translateY: lid.interpolate({inputRange: [0, 1], outputRange: [0, -d(52)]})},
+            {translateX: lid.interpolate({inputRange: [0, 1], outputRange: [0, -d(46)]})},
+            {rotate: lid.interpolate({inputRange: [0, 1], outputRange: ['0deg', '-16deg']})},
+          ],
+        }}
+      />
       <View style={{width: d(280), height: d(20), borderLeftWidth: d(8), borderRightWidth: d(8), borderColor: colors.glassEdge, backgroundColor: colors.glass}} />
       <View
         style={{
@@ -183,18 +279,34 @@ export function Jar({marbles, fresh = 0, k = 1}: {marbles: number; fresh?: numbe
           borderTopRightRadius: d(72),
           borderBottomLeftRadius: d(96),
           borderBottomRightRadius: d(96),
-          overflow: 'hidden',
-        }}>
-        {spots.map((p, i) => {
-          const dropIndex = i - (shown - drops.length);
-          const anim = dropIndex >= 0 ? {transform: [{translateY: drops[dropIndex]}]} : null;
+        }}
+      />
+      <View pointerEvents="none" style={{position: 'absolute', left: d(originLeft), top: d(originTop), width: d(JAR.width), height: d(JAR.height), zIndex: 2}}>
+        {drops.map((drop, i) => {
+          if (i < firstFresh) {
+            return <Marble key={i} size={d(2 * r)} style={{position: 'absolute', left: d(drop.final.x - r), top: d(drop.final.y - r)}} />;
+          }
+          const p = progress[i - firstFresh];
+          const keys = drop.path.filter((_, j) => j % 2 === 0 || j === drop.path.length - 1);
+          const input = keys.map((_, j) => (keys.length === 1 ? 0 : j / (keys.length - 1)));
           return (
-            <Animated.View key={i} style={[{position: 'absolute', left: d(p.left), bottom: d(p.bottom)}, anim]}>
-              <Marble size={d(72)} />
+            <Animated.View
+              key={i}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                transform: [
+                  {translateX: p.interpolate({inputRange: input, outputRange: keys.map(q => d(q.x - r))})},
+                  {translateY: p.interpolate({inputRange: input, outputRange: keys.map(q => d(q.y - r))})},
+                ],
+              }}>
+              <Marble size={d(2 * r)} />
             </Animated.View>
           );
         })}
-        <View style={{position: 'absolute', left: d(26), top: d(40), width: d(20), height: d(160), borderRadius: d(10), backgroundColor: 'rgba(255,255,255,0.25)'}} />
+        {/* The glass's reflection sits on top of the marbles. */}
+        <View style={{position: 'absolute', left: d(18), top: d(32), width: d(20), height: d(160), borderRadius: d(10), backgroundColor: 'rgba(255,255,255,0.22)'}} />
       </View>
       <View style={{width: d(380), height: d(26), marginTop: d(8), borderRadius: d(190), backgroundColor: 'rgba(10,16,60,0.35)'}} />
     </View>
@@ -226,7 +338,7 @@ export function Sparkle({size, style}: {size: number; style?: StyleProp<ImageSty
 const styles = StyleSheet.create({
   text: {color: colors.white, fontWeight: '600'},
   ringOff: {borderWidth: s(10), borderColor: 'transparent'},
-  ringOn: {borderColor: colors.white, transform: [{scale: 1.04}]},
+  ringOn: {borderColor: colors.white},
   button: {flexDirection: 'row', alignItems: 'center', justifyContent: 'center'},
   rewardPill: {flexDirection: 'row', backgroundColor: colors.white, alignSelf: 'center'},
 });

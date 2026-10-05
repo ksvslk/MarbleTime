@@ -18,21 +18,35 @@ export function linesNeeded(text: string, width: number, size: number, charWidth
     lines += 1;
     let used = 0;
     for (const word of paragraph.split(/\s+/).filter(Boolean)) {
-      if (word.length > cap) return Number.POSITIVE_INFINITY; // one word wider than the box
-      if (used === 0) used = word.length;
-      else if (used + 1 + word.length <= cap) used += 1 + word.length;
-      else {
-        lines += 1;
-        used = word.length;
+      // A line may also break after a hyphen ("Mari-Liis"); FitText marks those spots for the platform.
+      const parts = word.replace(/-(?=.)/g, '-\n').split('\n');
+      for (let i = 0; i < parts.length; i++) {
+        const part = parts[i];
+        if (part.length > cap) return Number.POSITIVE_INFINITY; // wider than the box on its own
+        const gap = i === 0 ? 1 : 0; // a space between words, nothing after a hyphen
+        if (used === 0) used = part.length;
+        else if (used + gap + part.length <= cap) used += gap + part.length;
+        else {
+          lines += 1;
+          used = part.length;
+        }
       }
     }
   }
   return lines;
 }
 
-export function fitFontSize(text: string, width: number, maxSize: number, minSize: number, maxLines: number, charWidth = CHAR_WIDTH): number {
+/** Line height as a share of the font size (FitText draws text with it). */
+export const LINE_HEIGHT = 1.15;
+
+/** How many lines fit: `maxLines`, or fewer when a box of `maxHeight` can't hold them at this size. */
+export function linesAllowed(size: number, maxLines: number, maxHeight?: number): number {
+  return maxHeight ? Math.max(1, Math.min(maxLines, Math.floor(maxHeight / Math.round(size * LINE_HEIGHT)))) : maxLines;
+}
+
+export function fitFontSize(text: string, width: number, maxSize: number, minSize: number, maxLines: number, charWidth = CHAR_WIDTH, maxHeight?: number): number {
   for (let size = maxSize; size > minSize; size -= Math.max(1, size * 0.04)) {
-    if (linesNeeded(text, width, size, charWidth) <= maxLines) return Math.floor(size);
+    if (linesNeeded(text, width, size, charWidth) <= linesAllowed(Math.floor(size), maxLines, maxHeight)) return Math.floor(size);
   }
   return Math.floor(minSize);
 }

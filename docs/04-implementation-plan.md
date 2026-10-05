@@ -86,7 +86,7 @@ Results go in `docs/spike-results.md` and the friction log.
   - the **brain-game screen** (one template, [03 §11](03-architecture.md#11-brain-games)) with a **built-in question bank**: 3 topics × 3 age bands
   - settings
 - [ ] Local persistence (AsyncStorage), debug hooks, D-pad focus with `react-tv-space-navigation`, read-aloud
-- [ ] "Demo Cartoons" test app: a CC video, the metered target
+- [x] "Demo Cartoons" test app (`apps/demo-cartoons`, Kotlin): plays *Big Buck Bunny* (CC BY 3.0) full screen from Wikimedia Commons, with the credit on screen; OK pauses. The metered target in strict-mode tests and the demo video. Installed on the stick.
 - [ ] Quick Vega parity check on the simulator at the end of the week
 
 **Done when:** on the stick alone, a kid claims a job, a grown-up approves with the PIN, and the marbles drop; and a kid plays a 3-question game and gets its marbles.
@@ -97,31 +97,34 @@ Done early on the stick (screens from the canvas, PIN approval, built-in brain g
 
 - [x] **Four languages: English, Estonian, German, Spanish.** Every TV text sits in one translation table (`tv/packages/shared/src/marble/i18n.ts`); the family language is a grown-ups setting. The word puzzles are written per language. ⚠️ A native speaker reviews et/de/es before the video.
 - [x] **Capital letters setting** for kid-facing text (many young kids learn capitals first).
-- [x] **Any text fits** (names and jobs are user content; AI writes questions; four languages): `FitText` shrinks to fit N lines and only then cuts off. The stress-test link `scripts/fire.sh open 'stress=1&screen=who'` loads a worst-case family.
+- [x] **Any text fits** (names and jobs are user content; AI writes questions; four languages): `FitText` shrinks to fit N lines and only then cuts off. The stress-test link `scripts/fire.sh open 'stress=1&screen=who'` loads a worst-case family. Lines may break after a hyphen (double names like Mari-Liis).
 - [x] **Marble value** shown under the jar ("● = 5 min").
-- [ ] **Sound effects** (marble clink, yay, try again, tap): `expo-audio` on Fire OS, `@amazon-devices/react-native-w3cmedia` `AudioPlayer` on Vega, MP3 files.
-- [ ] **Read-aloud in four languages:** pre-made MP3s, nothing synthesised at runtime. Polly for en/de/es; Estonian via TartuNLP Neurokõne (terms to confirm) or Azure `et-EE-AnuNeural`. On-device fallback for en/de/es: Pico.
-- [ ] **Animations:** real marble physics (computed up front, played back natively), the jar lid opening and closing, and more key moments (claim, right answer, approval).
-- [ ] **Job icons:** the AI picks from our own icon set (grow it to ~40 job icons); AI-drawn icons in our style only as an extra.
-- [ ] Remember state across app restarts.
+- [x] **Sound effects** on Fire OS (marble clinks timed to the physics, lid, yay, right, try again, tap; synthesised by `scripts/make-sounds.py`, MP3). Played by our own small native module (`tv/packages/expotv/modules/marble-audio`, Android SoundPool): `expo-audio` gave every player a media session, so MarbleTime kept the remote's play/pause after Home.
+- [ ] Sound effects and read-aloud on Vega (M3): `@amazon-devices/react-native-w3cmedia` `AudioPlayer` with our MP3s. (`keplerscript-audio-lib` only plays built-in system sounds or raw PCM streams.)
+- [ ] **Vega parity (Oct 5 check):** the Vega build runs the new code (screens, focus, entrance motion, icons). Scripted OK presses on the VVD only deliver `onPressIn` (FRICTION_LOG), so check presses, saved state and the game by hand with the on-screen remote.
+- [x] **Read-aloud in four languages** on Fire OS: recorded clips only, nothing synthesised on the TV. `scripts/make-voices.py` asks the app for every line it speaks (`spokenLines()`), records the new ones (Polly neural Ruth/Vicki/Lucia for en/de/es, TartuNLP Neurokõne "mari" for Estonian, terms to confirm before launch), evens out loudness and writes `voices.ts`. 44 lines × 4 languages, ~2 MB. The TV says "Who's here?", each card's name as the D-pad lands on it, "Great job, Mia! A grown-up will check.", why marbles came, each question, "Try again!" and the praise; the speaker button repeats the question. A line without a clip is skipped (no robot voice); in M2 the backend records each family's names and jobs. Grown-ups can turn "Read aloud" off. Pico is no longer needed.
+- [x] **Marble physics** (seeded, computed up front, played back natively) and the jar lid opening and closing.
+- [x] **More animations at key moments**: claim, right and wrong answers, counting, approval, Yay with the minutes counting up as marbles land, PIN shake, focus spring (rules in [03 §12](03-architecture.md#12-tv-design-rules)). Checked frame by frame on the stick with `screenrecord`.
+- [x] **Job icons:** 43 icons (5 of ours + 38 from Lucide, ISC, see THIRD_PARTY_NOTICES.md), each with a hint for the AI (`JOB_ICONS` in `data.ts`); the AI picks one per job in M2, the parent can change it. AI-drawn icons in our style only as an extra.
+- [x] Remember state across app restarts (AsyncStorage on both platforms; everything except the screen; the daily game cap resets at local midnight). Checked on the stick with a force-stop.
 
 ## M2 · Backend, parent PWA and Amazon Kids hand-off (Oct 9–14)
 
 Added on Oct 5: the parent app speaks the same four languages; **recurring jobs** (every day, or chosen weekdays; at most once per day; back on the TV board when due); length limits on names and job titles as a second safety net; the AI picks each job's icon from our set.
 
-- [ ] `backend/openapi.yaml` (contract first), then the CDK stack:
-  - HTTP API, Lambdas, DynamoDB
-  - Cognito
-  - $10 budget alarm
-- [ ] Endpoints in 03 §8, including **hand-off**, **device mode**, **game results** and **game settings**. Unit tests + `scripts/api-smoke.sh`.
-- [ ] **PWA:**
-  - sign-in, onboarding
-  - pair TV (QR link), approvals inbox (one tap, no photos), ± minutes
-  - jobs, history
-  - brain-game settings per kid: age, topics, daily cap, read aloud
+- [x] `backend/openapi.yaml` (contract first), then the CDK stack (written and synthesised; **not deployed yet**, waiting for the user's go):
+  - HTTP API, one Lambda, DynamoDB single table
+  - Cognito (managed login, code + PKCE), S3 + CloudFront for the PWA
+  - $10 budget alarm (when an email is given)
+- [x] Endpoints in 03 §8, including **hand-off**, **device mode**, **game results** and **game settings**. 143 tests (also run against DynamoDB Local) + `scripts/api-smoke.sh`. Local dev server: `cd backend && npm run dev -- --seed`.
+- [x] **PWA** (`parent-web/`, 48 tests, four languages), tried by the user on a phone over Wi-Fi:
+  - sign-in (Cognito, or a name against the dev server), onboarding
+  - pair TV (QR link or typed code), approvals inbox (one tap, no photos), ± minutes
+  - jobs (repeat: every day, chosen weekdays, once), history
+  - brain-game settings per kid: age, topics, daily cap (read aloud is family-wide for now)
   - **"Add N min in Amazon Kids"** step (opens `parents.amazon.com`, then mark done). It adds up approved jobs **and** game marbles.
-  - optional kid view
-- [ ] **TV:** pairing screen (QR), sync (state poll, claim and game-result upload), outbox
+  - [ ] optional kid view
+- [x] **TV:** pairing screen (QR), sync (state poll every 3 s, claim and game-result upload), outbox kept across restarts, the family's own PIN. Checked on the stick against the local backend: a claim reaches the backend in 1.5 s; an approval comes back as "Yay!".
 
 **Done when:**
 - A claim on the TV shows up on the phone, is approved, and the TV updates within ≤ 5 s.
