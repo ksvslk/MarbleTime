@@ -1,4 +1,4 @@
-# TimeJar: earned screen time on Fire TV (hackathon, deadline 2026-10-23 12:00 PDT)
+# MarbleTime: earned screen time on Fire TV (hackathon, deadline 2026-10-23 12:00 PDT)
 
 Kids earn TV time with real-life jobs (written by parents) and brain games (written by AI, checked by code).
 Docs: docs/ (README first; architecture docs/03, incl. §11 brain games and §12 TV design rules; plan docs/04; API ask docs/07).

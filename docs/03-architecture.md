@@ -7,13 +7,13 @@
 > - an **AWS serverless backend** (CDK: API Gateway + Lambda + DynamoDB + Cognito + Bedrock)
 > - TV screens for young kids: the [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh), rules in §12
 >
-> Alternatives are in [02-approaches](02-approaches.md). "TimeJar" is a working title.
+> Alternatives are in [02-approaches](02-approaches.md). The name MarbleTime was chosen on Oct 5 (TimeJar was the working title).
 
 ## 1. Big picture
 
 ```mermaid
 flowchart LR
-  Kid((Kid)) -->|"remote / voice"| TV["TimeJar TV app<br/>(Fire OS + Vega)"]
+  Kid((Kid)) -->|"remote / voice"| TV["MarbleTime TV app<br/>(Fire OS + Vega)"]
   TV <-->|"HTTPS (poll, later push)"| API["AWS backend<br/>API GW + Lambda + DynamoDB"]
   Parent((Parent)) --> PWA["Parent web app<br/>(PWA on phone)"]
   PWA <-->|HTTPS| API
@@ -65,7 +65,7 @@ flowchart TB
 ```mermaid
 sequenceDiagram
   actor Kid
-  participant TV as TimeJar (TV)
+  participant TV as MarbleTime (TV)
   participant API as Backend
   actor Parent as Parent (phone)
   Kid->>TV: claim "Empty dishwasher" (+15)
@@ -103,7 +103,7 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  participant TV as TimeJar (TV)
+  participant TV as MarbleTime (TV)
   participant API as Backend
   actor Parent as Parent (phone)
   TV->>API: POST /pairings (random code, 10 min TTL, platform, mode)
@@ -120,7 +120,7 @@ sequenceDiagram
 sequenceDiagram
   participant Gen as Generator (nightly)
   participant API as Backend
-  participant TV as TimeJar (TV)
+  participant TV as MarbleTime (TV)
   actor Kid
   Gen->>API: next day's sets per kid (age, topics), already checked
   TV->>API: GET /device/state (includes today's sets)
@@ -152,7 +152,7 @@ stateDiagram-v2
   Bedtime --> Free: bedtime ends / parent override
 ```
 
-**Metered apps:** everything except an allowlist (TimeJar, Fire TV home and settings, learning apps the parent picks).
+**Metered apps:** everything except an allowlist (MarbleTime, Fire TV home and settings, learning apps the parent picks).
 
 ### 5.2 Layers
 

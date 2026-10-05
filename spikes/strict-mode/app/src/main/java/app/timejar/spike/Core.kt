@@ -31,6 +31,8 @@ object Allowlist {
         "com.amazon.tv.settings",
         "com.android.systemui",
         "com.amazon.vizzini",          // Alexa voice overlay
+        "com.amazon.ftv.screensaver",  // screensaver after ~5 min idle: must never cost time
+        "com.amazon.tv.ftvambient",    // ambient experience
         "com.amazon.tv.oobe",
         "com.android.settings",
     )

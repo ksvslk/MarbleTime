@@ -55,7 +55,7 @@ gantt
 |---|---|---|---|
 | K1 | Does an Amazon Kids profile with a **daily limit** work on the 4K Plus? | You | The TV locks the kid profile at the limit |
 | K2 | Does **bonus time** from the Parent Dashboard unlock it? | You | Unlocked within ~1 min |
-| K3 | Can TimeJar (sideloaded) be **added to the kid profile**? Does it count toward the limit? Can a kid open it **after** time's up (per-category limits)? | You + agent | Answers decide how kids claim when locked |
+| K3 | Can MarbleTime (sideloaded) be **added to the kid profile**? Does it count toward the limit? Can a kid open it **after** time's up (per-category limits)? | You + agent | Answers decide how kids claim when locked |
 | R1 | Does the **Expo TV build** of the helloworld run on Fire OS 8 (32-bit) with D-pad focus? | Agent | Installs, runs, focus works |
 | R2 | Does the **Vega build** run on the Vega Virtual Device? | Agent | App launches; keys and logs work |
 | R3 | Does **text-to-speech** work in the Expo TV build on the stick (brain-game questions are read aloud)? | Agent | A test sentence is spoken |

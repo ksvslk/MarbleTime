@@ -17,9 +17,9 @@
     "build:app": "npm-run-all build:release",
     "build": "npm-run-all build:release",
     "release": "npm-run-all lint test build:app",
-    "vvd:mseries": "vega run-app build/aarch64-debug/vega_aarch64.vpkg com.amazondeveloper.hellosharedworkspace.main -d VirtualDevice",
-    "vvd:intel": "vega run-app build/x86_64-debug/vega_x86_64.vpkg com.amazondeveloper.hellosharedworkspace.main -d VirtualDevice",
-    "firetv": "vega run-app build/armv7-release/vega_armv7.vpkg com.amazondeveloper.hellosharedworkspace.main -d"
+    "vvd:mseries": "vega run-app build/aarch64-debug/vega_aarch64.vpkg app.marbletime.tv.main -d VirtualDevice",
+    "vvd:intel": "vega run-app build/x86_64-debug/vega_x86_64.vpkg app.marbletime.tv.main -d VirtualDevice",
+    "firetv": "vega run-app build/armv7-release/vega_armv7.vpkg app.marbletime.tv.main -d"
   },
   "dependencies": {
     "@amazon-devices/kepler-module-resolver-preset": "^0.1.15",
@@ -61,7 +61,7 @@
   },
   "kepler": {
     "projectType": "application",
-    "appName": "HelloSharedWorkspace",
+    "appName": "MarbleTime",
     "targets": [
       "tv"
     ]

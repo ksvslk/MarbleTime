@@ -30,9 +30,9 @@ Everything here was researched on 2026-10-02. Sources are at the bottom.
 | | Amazon Kids mode ✅ | Strict mode ✅ (sideload) | Earned Time API ◻️ (proposal) |
 |---|---|---|---|
 | Runs on | Fire OS + Vega, Appstore | Fire OS only, sideloaded + ADB setup | Fire OS + Vega |
-| Enforcement | Amazon Kids daily limit (OS-level) | TimeJar's usage watcher + lock screen | The OS, through the API |
-| Minutes from chores | Parent adds **bonus time** in Amazon's Parent Dashboard. TimeJar hands it off: one tap that opens the dashboard. | Automatic | Automatic (`grantBonusTime`) |
-| Kid locked out → can they still claim on the TV? | Probably not (the profile locks). Claim by **phone, voice, or before time runs out**. *(Per-category limits might keep TimeJar open: check on day 1.)* | Yes. The lock screen *is* the chore board. | Yes |
+| Enforcement | Amazon Kids daily limit (OS-level) | MarbleTime's usage watcher + lock screen | The OS, through the API |
+| Minutes from chores | Parent adds **bonus time** in Amazon's Parent Dashboard. MarbleTime hands it off: one tap that opens the dashboard. | Automatic | Automatic (`grantBonusTime`) |
+| Kid locked out → can they still claim on the TV? | Probably not (the profile locks). Claim by **phone, voice, or before time runs out**. *(Per-category limits might keep MarbleTime open: check on day 1.)* | Yes. The lock screen *is* the chore board. | Yes |
 | Role in the hackathon | **The shippable product** | **The demo's magic moment**: shows what the API would enable | **The "Shape" ask**, written up in [07](07-earned-time-api.md) |
 
 ---
@@ -105,7 +105,7 @@ You asked about *"mobile app or code on the chore?"*:
 | V4 | **One-time "TV ticket" codes** generated on the phone. The kid types 6 digits on the TV; codes are HMAC/TOTP-style, checked offline, and work once. | Parent decides | ◻️ fun extra |
 | V5 | **Static QR/NFC sticker on the chore** | ❌ only shows the kid was there | ◻️ only as a *claim shortcut* |
 | V6 | AI photo pre-check (Bedrock vision): verdict + reason, but the parent still approves | Helps the parent decide | ❌ dropped Oct 5: parents approve on the phone or TV, no photos needed |
-| V7 | **Voice claim** (*"Alexa, tell TimeJar I cleaned my room"*). In Amazon Kids mode it also works while the TV is locked. | Parent decides | ◻️ stretch #2 |
+| V7 | **Voice claim** (*"Alexa, tell MarbleTime I cleaned my room"*). In Amazon Kids mode it also works while the TV is locked. | Parent decides | ◻️ stretch #2 |
 | V8 | Ring camera events | Partly | ❌ for the hackathon |
 
 **Penalties** are a negative ledger entry with a reason.

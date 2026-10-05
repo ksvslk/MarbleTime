@@ -1,4 +1,4 @@
-# TimeJar (working title): the family chore board on your TV
+# MarbleTime: the family chore board on your TV
 
 *Hackathon:* **Build, Ship, Shape: Amazon Developer Hackathon**, Fire TV track. **Deadline Fri Oct 23 2026, 12:00 PDT (22:00 EEST).**
 *Test devices:* Fire TV Stick 4K Plus (Fire OS 8) and the Vega Virtual Device (simulator on the Mac).
@@ -20,12 +20,12 @@ How the minutes are *enforced* depends on where the app runs:
 | Mode | Runs on | Who enforces the time | Status |
 |---|---|---|---|
 | **Amazon Kids mode** | Appstore build on **Fire OS + Vega** | Amazon Kids' own daily limit. Approved minutes are handed off as **bonus time** (one tap in Amazon's Parent Dashboard). | can ship today |
-| **Strict mode** | Fire OS, sideloaded | TimeJar itself: counts time, locks other apps at zero, unlocks the moment a chore is approved | demo + power users |
+| **Strict mode** | Fire OS, sideloaded | MarbleTime itself: counts time, locks other apps at zero, unlocks the moment a chore is approved | demo + power users |
 | **Earned Time API** | Fire OS + Vega | The OS, automatically. This is the API we ask Amazon for. | proposal → [07](07-earned-time-api.md) |
 
 ```mermaid
 flowchart LR
-  Kid((Kid)) -->|"I did it! / plays a game"| TV["TimeJar on the TV<br/>jobs, games + marble jar"]
+  Kid((Kid)) -->|"I did it! / plays a game"| TV["MarbleTime on the TV<br/>jobs, games + marble jar"]
   TV -->|"claim / game result"| Cloud["AWS backend<br/>+ Bedrock writes brain games"]
   Cloud <-->|"approve / ± minutes"| Parent(("Parent's phone<br/>(or PIN on the TV)"))
   Cloud -->|"+2 marbles 🎉"| TV
@@ -87,7 +87,7 @@ flowchart LR
 
 ## Decisions for you
 
-1. **Name.** "TimeJar" is a placeholder.
+1. ~~**Name.**~~ ✅ **MarbleTime**, chosen Oct 5 (the working title was TimeJar, but two productivity apps already use that name).
 2. **Repo.** Public + MIT license, or private + reviewer invites?
 3. **Stack.** React Native for Fire OS + Vega (recommended), or the lower-risk Kotlin-only build (Fire OS only, weaker impact story)?
 4. **Team.** Solo, or are teammates joining?

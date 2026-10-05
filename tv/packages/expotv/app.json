@@ -1,6 +1,6 @@
 {
   "expo": {
-    "scheme": "routertv",
+    "scheme": "marbletime",
     "plugins": [
       [
         "@react-native-tvos/config-tv",
@@ -33,13 +33,13 @@
       "splash": {
         "image": "./assets/images/splash.png"
       },
-      "package": "com.anonymous.MyTVProject"
+      "package": "app.marbletime.tv"
     },
     "ios": {
       "splash": {
         "image": "./assets/images/splash.png"
       },
-      "bundleIdentifier": "com.anonymous.MyTVProject"
+      "bundleIdentifier": "app.marbletime.tv"
     },
     "web": {
       "bundler": "metro",
@@ -50,7 +50,7 @@
       "autolinkingModuleResolution": true,
       "typedRoutes": true
     },
-    "name": "MyTVProject",
-    "slug": "MyTVProject"
+    "name": "MarbleTime",
+    "slug": "marbletime"
   }
 }

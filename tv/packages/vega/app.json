@@ -1,5 +1,5 @@
 {
   "//": "The declared app name must follow this pattern to be KRL-compatible",
-  "name": "com.amazondeveloper.hellosharedworkspace.main",
-  "displayName": "HelloSharedWorkspace"
+  "name": "app.marbletime.tv.main",
+  "displayName": "MarbleTime"
 }

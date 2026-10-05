@@ -6,7 +6,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 TV="$ROOT/tv"
 VPKG="$TV/packages/vega/build/aarch64-debug/vega_aarch64.vpkg"
-APP_ID="com.amazondeveloper.hellosharedworkspace.main"   # renamed to the TimeJar id in M1
+APP_ID="app.marbletime.tv.main"
 SHOTS="$ROOT/.shots"
 
 # shellcheck disable=SC1090

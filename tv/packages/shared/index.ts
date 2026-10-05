@@ -13,3 +13,6 @@ export {createHttpClient} from './src/services/httpClient';
 export type {HttpClientConfig, HttpResponse} from './src/services/httpClient';
 
 
+
+// MarbleTime app (shared by the Fire OS and Vega builds)
+export {MarbleTimeApp} from './src/marble/MarbleTimeApp';

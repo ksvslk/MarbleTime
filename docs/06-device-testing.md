@@ -26,9 +26,9 @@ These checks decide how Amazon Kids mode works (04, checks K1–K3). Write the a
 2. **Set a short daily limit:** open the **Parent Dashboard** (`parents.amazon.com` or the *Amazon Kids Parent Dashboard* app) → the child → Set Up Screen Time → **Daily Time Limits**, e.g. 10 minutes.
 3. **K1:** switch to the kids profile and watch something allowed until the limit hits. *What does the TV show? Does it lock?*
 4. **K2:** in the Parent Dashboard, use **bonus time** (one tap since app v1.22). *Does the TV unlock? How fast?*
-5. **K3** (after the agent has installed TimeJar):
-   - Settings → Accounts & Profile Settings → **Kids Settings** → the profile → **Add Content**. *Is TimeJar offered? (It's sideloaded.)*
-   - Inside the kids profile, *does TimeJar's use count toward the limit*? *Can the kid open it **after** time's up?*
+5. **K3** (after the agent has installed MarbleTime):
+   - Settings → Accounts & Profile Settings → **Kids Settings** → the profile → **Add Content**. *Is MarbleTime offered? (It's sideloaded.)*
+   - Inside the kids profile, *does MarbleTime's use count toward the limit*? *Can the kid open it **after** time's up?*
    - Also check whether **Settings is blocked** in the kids profile. It should be, and that blocks the force-stop trick in strict mode.
 
 > Amazon Kids profiles aren't available on the Fire TV Cube or some Fire TV smart TVs. The 4K Plus should be fine; K1 confirms it.
@@ -44,7 +44,7 @@ scripts/fire.sh launch
 **What `grant` does.** Fire OS has no settings screen for these permissions. The same commands work on Fire OS 8 in other projects; the spike confirms them on your stick.
 
 ```bash
-PKG=app.timejar.tv
+PKG=app.marbletime.tv
 adb shell pm grant $PKG android.permission.PACKAGE_USAGE_STATS   # which app is in front, for how long
 adb shell appops set $PKG SYSTEM_ALERT_WINDOW allow             # overlays + bring the lock screen to front
 adb shell dumpsys deviceidle whitelist +$PKG                     # don't let the OS put us to sleep
@@ -56,7 +56,7 @@ adb shell settings put secure accessibility_enabled 1
 ```
 
 > Two notes:
-> - A **force-stop** of TimeJar removes it from the accessibility list.
+> - A **force-stop** of MarbleTime removes it from the accessibility list.
 > - While accessibility is on, **Prime Video stops auto-hiding its controls**, which is a known side effect.
 
 ## 4. Vega Virtual Device (simulator)
@@ -112,7 +112,7 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
 | # | Scenario | Expected |
 |---|---|---|
 | 1 | Approve a chore | PWA offers **"Add 15 min in Amazon Kids"** → opens the Parent Dashboard |
-| 2 | Add bonus time, tap "done" | Kids profile unlocked; TimeJar shows the hand-off as done |
+| 2 | Add bonus time, tap "done" | Kids profile unlocked; MarbleTime shows the hand-off as done |
 | 3 | Penalty (−10), then an approval (+15) | Suggested hand-off is **+5** (debt netted) |
 | 4 | Kids profile is locked | The kid can still claim through the phone/tablet kid view (or voice) |
 
@@ -120,7 +120,7 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
 
 | # | Scenario | Expected |
 |---|---|---|
-| 1 | Open YouTube or Demo Cartoons | Balance counts down. Home, Settings and TimeJar **don't** count. |
+| 1 | Open YouTube or Demo Cartoons | Balance counts down. Home, Settings and MarbleTime **don't** count. |
 | 2 | 5 and 1 minutes left | Banner over the running app |
 | 3 | Balance hits 0 | Lock screen ≤ 2 s; video pauses |
 | 4 | Approve a chore while locked | Unlocks by itself; balance shows +15 |

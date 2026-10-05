@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fire OS loop on the Fire TV stick over Wi-Fi ADB: connect, install, launch, keys, shot, logs.
-# Usage: scripts/fire.sh connect|install [apk]|launch|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs
+# Usage: scripts/fire.sh build|connect|install [apk]|launch|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs
 # The stick's address comes from .env.local: FIRETV=<ip>:5555
 set -euo pipefail
 
@@ -8,11 +8,15 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
 [ -f "$ROOT/.env.local" ] && source "$ROOT/.env.local"
 : "${FIRETV:?Set FIRETV=<ip>:5555 in .env.local}"
-APP_ID="${APP_ID:-com.anonymous.MyTVProject}"   # the starter's Expo TV id; renamed to the TimeJar id in M1
+APP_ID="${APP_ID:-app.marbletime.tv}"
 SHOTS="$ROOT/.shots"
 
 cmd="${1:-}"; shift || true
 case "$cmd" in
+  build)   # release APK for the stick (armeabi-v7a). --rerun on the JS bundle: Gradle doesn't see edits in tv/packages/shared.
+    export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}" JAVA_HOME="${JAVA_HOME:-/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home}"
+    [ -d "$ROOT/tv/packages/expotv/android" ] || (cd "$ROOT/tv/packages/expotv" && EXPO_TV=1 CI=1 npx expo prebuild --clean --platform android)
+    (cd "$ROOT/tv/packages/expotv/android" && ./gradlew :app:createBundleReleaseJsAndAssets --rerun assembleRelease -PreactNativeArchitectures=armeabi-v7a --console=plain -q) ;;
   connect) adb connect "$FIRETV" && adb -s "$FIRETV" shell getprop ro.build.version.sdk ;;
   install) adb -s "$FIRETV" install -r "${1:-$ROOT/tv/packages/expotv/android/app/build/outputs/apk/release/app-release.apk}" ;;
   launch)  adb -s "$FIRETV" shell monkey -p "$APP_ID" -c android.intent.category.LEANBACK_LAUNCHER 1 ;;
@@ -34,6 +38,6 @@ case "$cmd" in
   shot)
     mkdir -p "$SHOTS"; out="$SHOTS/fire-${1:-shot}.png"
     adb -s "$FIRETV" exec-out screencap -p > "$out" && echo "$out" ;;
-  logs)    adb -s "$FIRETV" logcat -d -s ReactNativeJS:* TimeJar:* Strict:* ;;
-  *) echo "usage: $0 connect|install [apk]|launch|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs" >&2; exit 2 ;;
+  logs)    adb -s "$FIRETV" logcat -d -s ReactNativeJS:* MarbleTime:* Strict:* ;;
+  *) echo "usage: $0 build|connect|install [apk]|launch|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs" >&2; exit 2 ;;
 esac

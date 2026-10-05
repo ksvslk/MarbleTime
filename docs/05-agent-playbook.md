@@ -81,10 +81,10 @@
 
 ```bash
 yarn expotv:prebuild && (cd tv/packages/expotv && npx expo run:android --device $FIRETV)  # or a release build + adb install
-adb -s $FIRETV shell am start -n app.timejar.tv/.MainActivity
+adb -s $FIRETV shell am start -n app.marbletime.tv/.MainActivity
 adb -s $FIRETV shell input keyevent KEYCODE_DPAD_DOWN KEYCODE_DPAD_CENTER   # drive the UI
 adb -s $FIRETV exec-out screencap -p > .shots/home.png                     # the agent looks at it
-adb -s $FIRETV logcat -d -s TimeJar:* Strict:* ReactNativeJS:*             # assert on logs
+adb -s $FIRETV logcat -d -s MarbleTime:* Strict:* ReactNativeJS:*             # assert on logs
 ```
 
 ### Vega: simulator on the Mac
@@ -92,9 +92,9 @@ adb -s $FIRETV logcat -d -s TimeJar:* Strict:* ReactNativeJS:*             # ass
 ```bash
 yarn vega:build                                    # → tv/packages/vega/build/aarch64-debug/*.vpkg
 vega virtual-device start
-vega run-app <vpkg> app.timejar.tv.main -d VirtualDevice
+vega run-app <vpkg> app.marbletime.tv.main -d VirtualDevice
 vega exec vda shell "inputd-cli button_press KEY_DOWN"           # remote keys
-vega exec vda shell "loggingctl log -f --vpkg app.timejar.tv"    # logs
+vega exec vda shell "loggingctl log -f --vpkg app.marbletime.tv"    # logs
 screencapture -x -l <vvd-window-id> .shots/vega-home.png         # macOS capture; needs Screen Recording permission
 ```
 
@@ -159,7 +159,7 @@ flowchart LR
 ## 10. Suggested `CLAUDE.md` skeleton
 
 ```markdown
-# TimeJar: family chore board + earned screen time on Fire TV (hackathon, deadline 2026-10-23 12:00 PDT)
+# MarbleTime: family chore board + earned screen time on Fire TV (hackathon, deadline 2026-10-23 12:00 PDT)
 Docs: docs/ (README first; architecture docs/03; plan docs/04; API ask docs/07). API contract: backend/openapi.yaml.
 ## Modes
 amazon_kids (Appstore, Fire OS + Vega) · strict (Fire OS sideload, Kotlin module) · api_mock (proposed Earned Time API)

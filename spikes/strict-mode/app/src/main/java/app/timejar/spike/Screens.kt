@@ -79,6 +79,49 @@ class MainActivity : Activity() {
     }
 }
 
+/**
+ * Day-1 check R3: can the stick read a brain-game question out loud?
+ *   adb shell am start -n app.timejar.spike/.SayActivity --es text "How many apples can you count?"
+ * Logs `Strict: tts …` lines for init, start and done.
+ */
+class SayActivity : Activity(), android.speech.tts.TextToSpeech.OnInitListener {
+    private var tts: android.speech.tts.TextToSpeech? = null
+    private var text = "How many apples can you count?"
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        text = intent.getStringExtra("text") ?: text
+        val root = column(this)
+        root.addView(label(this, text, 48f))
+        setContentView(root)
+        // Optional: --es engine com.svox.pico to try another engine than the default.
+        tts = android.speech.tts.TextToSpeech(this, this, intent.getStringExtra("engine"))
+    }
+
+    override fun onInit(status: Int) {
+        val engine = tts ?: return
+        Log.i(TAG, "Strict: tts init status=$status requested=${intent.getStringExtra("engine")} default=${engine.defaultEngine} engines=${engine.engines.map { it.name }}")
+        if (status != android.speech.tts.TextToSpeech.SUCCESS) { finish(); return }
+        val wanted = java.util.Locale.forLanguageTag(intent.getStringExtra("lang") ?: "en-US")
+        for (tag in listOf("en-GB", "en-US", wanted.toLanguageTag())) {
+            Log.i(TAG, "Strict: tts available $tag=${engine.isLanguageAvailable(java.util.Locale.forLanguageTag(tag))}")
+        }
+        Log.i(TAG, "Strict: tts setLanguage ${wanted.toLanguageTag()}=${engine.setLanguage(wanted)} voices=${engine.voices?.size}")
+        engine.setOnUtteranceProgressListener(object : android.speech.tts.UtteranceProgressListener() {
+            override fun onStart(utteranceId: String?) { Log.i(TAG, "Strict: tts start") }
+            override fun onDone(utteranceId: String?) { Log.i(TAG, "Strict: tts done"); runOnUiThread { finish() } }
+            @Deprecated("Required override") override fun onError(utteranceId: String?) { Log.w(TAG, "Strict: tts error") }
+        })
+        val result = engine.speak(text, android.speech.tts.TextToSpeech.QUEUE_FLUSH, null, "r3")
+        Log.i(TAG, "Strict: tts speak result=$result voice=${engine.voice?.name} locale=${engine.voice?.locale}")
+    }
+
+    override fun onDestroy() {
+        tts?.shutdown()
+        super.onDestroy()
+    }
+}
+
 /** The lock screen (S2): "Your jar is empty". HOME still works; reopening the blocked app locks again. */
 class LockActivity : Activity() {
     companion object { const val EXTRA_BLOCKED = "blocked" }

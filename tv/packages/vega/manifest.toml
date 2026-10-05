@@ -6,9 +6,9 @@
 schema-version = 1
 
 [package]
-title = "Basic UI React Native Application for project hellosharedworkspace"
+title = "MarbleTime"
 version = "0.1.0"
-id = "com.amazondeveloper.hellosharedworkspace"
+id = "app.marbletime.tv"
 
 [os.version]
 min = "1.2"
@@ -16,7 +16,7 @@ target = "1.2"
 
 [components]
 [[components.interactive]]
-id = "com.amazondeveloper.hellosharedworkspace.main"
+id = "app.marbletime.tv.main"
 runtime-module = "/com.amazon.kepler.runtime.react_native_kepler_4@IReactNativeKepler_0"
 launch-type = "singleton"
 categories = ["com.amazon.category.main"]
