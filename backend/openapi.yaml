@@ -1,0 +1,593 @@
+openapi: 3.1.0
+info:
+  title: MarbleTime API
+  version: 0.1.0
+  description: |
+    Kids earn TV time with real-life jobs (chores, approved by a parent) and brain games (checked by the TV).
+    Two callers:
+      - the parent web app, signed in with Cognito (`Authorization: Bearer <access token>`);
+      - a paired TV, with the device token it got when it was paired (`Authorization: Device <token>`).
+    Words: the API says "children", "chores" and "parent"; the apps say "kids", "jobs" and "grown-ups".
+    Times are epoch milliseconds. Minutes are whole multiples of 5 (one marble = 5 minutes).
+    Errors are `{"error": {"code": "...", "message": "..."}}` with a 4xx/5xx status.
+    Design: docs/03-architecture.md §4.1 (earning), §4.3 (pairing), §6 (ledger), §7 (data model), §8.
+
+servers:
+  - url: https://{apiId}.execute-api.us-east-1.amazonaws.com
+    variables:
+      apiId: {default: example}
+  - url: http://localhost:8787
+    description: local dev server (backend/src/dev-server.ts); `Bearer dev-<name>` signs a parent in
+
+security:
+  - parent: []
+
+paths:
+  # ---------- Parent: family ----------
+  /me:
+    get:
+      summary: Who is signed in, and their family (null until onboarding is done)
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Me'}}}}
+  /family:
+    post:
+      summary: Create the family (onboarding). The caller becomes its first parent.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/FamilyCreate'}}}}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Family'}}}}
+        '409': {$ref: '#/components/responses/Error'}
+    get:
+      summary: Everything the parent app shows
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/FamilyBundle'}}}}
+    patch:
+      summary: Name, language, TV settings, grown-ups PIN
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/FamilyPatch'}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Family'}}}}
+
+  # ---------- Parent: children ----------
+  /children:
+    post:
+      summary: Add a child
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ChildInput'}}}}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Child'}}}}
+        '400': {$ref: '#/components/responses/Error'}
+  /children/{childId}:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    patch:
+      summary: Edit a child (name, avatar, age, brain-game settings)
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ChildPatch'}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Child'}}}}
+    delete:
+      summary: Remove a child and everything about them
+      responses: {'204': {description: Deleted}}
+  /children/{childId}/adjust:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    post:
+      summary: Bonus (+) or penalty (−) minutes, with a reason
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [deltaMin, reason]
+              properties:
+                id: {type: string, description: client UUID; repeats are ignored}
+                deltaMin: {type: integer, minimum: -120, maximum: 120, multipleOf: 5, not: {const: 0}}
+                reason: {type: string, maxLength: 80}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Balance'}}}}
+  /children/{childId}/ledger:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    get:
+      summary: History, newest first
+      parameters:
+        - {name: limit, in: query, schema: {type: integer, minimum: 1, maximum: 200, default: 50}}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [entries], properties: {entries: {type: array, items: {$ref: '#/components/schemas/LedgerEntry'}}}}
+  /children/{childId}/handoff:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    get:
+      summary: Minutes to add in Amazon Kids (pending earned minutes minus outstanding penalties)
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Handoff'}}}}
+    post:
+      summary: Mark hand-off entries done (added in Amazon Kids) or skipped
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [entryIds, status]
+              properties:
+                entryIds: {type: array, items: {type: string}, minItems: 1, maxItems: 200}
+                status: {type: string, enum: [DONE, SKIPPED]}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Handoff'}}}}
+
+  # ---------- Parent: chores ----------
+  /chores:
+    post:
+      summary: Add a job. Without `icon`, the server picks one from the job-icon set by the title.
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ChoreInput'}}}}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Chore'}}}}
+        '400': {$ref: '#/components/responses/Error'}
+  /chores/{choreId}:
+    parameters: [{$ref: '#/components/parameters/choreId'}]
+    patch:
+      summary: Edit a job
+      requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ChorePatch'}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Chore'}}}}
+    delete:
+      summary: Remove a job (its history stays)
+      responses: {'204': {description: Deleted}}
+
+  # ---------- Parent: claims ----------
+  /claims:
+    get:
+      summary: Claims, newest first (approvals inbox = status=waiting)
+      parameters:
+        - {name: status, in: query, schema: {$ref: '#/components/schemas/ClaimStatus'}}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [claims], properties: {claims: {type: array, items: {$ref: '#/components/schemas/Claim'}}}}
+  /claims/{claimId}/approve:
+    parameters: [{$ref: '#/components/parameters/claimId'}]
+    post:
+      summary: Yes. Adds the job's minutes to the child (once; repeats return the same claim).
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '409': {$ref: '#/components/responses/Error'}
+  /claims/{claimId}/reject:
+    parameters: [{$ref: '#/components/parameters/claimId'}]
+    post:
+      summary: Not yet. No minutes; the job is back on the TV board.
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '409': {$ref: '#/components/responses/Error'}
+
+  # ---------- Parent: devices and pairing ----------
+  /pairings/{code}/confirm:
+    parameters: [{$ref: '#/components/parameters/code'}]
+    post:
+      summary: The parent scanned the TV's QR code and named the TV. Creates the device.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name: {type: string, minLength: 1, maxLength: 40}
+                mode: {$ref: '#/components/schemas/DeviceMode'}
+      responses:
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Device'}}}}
+        '404': {$ref: '#/components/responses/Error'}
+        '410': {$ref: '#/components/responses/Error'}
+  /devices:
+    get:
+      summary: Paired TVs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [devices], properties: {devices: {type: array, items: {$ref: '#/components/schemas/Device'}}}}
+  /devices/{deviceId}:
+    parameters: [{$ref: '#/components/parameters/deviceId'}]
+    patch:
+      summary: Rename a TV or change its mode
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name: {type: string, minLength: 1, maxLength: 40}
+                mode: {$ref: '#/components/schemas/DeviceMode'}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Device'}}}}
+    delete:
+      summary: Unpair a TV (its token stops working)
+      responses: {'204': {description: Deleted}}
+
+  # ---------- TV: pairing (no auth: the short-lived code is the secret) ----------
+  /pairings:
+    post:
+      summary: A TV asks to be paired. Shows the code and a QR code of `pairUrl`.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform]
+              properties:
+                platform: {$ref: '#/components/schemas/Platform'}
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [code, expiresAt, pairUrl]
+                properties:
+                  code: {type: string, description: '6 characters, no look-alikes (A–Z without I, O; 2–9)', example: K7QX4M}
+                  expiresAt: {type: integer, description: 10 minutes from now}
+                  pairUrl: {type: string, description: 'parent app link, e.g. https://…/pair/K7QX4M'}
+  /pairings/{code}:
+    parameters: [{$ref: '#/components/parameters/code'}]
+    get:
+      summary: The TV polls (every 2 s) until a parent confirms. The token is handed out once.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: {type: string, enum: [waiting, paired, expired]}
+                  deviceToken: {type: string, description: 'only once, with status paired; 256-bit random, stored hashed'}
+                  deviceId: {type: string}
+        '404': {$ref: '#/components/responses/Error'}
+
+  # ---------- TV (device token) ----------
+  /device/state:
+    get:
+      summary: Everything the TV needs (the poll target; ~3 s on screen). Supports If-None-Match → 304.
+      security: [{device: []}]
+      responses:
+        '200': {description: OK, headers: {ETag: {schema: {type: string}}}, content: {application/json: {schema: {$ref: '#/components/schemas/DeviceState'}}}}
+        '304': {description: Not changed}
+        '401': {$ref: '#/components/responses/Error'}
+  /device/claims:
+    post:
+      summary: A child says "I did it!". Idempotent on `id` (the TV's outbox may resend).
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, childId, choreId, at]
+              properties:
+                id: {type: string, description: client UUID}
+                childId: {type: string}
+                choreId: {type: string}
+                at: {type: integer}
+      responses:
+        '200': {description: OK (already had it), content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '409': {description: 'Already done today (or a one-off job already approved)', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /device/claims/{claimId}:
+    parameters: [{$ref: '#/components/parameters/claimId'}]
+    delete:
+      summary: '"Oops!": take back a waiting claim'
+      security: [{device: []}]
+      responses:
+        '204': {description: Deleted (or already gone)}
+        '409': {$ref: '#/components/responses/Error'}
+  /device/claims/{claimId}/decide:
+    parameters: [{$ref: '#/components/parameters/claimId'}]
+    post:
+      summary: A grown-up decides on the TV, with the family PIN (5 wrong PINs a minute per TV → 429)
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [yes, pin]
+              properties:
+                yes: {type: boolean}
+                pin: {type: string, pattern: '^[0-9]{4}$'}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '403': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
+  /device/games/results:
+    post:
+      summary: A finished brain game. The server applies the child's daily game cap. Idempotent on `id`.
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, childId, topic, correct, total, at]
+              properties:
+                id: {type: string, description: client UUID}
+                childId: {type: string}
+                topic: {$ref: '#/components/schemas/Topic'}
+                correct: {type: integer, minimum: 0}
+                total: {type: integer, minimum: 1, maximum: 10}
+                at: {type: integer}
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [marbles, balanceSec]
+                properties:
+                  marbles: {type: integer, description: 'marbles credited (0 when the daily cap is reached)'}
+                  balanceSec: {type: integer}
+  /device/heartbeat:
+    post:
+      summary: The TV is alive (shown as "last seen" in the parent app)
+      security: [{device: []}]
+      requestBody:
+        content:
+          application/json:
+            schema: {type: object, properties: {appVersion: {type: string}}}
+      responses: {'204': {description: OK}}
+
+components:
+  securitySchemes:
+    parent:
+      type: http
+      scheme: bearer
+      description: Cognito access token (local dev server - `dev-<name>`)
+    device:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: '`Device <token>` from pairing'
+
+  parameters:
+    childId: {name: childId, in: path, required: true, schema: {type: string}}
+    choreId: {name: choreId, in: path, required: true, schema: {type: string}}
+    claimId: {name: claimId, in: path, required: true, schema: {type: string}}
+    deviceId: {name: deviceId, in: path, required: true, schema: {type: string}}
+    code: {name: code, in: path, required: true, schema: {type: string, pattern: '^[A-HJ-NP-Z2-9]{6}$'}}
+
+  responses:
+    Error:
+      description: Error
+      content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: {type: string, example: not_found}
+            message: {type: string}
+
+    Lang: {type: string, enum: [en, et, de, es]}
+    Color: {type: string, enum: [peach, mint, sky, lilac, gold], description: card and avatar colours from the TV design}
+    Avatar: {type: string, enum: [bear, bunny]}
+    Topic: {type: string, enum: [numbers, words, puzzles]}
+    Platform: {type: string, enum: [fireos, vega, web]}
+    DeviceMode: {type: string, enum: [amazon_kids, strict, api_mock], default: amazon_kids}
+    ClaimStatus: {type: string, enum: [waiting, approved, rejected]}
+    JobIcon:
+      type: string
+      description: JOB_ICONS in tv/packages/shared/src/marble/data.ts (with a hint for each)
+      enum: [toys, cat, tooth, moon, broom, bed, shirt, laundry, trash, recycle, table, cook, wash, shower, bath, dog,
+             fish, bird, rabbit, plant, leaf, snow, book, pencil, backpack, music, paint, puzzle, bike, shoes, car,
+             shopping, spray, sofa, lamp, baby, heart, water, fruit, veggie, sun, mail, star]
+
+    Me:
+      type: object
+      required: [parent, family]
+      properties:
+        parent: {type: object, required: [id], properties: {id: {type: string}, email: {type: string}}}
+        family: {oneOf: [{$ref: '#/components/schemas/Family'}, {type: 'null'}]}
+
+    Family:
+      type: object
+      required: [id, name, lang, timezone, caps, voice, hasPin, createdAt]
+      properties:
+        id: {type: string}
+        name: {type: string, maxLength: 40}
+        lang: {$ref: '#/components/schemas/Lang'}
+        timezone: {type: string, example: Europe/Tallinn, description: 'IANA zone; "today" (daily jobs, game cap) is this zone''s day'}
+        caps: {type: boolean, description: kid text in CAPITAL LETTERS on the TV}
+        voice: {type: boolean, description: read aloud on the TV}
+        hasPin: {type: boolean}
+        createdAt: {type: integer}
+    FamilyCreate:
+      type: object
+      required: [name, lang, timezone, pin]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 40}
+        lang: {$ref: '#/components/schemas/Lang'}
+        timezone: {type: string}
+        pin: {type: string, pattern: '^[0-9]{4}$', description: grown-ups PIN on the TV}
+    FamilyPatch:
+      type: object
+      properties:
+        name: {type: string, minLength: 1, maxLength: 40}
+        lang: {$ref: '#/components/schemas/Lang'}
+        timezone: {type: string}
+        caps: {type: boolean}
+        voice: {type: boolean}
+        pin: {type: string, pattern: '^[0-9]{4}$'}
+    FamilyBundle:
+      type: object
+      required: [family, children, chores, devices]
+      properties:
+        family: {$ref: '#/components/schemas/Family'}
+        children: {type: array, items: {$ref: '#/components/schemas/Child'}}
+        chores: {type: array, items: {$ref: '#/components/schemas/Chore'}}
+        devices: {type: array, items: {$ref: '#/components/schemas/Device'}}
+
+    GameSettings:
+      type: object
+      required: [topics, dailyCapMarbles]
+      properties:
+        topics: {type: array, items: {$ref: '#/components/schemas/Topic'}, uniqueItems: true}
+        dailyCapMarbles: {type: integer, minimum: 0, maximum: 12, default: 4}
+    Child:
+      type: object
+      required: [id, name, avatar, color, age, balanceSec, games]
+      properties:
+        id: {type: string}
+        name: {type: string, maxLength: 24}
+        avatar: {$ref: '#/components/schemas/Avatar'}
+        color: {$ref: '#/components/schemas/Color'}
+        age: {type: integer, minimum: 3, maximum: 12}
+        balanceSec: {type: integer, description: earned minutes × 60}
+        games: {$ref: '#/components/schemas/GameSettings'}
+    ChildInput:
+      type: object
+      required: [name, avatar, color, age]
+      properties:
+        name: {type: string, minLength: 1, maxLength: 24}
+        avatar: {$ref: '#/components/schemas/Avatar'}
+        color: {$ref: '#/components/schemas/Color'}
+        age: {type: integer, minimum: 3, maximum: 12}
+        games: {$ref: '#/components/schemas/GameSettings'}
+    ChildPatch:
+      type: object
+      properties:
+        name: {type: string, minLength: 1, maxLength: 24}
+        avatar: {$ref: '#/components/schemas/Avatar'}
+        color: {$ref: '#/components/schemas/Color'}
+        age: {type: integer, minimum: 3, maximum: 12}
+        games: {$ref: '#/components/schemas/GameSettings'}
+
+    Repeat:
+      description: How often a job can be done. Every kind can be done at most once per day per child.
+      oneOf:
+        - {type: object, required: [kind], properties: {kind: {const: daily}}}
+        - {type: object, required: [kind, days], properties: {kind: {const: weekdays}, days: {type: array, items: {type: integer, minimum: 1, maximum: 7}, minItems: 1, uniqueItems: true, description: 'ISO weekdays, 1 = Monday'}}}
+        - {type: object, required: [kind], properties: {kind: {const: once}}, description: 'gone once approved'}
+    Chore:
+      type: object
+      required: [id, title, icon, color, minutes, repeat, childIds, createdAt]
+      properties:
+        id: {type: string}
+        title: {type: string, maxLength: 60}
+        icon: {$ref: '#/components/schemas/JobIcon'}
+        color: {$ref: '#/components/schemas/Color'}
+        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        repeat: {$ref: '#/components/schemas/Repeat'}
+        childIds: {type: array, items: {type: string}, minItems: 1}
+        createdAt: {type: integer}
+    ChoreInput:
+      type: object
+      required: [title, minutes, childIds]
+      properties:
+        title: {type: string, minLength: 1, maxLength: 60}
+        icon: {$ref: '#/components/schemas/JobIcon'}
+        color: {$ref: '#/components/schemas/Color'}
+        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        repeat: {$ref: '#/components/schemas/Repeat'}
+        childIds: {type: array, items: {type: string}, minItems: 1}
+    ChorePatch:
+      type: object
+      properties:
+        title: {type: string, minLength: 1, maxLength: 60}
+        icon: {$ref: '#/components/schemas/JobIcon'}
+        color: {$ref: '#/components/schemas/Color'}
+        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        repeat: {$ref: '#/components/schemas/Repeat'}
+        childIds: {type: array, items: {type: string}, minItems: 1}
+
+    Claim:
+      type: object
+      required: [id, childId, choreId, status, minutes, createdAt]
+      properties:
+        id: {type: string}
+        childId: {type: string}
+        choreId: {type: string}
+        choreTitle: {type: string, description: copied at claim time, so history survives edits}
+        status: {$ref: '#/components/schemas/ClaimStatus'}
+        minutes: {type: integer, description: the job's minutes at claim time}
+        createdAt: {type: integer}
+        decidedAt: {type: integer}
+        decidedBy: {type: string, enum: [parent, tv]}
+
+    LedgerEntry:
+      type: object
+      required: [id, childId, deltaSec, type, reason, createdAt]
+      properties:
+        id: {type: string}
+        childId: {type: string}
+        deltaSec: {type: integer}
+        type: {type: string, enum: [ALLOWANCE, CHORE, GAME, BONUS, PENALTY, USAGE, ADJUST]}
+        reason: {type: string}
+        refId: {type: string, description: claim id or game result id}
+        createdBy: {type: string, description: '"parent:<id>", "tv:<deviceId>" or "system"'}
+        createdAt: {type: integer}
+        handoff: {type: string, enum: [PENDING, DONE, SKIPPED], description: 'Amazon Kids hand-off, positive entries only'}
+    Balance:
+      type: object
+      required: [balanceSec, entry]
+      properties:
+        balanceSec: {type: integer}
+        entry: {$ref: '#/components/schemas/LedgerEntry'}
+    Handoff:
+      type: object
+      required: [pendingMinutes, entries]
+      properties:
+        pendingMinutes: {type: integer, description: 'pending earned minutes minus outstanding penalty debt, never below 0'}
+        entries: {type: array, items: {$ref: '#/components/schemas/LedgerEntry'}, description: PENDING entries}
+
+    Device:
+      type: object
+      required: [id, name, platform, mode, createdAt]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        platform: {$ref: '#/components/schemas/Platform'}
+        mode: {$ref: '#/components/schemas/DeviceMode'}
+        lastSeen: {type: integer}
+        createdAt: {type: integer}
+
+    DeviceState:
+      type: object
+      description: Small on purpose; the TV replaces its local copy with it (claims it has not uploaded yet stay local).
+      required: [family, children, chores, claims, gameMarblesToday, today, serverTime]
+      properties:
+        family:
+          type: object
+          required: [id, name, lang, caps, voice, pin]
+          properties:
+            id: {type: string}
+            name: {type: string}
+            lang: {$ref: '#/components/schemas/Lang'}
+            caps: {type: boolean}
+            voice: {type: boolean}
+            pin:
+              description: so the TV can check the grown-ups PIN offline; hash = hex(sha256(salt + ":" + pin))
+              oneOf:
+                - {type: 'null'}
+                - {type: object, required: [salt, hash], properties: {salt: {type: string}, hash: {type: string}}}
+        children: {type: array, items: {$ref: '#/components/schemas/Child'}}
+        chores: {type: array, items: {$ref: '#/components/schemas/Chore'}, description: only jobs assigned to someone}
+        claims: {type: array, items: {$ref: '#/components/schemas/Claim'}, description: 'waiting, plus decided in the last 7 days'}
+        gameMarblesToday: {type: object, additionalProperties: {type: integer}, description: childId → game marbles earned today}
+        today: {type: string, description: 'the family''s local date, YYYY-MM-DD'}
+        serverTime: {type: integer}
