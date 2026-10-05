@@ -1,6 +1,7 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Easing, Image, ImageStyle, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle} from 'react-native';
 import {IconName, Shape} from './data';
+import {CAPS_WIDTH, CHAR_WIDTH, fitFontSize} from './fit';
 import {colors, s} from './theme';
 
 const ICONS: Record<IconName, number> = {
@@ -37,6 +38,35 @@ export function Icon({name, size, color = colors.ink, style}: {name: IconName; s
 
 export function T({style, children, numberOfLines}: {style?: StyleProp<TextStyle>; children: React.ReactNode; numberOfLines?: number}) {
   return <Text style={[styles.text, style]} numberOfLines={numberOfLines}>{children}</Text>;
+}
+
+/**
+ * Text that always fits its box: the largest size (≤ max) at which it fits `width` in `lines` lines;
+ * only at `min` does it cut off with "…". Use it for anything a parent, the AI or a translation can make long.
+ * Sizes and width are device px (pass s(designPx)).
+ */
+export function FitText({text: raw, width, max, min, lines = 1, caps, style}: {text: string; width: number; max: number; min?: number; lines?: number; caps?: string | false; style?: StyleProp<TextStyle>}) {
+  // caps = the language tag when kid text is shown in CAPITALS (locale-aware: ß → SS, etc.)
+  const text = caps ? raw.toLocaleUpperCase(caps) : raw;
+  const minSize = min ?? Math.round(max * 0.45);
+  const estimate = useMemo(() => fitFontSize(text, width, max, minSize, lines, caps ? CAPS_WIDTH : CHAR_WIDTH), [text, width, max, minSize, lines, caps]);
+  const [size, setSize] = useState(estimate);
+  useEffect(() => setSize(estimate), [estimate]);
+  return (
+    <Text
+      style={[styles.text, style, {fontSize: size, lineHeight: Math.round(size * 1.15), maxWidth: width}]}
+      numberOfLines={lines}
+      ellipsizeMode="tail"
+      onTextLayout={e => {
+        // Where the platform reports real layout: if the visible lines lost text, step the size down.
+        const shown = e.nativeEvent.lines.map(l => l.text).join('');
+        if (shown.replace(/\s/g, '').length < text.replace(/\s/g, '').length && size > minSize) {
+          setSize(Math.max(minSize, Math.floor(size * 0.9)));
+        }
+      }}>
+      {text}
+    </Text>
+  );
 }
 
 /**
@@ -85,7 +115,7 @@ export function Button({title, icon, onPress, primary, preferred, size = 1}: {ti
       label={title}
       style={[styles.button, {height: s(124 * size), borderRadius: s(62 * size), paddingHorizontal: s(60 * size), backgroundColor: primary ? colors.gold : colors.chip}]}>
       {icon ? <Icon name={icon} size={s(52 * size)} color={fg} style={{marginRight: s(18 * size)}} /> : null}
-      <T style={{color: fg, fontSize: s(54 * size), fontWeight: '700'}}>{title}</T>
+      <FitText text={title} width={s(520 * size)} max={s(54 * size)} min={s(30 * size)} style={{color: fg, fontWeight: '700'}} />
     </Focusable>
   );
 }

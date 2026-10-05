@@ -327,3 +327,5 @@ The [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh) has all 1
 - **The label under the selected card says what OK does:** "I did it!" for a job (a grown-up checks) or "Let's play!" for a game (the app checks).
 - **Words:** the UI says "job" and "grown-up"; docs and code say "chore" and "parent".
 - **Type and layout:** Fredoka; text at least 24 px at 1080p; 5% overscan-safe margins.
+- **Any text must fit, and look good.** Names and jobs come from parents, questions from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines, and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
+- **Languages:** English, Estonian, German, Spanish (a family setting). Optional **CAPITAL LETTERS** for kid-facing text.

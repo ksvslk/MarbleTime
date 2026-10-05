@@ -91,7 +91,23 @@ Results go in `docs/spike-results.md` and the friction log.
 
 **Done when:** on the stick alone, a kid claims a job, a grown-up approves with the PIN, and the marbles drop; and a kid plays a 3-question game and gets its marbles.
 
+### M1 status and additions (Oct 5)
+
+Done early on the stick (screens from the canvas, PIN approval, built-in brain games, 17 unit tests). Added on Oct 5 at the user's request:
+
+- [x] **Four languages: English, Estonian, German, Spanish.** Every TV text sits in one translation table (`tv/packages/shared/src/marble/i18n.ts`); the family language is a grown-ups setting. The word puzzles are written per language. ⚠️ A native speaker reviews et/de/es before the video.
+- [x] **Capital letters setting** for kid-facing text (many young kids learn capitals first).
+- [x] **Any text fits** (names and jobs are user content; AI writes questions; four languages): `FitText` shrinks to fit N lines and only then cuts off. The stress-test link `scripts/fire.sh open 'stress=1&screen=who'` loads a worst-case family.
+- [x] **Marble value** shown under the jar ("● = 5 min").
+- [ ] **Sound effects** (marble clink, yay, try again, tap): `expo-audio` on Fire OS, `@amazon-devices/react-native-w3cmedia` `AudioPlayer` on Vega, MP3 files.
+- [ ] **Read-aloud in four languages:** pre-made MP3s, nothing synthesised at runtime. Polly for en/de/es; Estonian via TartuNLP Neurokõne (terms to confirm) or Azure `et-EE-AnuNeural`. On-device fallback for en/de/es: Pico.
+- [ ] **Animations:** real marble physics (computed up front, played back natively), the jar lid opening and closing, and more key moments (claim, right answer, approval).
+- [ ] **Job icons:** the AI picks from our own icon set (grow it to ~40 job icons); AI-drawn icons in our style only as an extra.
+- [ ] Remember state across app restarts.
+
 ## M2 · Backend, parent PWA and Amazon Kids hand-off (Oct 9–14)
+
+Added on Oct 5: the parent app speaks the same four languages; **recurring jobs** (every day, or chosen weekdays; at most once per day; back on the TV board when due); length limits on names and job titles as a second safety net; the AI picks each job's icon from our set.
 
 - [ ] `backend/openapi.yaml` (contract first), then the CDK stack:
   - HTTP API, Lambdas, DynamoDB
