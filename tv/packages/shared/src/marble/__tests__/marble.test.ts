@@ -1,110 +1,89 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import {bank, DAILY_GAME_MARBLES, isQuestionValid, JOB_ICONS, Question, questionsFor} from '../data';
+import {JOB_ICONS, SAMPLE_FAMILY} from '../data';
 import {LANGS, STRINGS} from '../i18n';
 import {CAPS_WIDTH, fitFontSize, linesNeeded} from '../fit';
 import type {ServerState} from '../api';
-import {applyServer, checkPin, initialState, isDone, Link, localDay, marblesIn, reducer, restore, State, takenToday, timeToday, toSaved} from '../logic';
+import {
+  applyServer, celebrationToShow, checkPin, defaultDailyMax, firstSyncPending, initialState, isDone, jarFull, jarRoom, jarSize, Link, localDay, marblesIn,
+  needsPairing, normalKid, notYetToday, reducer, restore, rewardFor, State, takenToday, timeToday, toSaved,
+} from '../logic';
 import {sha256Hex} from '../sha256';
 import {spokenLines, voiceKey} from '../voiceLines';
 import {VOICES} from '../voices';
 
-describe('question checker (the app checks every question, including AI-made ones)', () => {
-  it('accepts every question in the built-in bank, in every language', () => {
-    for (const {id} of LANGS) for (const topic of Object.values(bank(id))) {
-      for (const band of Object.values(topic)) {
-        for (const q of band) expect(isQuestionValid(q)).toBe(true);
-      }
-    }
+/** The sample family as a test link loads it: Mia (5) has a 60-minute ceiling and a 30-minute base, Leo (8) 90 and 40. */
+const sample: State = reducer(initialState, {type: 'setFamily', family: SAMPLE_FAMILY, balances: {mia: 10, leo: 20}});
+
+/** A kid claims a job and a grown-up says yes on the TV. */
+function approve(s: State, kidId: string, jobId: string): State {
+  const claimed = reducer(s, {type: 'claim', kidId, jobId});
+  const claim = claimed.claims.find(c => c.kidId === kidId && c.jobId === jobId && c.status === 'waiting')!;
+  return reducer(claimed, {type: 'decide', claimId: claim.id, yes: true});
+}
+const mia = (s: State) => s.claims.filter(c => c.kidId === 'mia');
+
+describe('today’s jar: a budget with a ceiling (docs/08)', () => {
+  it('holds the base plus what was earned, never more than the ceiling', () => {
+    expect([timeToday(sample, 'mia'), jarSize(sample, 'mia'), jarRoom(sample, 'mia')]).toEqual([40, 6, 20]);
+    expect(timeToday({...sample, balances: {mia: 999}}, 'mia')).toBe(60);
   });
 
-  it('rejects a counting question whose answer does not match the picture', () => {
-    const q: Question = {
-      prompt: 'How many apples?', say: '', praise: '',
-      picture: {kind: 'count', item: 'apple', n: 4},
-      choices: [{kind: 'text', text: '3'}, {kind: 'text', text: '4'}, {kind: 'text', text: '5'}],
-      answer: 0,
-    };
-    expect(isQuestionValid(q)).toBe(false);
+  it('one marble is ten minutes', () => {
+    expect([marblesIn(40), marblesIn(39), marblesIn(-5)]).toEqual([4, 3, 0]);
   });
 
-  it('rejects a pattern question with the wrong next shape', () => {
-    const q: Question = {
-      prompt: 'What comes next?', say: '', praise: '',
-      picture: {kind: 'sequence', shapes: ['circle', 'triangle', 'circle', 'triangle', 'circle']},
-      choices: [{kind: 'shape', shape: 'square'}, {kind: 'shape', shape: 'triangle'}, {kind: 'shape', shape: 'circle'}],
-      answer: 2,
-    };
-    expect(isQuestionValid(q)).toBe(false);
+  it('a claim waits for a grown-up and adds no time on its own', () => {
+    const s = reducer(sample, {type: 'claim', kidId: 'mia', jobId: 'toys'});
+    expect([mia(s).map(c => c.status), s.balances.mia]).toEqual([['waiting'], 10]);
   });
 
-  it('rejects duplicate choices and wrong sums', () => {
-    const dup: Question = {
-      prompt: '', say: '', praise: '',
-      picture: {kind: 'sentence', before: '7 + 5 =', after: ''},
-      choices: [{kind: 'text', text: '12'}, {kind: 'text', text: '12'}, {kind: 'text', text: '13'}],
-      answer: 0,
-    };
-    expect(isQuestionValid(dup)).toBe(false);
-    const wrongSum = {...dup, choices: [{kind: 'text', text: '11'}, {kind: 'text', text: '12'}, {kind: 'text', text: '13'}], answer: 0} as Question;
-    expect(isQuestionValid(wrongSum)).toBe(false);
+  it('"Yes" puts the job’s marbles in the jar and celebrates; "Not yet" adds nothing', () => {
+    const yes = approve(sample, 'mia', 'cat'); // 20 minutes, and 20 fit
+    expect(yes.balances.mia).toBe(30);
+    expect(mia(yes)[0]).toMatchObject({status: 'approved', reward: 'marbles', minutesCredited: 20});
+    expect(yes.celebrations).toEqual([{id: mia(yes)[0].id, kidId: 'mia', marbles: 2, why: {kind: 'job', jobId: 'cat', reward: 'marbles'}}]);
+    const claimed = reducer(sample, {type: 'claim', kidId: 'mia', jobId: 'cat'});
+    const no = reducer(claimed, {type: 'decide', claimId: claimed.claims[0].id, yes: false});
+    expect([no.balances.mia, no.celebrations.length, no.claims[0].status]).toEqual([10, 0, 'rejected']);
   });
 
-  it('gives young kids picture questions and older kids text questions', () => {
-    expect(questionsFor('numbers', 5)[0].picture.kind).toBe('count');
-    expect(questionsFor('numbers', 8)[0].picture.kind).toBe('sentence');
-    expect(questionsFor('words', 5).length).toBe(3); // no young word bank yet: falls back to the older one
-  });
-});
-
-describe('jar and approvals', () => {
-  const claimed = (s: State) => reducer(s, {type: 'claim', kidId: 'mia', jobId: 'toys'});
-
-  it('a claim waits for a grown-up and does not add time on its own', () => {
-    const s = claimed(initialState);
-    expect(s.claims).toHaveLength(1);
-    expect(s.claims[0].status).toBe('waiting');
-    expect(s.balances.mia).toBe(initialState.balances.mia);
+  it('only what fits goes in; once the jar is full, a job earns a new character instead', () => {
+    const almost: State = {...sample, balances: {...sample.balances, mia: 20}}; // 30 + 20 = 50 of 60: one marble fits
+    const partly = approve(almost, 'mia', 'cat'); // a 20-minute job
+    expect(mia(partly)[0]).toMatchObject({reward: 'marbles', minutesCredited: 10});
+    expect([timeToday(partly, 'mia'), jarFull(partly, 'mia')]).toEqual([60, true]);
+    const extra = approve(partly, 'mia', 'toys');
+    expect(extra.balances.mia).toBe(partly.balances.mia);
+    expect(extra.family.kids.find(k => k.id === 'mia')?.characterTokens).toBe(1);
+    expect(extra.celebrations[extra.celebrations.length - 1]).toMatchObject({marbles: 0, why: {kind: 'job', jobId: 'toys', reward: 'character'}});
   });
 
-  it('"Yes" adds the minutes and queues a celebration; "Not yet" adds nothing', () => {
-    const s = claimed(initialState);
-    const yes = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10});
-    expect(yes.balances.mia).toBe(initialState.balances.mia + 10);
-    expect(yes.celebrations).toEqual([{id: s.claims[0].id, kidId: 'mia', marbles: 2, why: {kind: 'job', jobId: 'toys'}}]);
-    const no = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: false, minutes: 0});
-    expect(no.balances.mia).toBe(initialState.balances.mia);
-    expect(no.celebrations).toHaveLength(0);
+  it('a routine job is praised, without a marble', () => {
+    const s = approve(sample, 'mia', 'teeth');
+    expect([s.balances.mia, mia(s)[0].reward, mia(s)[0].minutesCredited]).toEqual([10, 'praise', 0]);
+    expect(rewardFor(sample, 'mia', SAMPLE_FAMILY.jobs.mia.find(j => j.id === 'teeth'))).toEqual({reward: 'praise', minutes: 0});
   });
 
-  it('a decision only counts once', () => {
-    const s = claimed(initialState);
-    const once = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10});
-    const twice = reducer(once, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10});
-    expect(twice.balances.mia).toBe(once.balances.mia);
+  it('a decision counts once, and claiming twice makes one claim', () => {
+    const once = approve(sample, 'mia', 'toys');
+    expect(reducer(once, {type: 'decide', claimId: mia(once)[0].id, yes: true}).balances.mia).toBe(once.balances.mia);
+    const twice = reducer(reducer(sample, {type: 'claim', kidId: 'mia', jobId: 'toys'}), {type: 'claim', kidId: 'mia', jobId: 'toys'});
+    expect(twice.claims).toHaveLength(1);
   });
 
-  it('claiming the same job twice does not make two claims', () => {
-    expect(claimed(claimed(initialState)).claims).toHaveLength(1);
-  });
-
-  it('games pay marbles straight away, up to the daily cap', () => {
-    let s = initialState;
-    for (let i = 0; i < 3; i++) s = reducer(s, {type: 'gameDone', kidId: 'mia', marbles: 2, gameId: 'numbers'});
-    expect(s.gameMarblesToday.mia).toBe(DAILY_GAME_MARBLES);
-    expect(s.balances.mia).toBe(initialState.balances.mia + DAILY_GAME_MARBLES * 5);
-  });
-
-  it('one marble is five minutes', () => {
-    expect(marblesIn(35)).toBe(7);
-    expect(marblesIn(39)).toBe(7);
+  it('a kid without a ceiling gets it from health guidance (60 under 7, 90 from 7) and half of it as the base', () => {
+    expect([defaultDailyMax(6), defaultDailyMax(7)]).toEqual([60, 90]);
+    const kid = {id: 'k', name: 'K', avatar: 'bear', avatarBg: '#000', age: 8} as Parameters<typeof normalKid>[0];
+    expect(normalKid(kid)).toMatchObject({dailyMaxMin: 90, dailyBaseMin: 50, characterTokens: 0}); // half, rounded up to whole marbles
+    expect(normalKid({...kid, age: 5, dailyBaseMin: 25, dailyMaxMin: 60})).toMatchObject({dailyMaxMin: 60, dailyBaseMin: 30}); // whole marbles
+    expect(normalKid({...kid, age: 5, dailyBaseMin: 90, dailyMaxMin: 60}).dailyBaseMin).toBe(60); // never above the ceiling
   });
 });
 
 describe('saving and loading (the jar survives a restart)', () => {
   const busy = () => {
-    let s = reducer(initialState, {type: 'claim', kidId: 'mia', jobId: 'toys'});
-    s = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10});
+    let s = approve(sample, 'mia', 'toys');
     s = reducer(s, {type: 'claim', kidId: 'leo', jobId: 'table'});
     s = reducer(s, {type: 'setLang', lang: 'et'});
     return reducer(s, {type: 'setCaps', caps: true});
@@ -118,7 +97,7 @@ describe('saving and loading (the jar survives a restart)', () => {
 
   it('ignores a broken or unknown save', () => {
     for (const junk of [null, 'oops', 42, {version: 99, lang: 'de'}, {}]) expect(restore(initialState, junk)).toEqual(initialState);
-    const partly = restore(initialState, {version: 1, lang: 'xx', caps: 'yes', balances: {mia: 50}});
+    const partly = restore(initialState, {version: 1, demo: true, lang: 'xx', caps: 'yes', balances: {mia: 50}});
     expect(partly.lang).toBe('en');
     expect(partly.caps).toBe(false);
     expect(partly.balances).toEqual({mia: 50});
@@ -131,11 +110,17 @@ describe('saving and loading (the jar survives a restart)', () => {
     expect(toSaved(s).claims).toHaveLength(2);
   });
 
-  it('the daily game cap starts again on a new day', () => {
-    const yesterday = {...initialState, gameDay: '2000-01-01', gameMarblesToday: {mia: DAILY_GAME_MARBLES}};
-    const s = reducer(yesterday, {type: 'gameDone', kidId: 'mia', marbles: 2, gameId: 'numbers'});
-    expect(s.gameMarblesToday).toEqual({mia: 2});
-    expect(s.gameDay).toBe(localDay(Date.now()));
+  it('loads a save from before the daily ceiling, when there were games, in today’s shape', () => {
+    const old = JSON.parse(JSON.stringify({
+      ...toSaved(sample),
+      family: {kids: [{id: 'mia', name: 'Mia', avatar: 'bear', avatarBg: '#fff', age: 5, dailyBaseMin: 30}], jobs: {mia: []}, games: {mia: [{id: 'numbers'}]}},
+      gameMarblesToday: {mia: 2},
+      outbox: [{kind: 'game', id: 'g', childId: 'mia', topic: 'numbers', correct: 3, total: 3, at: 1}],
+      celebrations: [{id: 'c', kidId: 'mia', marbles: 2, why: {kind: 'game', gameId: 'numbers'}}],
+    }));
+    const s = restore(initialState, old);
+    expect(s.family).toEqual({kids: [expect.objectContaining({id: 'mia', dailyMaxMin: 60, dailyBaseMin: 30, characterTokens: 0})], jobs: {mia: []}});
+    expect([s.outbox, s.celebrations, 'gameMarblesToday' in s]).toEqual([[], [], false]);
   });
 });
 
@@ -152,8 +137,9 @@ describe('job icons (the AI picks one per job from this set)', () => {
 });
 
 describe('read-aloud (kids who cannot read yet hear every line)', () => {
-  it('every line the sample family hears is recorded, in every language', () => {
+  it('every fixed phrase is recorded, in every language (a family\'s own words come from the narrator)', () => {
     for (const {id} of LANGS) for (const line of spokenLines(id)) expect([id, line, VOICES[id][line] !== undefined]).toEqual([id, line, true]);
+    expect(spokenLines('en')).toEqual(["Who’s here?", 'A grown-up will check.', 'Yay!', 'Wow!', 'Thank you!', 'Your jar is full, so you earned a new character!']);
   });
   it('finds a line whatever its spacing', () => {
     expect(voiceKey('Great job,\nMia!')).toBe('Great job, Mia!');
@@ -167,25 +153,23 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
   const paired: State = {...initialState, link};
   const server: ServerState = {
     family: {id: 'f', name: 'Tamm', lang: 'et', caps: true, voice: false, pin: link.pin},
-    children: [{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', color: 'mint', age: 6, balanceSec: 25 * 60 + 30, games: {topics: ['numbers'], dailyCapMarbles: 4}}],
+    children: [{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', color: 'mint', age: 6, balanceSec: 25 * 60 + 30, dailyBaseMin: 30, dailyMaxMin: 60, characterTokens: 0}],
     chores: [
       {id: 'c1', title: 'Koristan toa', icon: 'toys', color: 'peach', minutes: 10, repeat: {kind: 'daily'}, childIds: ['k1']},
-      {id: 'c2', title: 'Täna', icon: 'plant', color: 'sky', minutes: 5, repeat: {kind: 'weekdays', days: [isoToday]}, childIds: ['k1']},
-      {id: 'c3', title: 'Mitte täna', icon: 'car', color: 'sky', minutes: 5, repeat: {kind: 'weekdays', days: [(isoToday % 7) + 1]}, childIds: ['k1']},
+      {id: 'c2', title: 'Täna', icon: 'plant', color: 'sky', minutes: 5, repeat: {kind: 'weekdays', days: [isoToday]}, childIds: ['k1'], routine: true},
+      {id: 'c3', title: 'Mitte täna', icon: 'car', color: 'sky', minutes: 20, repeat: {kind: 'weekdays', days: [(isoToday % 7) + 1]}, childIds: ['k1']},
     ],
     claims: [],
-    gameMarblesToday: {k1: 2},
     today: localDay(now),
     serverTime: now,
   };
   const claimed = (s: State) => reducer(s, {type: 'claim', kidId: 'k1', jobId: 'c1'});
 
-  it('queues claims, decisions and game results for the backend, but only once paired', () => {
+  it('queues claims and decisions for the backend, but only once paired', () => {
     expect(claimed(initialState).outbox).toEqual([]);
     const s = claimed(paired);
     expect(s.outbox).toEqual([{kind: 'claim', id: s.claims[0].id, childId: 'k1', choreId: 'c1', at: s.claims[0].at}]);
-    expect(reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, minutes: 10}).outbox.map(o => o.kind)).toEqual(['claim', 'decide']);
-    expect(reducer(paired, {type: 'gameDone', kidId: 'k1', marbles: 2, gameId: 'numbers', total: 3}).outbox).toMatchObject([{kind: 'game', childId: 'k1', topic: 'numbers', correct: 3, total: 3}]);
+    expect(reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true}).outbox.map(o => o.kind)).toEqual(['claim', 'decide']);
   });
 
   it('"Oops!" before the claim was sent just drops it; after, it asks the backend to take it back', () => {
@@ -195,30 +179,72 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     expect(reducer(sent, {type: 'undoClaim', kidId: 'k1', jobId: 'c1'}).outbox).toEqual([{kind: 'undo', id: `undo-${s.claims[0].id}`, claimId: s.claims[0].id}]);
   });
 
-  it('takes in the family, time and settings from the backend', () => {
+  it('takes in the family, the jar’s ceiling, jobs, time and settings from the backend', () => {
     const s = applyServer(paired, server, now);
-    expect(s.family.kids).toEqual([{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', avatarBg: expect.any(String), age: 6, dailyBaseMin: 30}]);
-    expect(s.family.jobs.k1.map(j => j.id)).toEqual(['c1', 'c2']);
-    expect(s.family.games.k1.map(g => g.topic)).toEqual(['numbers']);
+    expect(s.family.kids).toEqual([{id: 'k1', name: 'Mari-Liis', avatar: 'bunny', avatarBg: expect.any(String), age: 6, dailyBaseMin: 30, dailyMaxMin: 60, characterTokens: 0}]);
+    expect(s.family.jobs.k1.map(j => [j.id, j.minutes, j.routine])).toEqual([['c1', 10, false], ['c2', 10, true]]); // not due today: gone; 5 → one marble
     expect(s.balances).toEqual({k1: 25});
-    expect([s.lang, s.caps, s.voice, s.link?.familyName, s.gameMarblesToday.k1]).toEqual(['et', true, false, 'Tamm', 2]);
+    expect([s.lang, s.caps, s.voice, s.link?.familyName]).toEqual(['et', true, false, 'Tamm']);
   });
 
-  it('keeps what the backend has not seen yet, and celebrates jobs approved on the phone', () => {
+  it('a backend from before the daily ceiling gets the defaults from health guidance', () => {
+    const {dailyBaseMin: _b, dailyMaxMin: _m, characterTokens: _c, ...older} = server.children[0];
+    const s = applyServer(paired, {...server, children: [older]}, now);
+    expect(s.family.kids[0]).toMatchObject({dailyMaxMin: 60, dailyBaseMin: 30, characterTokens: 0});
+    expect(timeToday(s, 'k1')).toBe(30 + 25);
+  });
+
+  it('keeps what the backend has not seen yet, and celebrates jobs approved on the phone with what they gave and who said yes', () => {
     let s = applyServer(claimed(paired), server, now); // the claim is still in the outbox
     expect(s.claims).toHaveLength(1);
     const id = s.claims[0].id;
     s = reducer(s, {type: 'sent', id});
-    const approved = {...server, claims: [{id, childId: 'k1', choreId: 'c1', status: 'approved' as const, minutes: 10, createdAt: now, decidedBy: 'parent' as const}]};
-    s = applyServer(applyServer(s, {...approved, claims: [{...approved.claims[0], status: 'waiting'}]}, now), approved, now);
-    expect(s.celebrations).toEqual([{id, kidId: 'k1', marbles: 2, why: {kind: 'job', jobId: 'c1'}}]);
+    const waiting = {id, childId: 'k1', choreId: 'c1', status: 'waiting' as const, minutes: 10, createdAt: now};
+    const approved = {...waiting, status: 'approved' as const, decidedBy: 'parent' as const, approverName: 'Isa', reward: 'marbles' as const, minutesCredited: 10};
+    s = applyServer(applyServer(s, {...server, claims: [waiting]}, now), {...server, claims: [approved]}, now);
+    expect(s.celebrations).toEqual([{id, kidId: 'k1', marbles: 1, why: {kind: 'job', jobId: 'c1', reward: 'marbles', approver: 'Isa'}}]);
+    expect(s.claims[0]).toMatchObject({reward: 'marbles', minutesCredited: 10, approverName: 'Isa'});
+    // A full jar's job earns a character; an older backend's approval counts as plain marbles.
+    const character = applyServer(applyServer(paired, {...server, claims: [waiting]}, now), {...server, claims: [{...approved, reward: 'character', minutesCredited: 0}]}, now);
+    expect(character.celebrations[0]).toMatchObject({marbles: 0, why: {reward: 'character'}});
+    const {reward: _r, minutesCredited: _mc, approverName: _a, ...plain} = approved;
+    const older = applyServer(applyServer(paired, {...server, claims: [waiting]}, now), {...server, claims: [plain]}, now);
+    expect(older.celebrations[0]).toMatchObject({marbles: 1, why: {reward: 'marbles'}});
     // A TV paired after the approval doesn't replay old news.
-    expect(applyServer(paired, approved, now).celebrations).toEqual([]);
+    expect(applyServer(paired, {...server, claims: [approved]}, now).celebrations).toEqual([]);
+  });
+
+  it('settings changed on a paired TV go to the backend as one change, and a sync never undoes them before that', () => {
+    expect(reducer(initialState, {type: 'setLang', lang: 'de'}).outbox).toEqual([]);
+    let s = reducer(reducer(paired, {type: 'setLang', lang: 'de'}), {type: 'setCaps', caps: true});
+    expect(s.outbox).toEqual([{kind: 'settings', id: 'settings', lang: 'de', caps: true}]);
+    expect([applyServer(s, server, now).lang, applyServer(s, server, now).caps]).toEqual(['de', true]); // server still says et, false
+    s = reducer(s, {type: 'sent', id: 'settings'});
+    expect(applyServer(s, server, now).lang).toBe('et'); // sent: the backend's word counts again
+  });
+
+  it('shows a "Yay!" where the kid can see it, not on someone else’s board or the grown-ups’ screen', () => {
+    const c = {id: 'x', kidId: 'k1', marbles: 2, why: {kind: 'job' as const, jobId: 'c1', reward: 'marbles' as const}};
+    const at = (screen: State['screen']) => celebrationToShow({...paired, celebrations: [c], screen});
+    expect(at({name: 'who'})).toBe(c);
+    expect(at({name: 'board', kidId: 'k1'})).toBe(c);
+    expect(at({name: 'claimed', kidId: 'k1', jobId: 'c1'})).toBe(c);
+    expect(at({name: 'board', kidId: 'k2'})).toBeUndefined();
+    expect(at({name: 'grownups'})).toBeUndefined();
+  });
+
+  it('explains a "not yet" on the kid’s board until they try the job again', () => {
+    let s = reducer(paired, {type: 'claim', kidId: 'k1', jobId: 'c1'});
+    s = reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: false});
+    expect(notYetToday(s, 'k1').map(c => c.jobId)).toEqual(['c1']);
+    expect(notYetToday(s, 'k1', Date.now() + 86400000)).toEqual([]); // tomorrow
+    const again = reducer({...s, claims: s.claims.map(c => ({...c, at: c.at - 1}))}, {type: 'claim', kidId: 'k1', jobId: 'c1'});
+    expect(notYetToday(again, 'k1')).toEqual([]);
   });
 
   it('celebrates a bonus from the phone once, and explains minutes taken away today', () => {
-    const bonus = {id: 'b1', childId: 'k1', deltaMin: 10, reason: 'Helped grandma', at: now};
-    const taken = {id: 'p1', childId: 'k1', deltaMin: -5, reason: 'Left the toys out', at: now};
+    const bonus = {id: 'b1', childId: 'k1', deltaMin: 20, reason: 'Helped grandma', at: now};
+    const taken = {id: 'p1', childId: 'k1', deltaMin: -10, reason: 'Left the toys out', at: now};
     let s = applyServer(paired, server, now); // the first sync after pairing
     expect(applyServer(paired, {...server, adjustments: [bonus]}, now).celebrations).toEqual([]); // old news isn't replayed
     s = applyServer(s, {...server, adjustments: [taken, bonus]}, now);
@@ -228,14 +254,8 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     expect(takenToday(s, 'k1', now + 86400000)).toEqual([]);
   });
 
-  it('the jar holds the daily base plus what was earned', () => {
-    const s = applyServer(paired, {...server, children: [{...server.children[0], dailyBaseMin: 30}]}, now);
-    expect(timeToday(s, 'k1')).toBe(30 + 25);
-    expect(applyServer(paired, server, now).family.kids[0].dailyBaseMin).toBe(30); // an older backend: the default
-  });
-
-  it('drops celebrations saved in the old shape instead of showing them wrong', () => {
-    const old = {...toSaved(initialState), celebrations: [{kidId: 'mia', marbles: 2, jobId: 'toys'}]};
+  it('drops celebrations saved in an old shape instead of showing them wrong', () => {
+    const old = {...toSaved(paired), celebrations: [{kidId: 'k1', marbles: 2, jobId: 'c1'}, {id: 'y', kidId: 'k1', marbles: 2, why: {kind: 'job', jobId: 'c1'}}]};
     expect(restore(initialState, old).celebrations).toEqual([]);
   });
 
@@ -247,10 +267,40 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     expect(isDone(withClaim(now - 86400000), 'k1', {...job, once: true}, now)).toBe(true);
   });
 
-  it('the grown-ups PIN: 1234 before pairing, the family’s own after', () => {
-    expect(checkPin(initialState, '1234')).toBe(true);
+  it('the grown-ups PIN: the family’s own once paired; 1234 only with a test link’s sample family', () => {
     expect(checkPin(paired, '1234')).toBe(false);
     expect(checkPin(paired, '4321')).toBe(true);
+    expect(checkPin(sample, '1234')).toBe(true);
+    expect(checkPin(initialState, '1234')).toBe(false); // a fresh TV has no grown-ups area to open
+  });
+
+  it('a fresh TV shows the welcome screen until a phone pairs it and the family arrives', () => {
+    expect([initialState.family.kids, initialState.balances, needsPairing(initialState)]).toEqual([[], {}, true]);
+    expect(needsPairing(sample)).toBe(false); // test links work unpaired
+    const linked = reducer({...initialState, lang: 'et'}, {type: 'linked', link});
+    expect([needsPairing(linked), firstSyncPending(linked), linked.lang]).toEqual([false, true, 'et']);
+    expect(firstSyncPending(applyServer(linked, server, now))).toBe(false);
+    expect(reducer(linked, {type: 'linked', link}).demo).toBe(false);
+  });
+
+  it('disconnecting forgets the family but keeps the TV’s settings', () => {
+    const s = reducer(reducer(applyServer(claimed(paired), server, now), {type: 'setVoice', voice: true}), {type: 'unlink'});
+    expect(s).toEqual({...initialState, lang: 'et', caps: true, voice: true});
+    expect(needsPairing(s)).toBe(true);
+  });
+
+  it('an unpaired save from before the welcome screen (the old sample family) loads as a fresh TV', () => {
+    const old = {...toSaved(sample), demo: undefined, lang: 'de'};
+    expect(restore(initialState, JSON.parse(JSON.stringify(old)))).toEqual({...initialState, lang: 'de'});
+    expect(restore(initialState, JSON.parse(JSON.stringify(toSaved(sample))))).toEqual({...sample, screen: {name: 'who'}}); // a test link's family stays
+  });
+
+  it('never shows a screen for a kid who isn’t in the family', () => {
+    const s = applyServer(paired, server, now);
+    expect(reducer(s, {type: 'go', screen: {name: 'board', kidId: 'mia'}}).screen).toEqual({name: 'who'});
+    const onBoard = reducer(s, {type: 'go', screen: {name: 'board', kidId: 'k1'}});
+    expect(onBoard.screen).toEqual({name: 'board', kidId: 'k1'});
+    expect(applyServer(onBoard, {...server, children: [], chores: []}, now).screen).toEqual({name: 'who'}); // removed on the phone
   });
 
   it('saves the pairing and the outbox', () => {
@@ -304,6 +354,15 @@ describe('text fitting for user content', () => {
     expect(linesNeeded('KORISTA LEGOD PÕRANDALT', 280, size, CAPS_WIDTH) * Math.round(size * 1.15)).toBeLessThanOrEqual(124);
     expect(fitFontSize('KASS', 280, 42, 22, 3, CAPS_WIDTH, 124)).toBe(42); // short titles stay big
   });
+  it('sizes marbles to the jar, so a full jar of any size is full to the top', () => {
+    const {JAR, JAR_CAPACITY, pileTop, radiusFor} = require('../physics');
+    for (let n = 2; n <= JAR_CAPACITY; n++) {
+      const top = pileTop(n, radiusFor(n));
+      expect([n, top >= JAR.height * 0.08 - 0.5, top <= JAR.height * 0.15]).toEqual([n, true, true]);
+    }
+    expect(radiusFor(6)).toBeGreaterThan(radiusFor(12)); // a 60-minute jar has bigger marbles than a 120-minute one
+  });
+
   it('wraps a double name after its hyphen instead of mid-word', () => {
     // 360 px at 46 px capitals holds 11 letters: "MAXIMILIAN-" / "ALEXANDER".
     expect(linesNeeded('MAXIMILIAN-ALEXANDER', 360, 46, CAPS_WIDTH)).toBe(2);

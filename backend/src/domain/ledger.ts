@@ -1,23 +1,67 @@
-/** The ledger: bonuses and penalties, history, the Amazon Kids hand-off, and brain-game marbles (docs/03 §6, §11). */
+/** The ledger: bonuses and penalties, history, and the Amazon Kids hand-off (docs/03 §6). */
 import type {Deps} from './deps';
 import {busy, conflict, notFound} from './errors';
 import {newId} from './secrets';
-import {localDay} from './time';
-import {type Child, type Device, type Family, type LedgerEntry, MARBLE_SEC, type Parent} from './types';
-import type {AdjustInput, GameInput, HandoffInput} from './validate';
+import {localDay, nextDay, startOfDay} from './time';
+import type {Child, Family, LedgerEntry, Parent} from './types';
+import type {AdjustInput, HandoffInput} from './validate';
 import {entryView, newestFirst} from './views';
 
-/** Marbles for one finished brain game (2 = 10 min), before the daily cap. */
-export const GAME_MARBLES = 2;
+/**
+ * Settles a kid's hand-off from before today. Minutes marked handed off (DONE or SKIPPED) stay in the jar for the rest
+ * of the family's local day: they are today's TV, so the daily maximum holds and the TV's marbles don't vanish when a
+ * parent taps "I added it". After the next local midnight, the kid's first read or write takes them out of the jar
+ * with one HANDOFF entry, written once (it is conditional on the balance, the debt and the due as read, like an
+ * approval), dated at that midnight, and never below an empty jar.
+ *
+ * Whatever the jar couldn't give up had already left it with a minus (whose debt waits for a hand-off): it pays that
+ * debt, so no minutes stay in the jar for good. (The jar then always holds pending minutes + today's due − the debt.)
+ */
+export async function settleDue(deps: Deps, family: Family, child: Child): Promise<{child: Child; settled: boolean}> {
+  let current = child;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const {handoffDueSec: dueSec, handoffDueDay: dueDay, ...rest} = current;
+    const now = deps.now();
+    if (!dueSec || dueDay === undefined || dueDay >= localDay(now, family.timezone)) return {child: current, settled: false};
+    const takeSec = Math.max(0, Math.min(dueSec, current.balanceSec));
+    const paid = Math.min(dueSec - takeSec, current.debtSec);
+    const entry: LedgerEntry | undefined = takeSec > 0 ? {
+      id: newId(), childId: current.id, deltaSec: -takeSec, type: 'HANDOFF', reason: `Handed off on ${dueDay}`, createdBy: 'system',
+      createdAt: Math.min(now, startOfDay(nextDay(dueDay), family.timezone)),
+    } : undefined;
+    if (await deps.repo.settleDue(family.id, current.id, {...(entry && {entry}), debtPaidSec: paid, read: current})) {
+      return {child: {...rest, balanceSec: current.balanceSec - takeSec, debtSec: current.debtSec - paid}, settled: true};
+    }
+    // Something else changed the kid at the same moment (or settled it): look again.
+    const again = await deps.repo.getChild(family.id, current.id);
+    if (!again) throw notFound('child');
+    current = again;
+  }
+  throw busy();
+}
 
-async function requireChild(deps: Deps, familyId: string, childId: string): Promise<Child> {
-  const child = await deps.repo.getChild(familyId, childId);
+/** A kid as of now (a hand-off due from before today settled first); on a write path the family hears `changed` if it settled. */
+export async function currentChild(deps: Deps, family: Family, childId: string, write: boolean): Promise<Child | undefined> {
+  const child = await deps.repo.getChild(family.id, childId);
+  if (!child) return undefined;
+  const result = await settleDue(deps, family, child);
+  if (result.settled && write) deps.changed(family.id);
+  return result.child;
+}
+
+/** All the family's kids as of now (reads: a settlement just shows in what they return). */
+export async function currentChildren(deps: Deps, family: Family): Promise<Child[]> {
+  return Promise.all((await deps.repo.listChildren(family.id)).map(async child => (await settleDue(deps, family, child)).child));
+}
+
+async function requireChild(deps: Deps, family: Family, childId: string, write: boolean): Promise<Child> {
+  const child = await currentChild(deps, family, childId, write);
   if (!child) throw notFound('child');
   return child;
 }
 
-async function balance(deps: Deps, familyId: string, entry: LedgerEntry) {
-  const child = await requireChild(deps, familyId, entry.childId);
+async function balance(deps: Deps, family: Family, entry: LedgerEntry) {
+  const child = await requireChild(deps, family, entry.childId, false);
   return {balanceSec: child.balanceSec, entry: entryView(entry)};
 }
 
@@ -29,8 +73,8 @@ async function balance(deps: Deps, familyId: string, entry: LedgerEntry) {
 export async function adjust(deps: Deps, family: Family, parent: Parent, childId: string, input: AdjustInput) {
   for (let attempt = 0; attempt < 3; attempt++) {
     const earlier = await previousAdjust(deps, family.id, childId, input.id);
-    if (earlier) return balance(deps, family.id, earlier);
-    const child = await requireChild(deps, family.id, childId);
+    if (earlier) return balance(deps, family, earlier);
+    const child = await requireChild(deps, family, childId, true);
     const deltaMin = input.deltaMin > 0 ? input.deltaMin : -Math.min(-input.deltaMin, Math.floor(child.balanceSec / 60));
     if (deltaMin === 0) throw conflict('empty_jar', 'The jar is empty: there are no minutes to take away');
     const deltaSec = deltaMin * 60;
@@ -43,7 +87,10 @@ export async function adjust(deps: Deps, family: Family, parent: Parent, childId
       // What was taken adds to the hand-off debt, and the jar must still hold it when this is written.
       ...(deltaSec < 0 && {debtSec: -deltaSec, minBalanceSec: -deltaSec}),
     });
-    if (result === 'ok') return balance(deps, family.id, entry);
+    if (result === 'ok') {
+      deps.changed(family.id);
+      return balance(deps, family, entry);
+    }
     // The same request landed at the same moment, or the jar changed (or the kid is gone): look again.
   }
   throw busy();
@@ -58,7 +105,7 @@ async function previousAdjust(deps: Deps, familyId: string, childId: string, id:
 }
 
 export async function history(deps: Deps, family: Family, childId: string, limit: number) {
-  await requireChild(deps, family.id, childId);
+  await requireChild(deps, family, childId, false);
   return {entries: (await deps.repo.entries(family.id, childId, limit)).map(entryView)};
 }
 
@@ -72,7 +119,7 @@ const total = (entries: LedgerEntry[]) => entries.reduce((sum, e) => sum + e.del
  * was added for them), so the debt waits for the next hand-off.
  */
 export async function handoff(deps: Deps, family: Family, childId: string) {
-  const child = await requireChild(deps, family.id, childId);
+  const child = await requireChild(deps, family, childId, false);
   const pending = await deps.repo.pendingEntries(family.id, childId);
   return {
     pendingMinutes: Math.max(0, Math.floor((total(pending) - child.debtSec) / 60)),
@@ -80,52 +127,36 @@ export async function handoff(deps: Deps, family: Family, childId: string) {
   };
 }
 
-/** Marks entries DONE or SKIPPED. Ids that aren't PENDING (any more) are ignored, so a repeat is harmless. */
+/** Entries per transaction: at most 100 writes, so 99 entries and the child. */
+const SETTLE_BATCH = 99;
+
+/**
+ * Marks entries DONE (added in Amazon Kids) or SKIPPED (settled another way). DONE pays the penalty debt from those
+ * entries' minutes at once, so `pendingMinutes` is right straight away; their minutes leave the jar at the family's
+ * next local midnight (settleDue): the entries' minutes less the debt they paid, since a minus already took those out.
+ *
+ * Ids that aren't PENDING (any more) are ignored, so marking the same entries twice settles them once. A due from an
+ * earlier day is settled first. Entries settled before HANDOFF entries existed stay as they are: nothing is backfilled.
+ */
 export async function settleHandoff(deps: Deps, family: Family, childId: string, input: HandoffInput) {
   const wanted = new Set(input.entryIds);
   for (let attempt = 0; attempt < 3; attempt++) {
-    const child = await requireChild(deps, family.id, childId);
+    const child = await requireChild(deps, family, childId, true);
+    const day = localDay(deps.now(), family.timezone);
     const chosen = (await deps.repo.pendingEntries(family.id, childId)).filter(e => wanted.has(e.id));
     let debt = input.status === 'DONE' ? child.debtSec : 0;
     let settled = true;
-    // One transaction holds at most 100 writes: 99 entries and the child.
-    for (let i = 0; i < chosen.length && settled; i += 99) {
-      const batch = chosen.slice(i, i + 99);
+    for (let i = 0; i < chosen.length && settled; i += SETTLE_BATCH) {
+      const batch = chosen.slice(i, i + SETTLE_BATCH);
       const paid = Math.min(debt, total(batch));
-      settled = await deps.repo.settleEntries(family.id, childId, batch, input.status, paid);
+      settled = await deps.repo.settleEntries(family.id, childId, batch, input.status, paid, {sec: total(batch) - paid, day});
       if (settled) debt -= paid;
     }
-    if (settled) return handoff(deps, family, childId);
-    // Another hand-off landed at the same moment: read again (settled entries are no longer pending).
-  }
-  throw busy();
-}
-
-/**
- * A finished brain game, checked on the TV: GAME_MARBLES, capped by the kid's daily cap minus the game marbles
- * already earned on the family's local today. Idempotent on the result id.
- */
-export async function recordGame(deps: Deps, family: Family, device: Device, input: GameInput) {
-  for (let attempt = 0; attempt < 3; attempt++) {
-    const [done, child] = await Promise.all([deps.repo.getRef(family.id, input.childId, input.id), requireChild(deps, family.id, input.childId)]);
-    if (done) return {marbles: done.kind === 'game' ? done.marbles : 0, balanceSec: child.balanceSec};
-    const now = deps.now();
-    const day = localDay(now, family.timezone);
-    const earned = child.gameDay === day ? (child.gameMarbles ?? 0) : 0;
-    const marbles = Math.max(0, Math.min(GAME_MARBLES, child.games.dailyCapMarbles - earned));
-    const entry: LedgerEntry | undefined = marbles > 0 ? {
-      id: newId(), childId: child.id, deltaSec: marbles * MARBLE_SEC, type: 'GAME', reason: input.topic,
-      refId: input.id, createdBy: `tv:${device.id}`, createdAt: now, handoff: 'PENDING',
-    } : undefined;
-    const result = await deps.repo.creditGame(family.id, input.id, {
-      childId: child.id,
-      marbles,
-      before: {day: child.gameDay, marbles: child.gameMarbles},
-      after: {day, marbles: earned + marbles},
-      ...(entry && {entry}),
-    });
-    if (result === 'ok') return {marbles, balanceSec: (await requireChild(deps, family.id, child.id)).balanceSec};
-    // The same result just landed (a resend), or another game counted meanwhile: look again.
+    if (settled) {
+      if (chosen.length) deps.changed(family.id);
+      return handoff(deps, family, childId);
+    }
+    // Another hand-off landed at the same moment, or midnight passed: read again (settled entries are no longer pending).
   }
   throw busy();
 }

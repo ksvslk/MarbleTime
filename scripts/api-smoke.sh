@@ -98,6 +98,10 @@ call GET /device/state "" "$TV"; expect 200 "the TV's state"
 [ "$(jget "$BODY" .device.name)" = "Smoke TV" ] || fail "the TV should see its own name: $(jget "$BODY" .device)"
 [ "$(jfind "$BODY" .children "$child" balanceSec)" = 0 ] || fail "the new kid should start at 0"
 [ "$(jfind "$BODY" .children "$child" dailyBaseMin)" = 30 ] || fail "the new kid should get the default daily base (30 min)"
+case "$(jget "$BODY" .gameSets)" in "["*) ;; *) fail "the TV state has no gameSets list" ;; esac
+case "$(jget "$BODY" .realtimeUrl)" in ws://*|wss://*) ;; *) fail "the TV state has no realtimeUrl" ;; esac
+call GET /push/key; expect 200 "the Web Push key"
+[ -n "$(jget "$BODY" .publicKey)" ] || fail "no Web Push public key"
 
 # The kid says "I did it!" on the TV (the outbox may send it twice).
 claim=$(uuid)
@@ -128,9 +132,13 @@ call GET /device/state "" "$TV"; expect 200 "the TV's state after the minus"
   fail "the TV doesn't see the minus: $(jget "$BODY" .adjustments)"
 ok "parent: 5 min taken away; the TV sees it with its reason"
 
-etag=$(curl -sS -o /dev/null -D - -H "authorization: $TV" "$API/device/state" | tr -d '\r' | awk -F': ' 'tolower($1) == "etag" {print $2}')
-[ "$(curl -sS -o /dev/null -w '%{http_code}' -H "authorization: $TV" -H "if-none-match: $etag" "$API/device/state")" = 304 ] ||
-  fail "an unchanged state should answer If-None-Match with 304"
+# Brain-game sets may land in the background between the two requests, so give it a few tries.
+for _ in 1 2 3; do
+  etag=$(curl -sS -o /dev/null -D - -H "authorization: $TV" "$API/device/state" | tr -d '\r' | awk -F': ' 'tolower($1) == "etag" {print $2}')
+  status=$(curl -sS -o /dev/null -w '%{http_code}' -H "authorization: $TV" -H "if-none-match: $etag" "$API/device/state")
+  [ "$status" = 304 ] && break
+done
+[ "$status" = 304 ] || fail "an unchanged state should answer If-None-Match with 304"
 ok "TV: unchanged state → 304"
 
 # Clean up: the kid (and the job only they had) and the TV.

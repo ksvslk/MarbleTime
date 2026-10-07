@@ -1,0 +1,140 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Light beam from flashlight -->
+    <radialGradient id="lightBeam" cx="0%" cy="50%" r="100%">
+      <stop offset="0%" stop-color="#FFF9C4" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#FFF59D" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background Ambience (soft nightglow ring) -->
+  <circle cx="256" cy="270" r="210" fill="#E8EAF6"/>
+
+  <!-- EXTRA: Tail, Flashlight Glow, and Heroic Blanket-Cape -->
+  <g id="extra" data-pivot="256 320">
+    <!-- Waved wagging tail -->
+    <path d="M180 340 C140 350 120 310 135 285 C145 268 165 290 155 305 C148 315 160 330 185 325 Z" fill="#D7CCC8"/>
+    <!-- Yellow Night-Hero Cape behind body -->
+    <path d="M210 240 Q150 280 165 375 Q210 395 245 365 Q230 300 220 240 Z" fill="#FFCA28"/>
+    <path d="M225 245 Q175 285 185 360 Q215 375 240 355 Z" fill="#FFD54F"/>
+    <!-- Flashlight Beam (casting forward to fight the dark) -->
+    <polygon points="370,305 500,230 512,390 370,335" fill="url(#lightBeam)"/>
+  </g>
+
+  <!-- LEGS: Sturdy, slightly shaking but standing firm -->
+  <g id="legs" data-pivot="256 380">
+    <!-- Back / Left Leg & Paw -->
+    <rect x="205" y="340" width="36" height="70" rx="18" fill="#BCAAA4"/>
+    <ellipse cx="218" cy="410" rx="24" ry="14" fill="#A1887F"/>
+    <circle cx="206" cy="414" r="4" fill="#8D6E63"/>
+    <circle cx="218" cy="416" r="4" fill="#8D6E63"/>
+    <circle cx="230" cy="414" r="4" fill="#8D6E63"/>
+
+    <!-- Front / Right Leg & Paw -->
+    <rect x="275" y="340" width="36" height="70" rx="18" fill="#BCAAA4"/>
+    <ellipse cx="292" cy="410" rx="24" ry="14" fill="#A1887F"/>
+    <circle cx="280" cy="414" r="4" fill="#8D6E63"/>
+    <circle cx="292" cy="416" r="4" fill="#8D6E63"/>
+    <circle cx="304" cy="414" r="4" fill="#8D6E63"/>
+  </g>
+
+  <!-- BODY: Chubby, warm pup tummy -->
+  <g id="body" data-pivot="256 290">
+    <!-- Main torso -->
+    <ellipse cx="256" cy="295" rx="68" ry="75" fill="#D7CCC8"/>
+    <!-- Soft cream belly patch -->
+    <ellipse cx="262" cy="305" rx="44" ry="52" fill="#FFF8E1"/>
+    <!-- Cape Collar tied bravely -->
+    <path d="M218 238 Q256 260 298 238 Q304 250 292 256 Q256 270 222 254 Z" fill="#FFA000"/>
+    <!-- Star badge of courage on chest -->
+    <path d="M260 262 L263 270 L271 270 L265 275 L267 283 L260 278 L253 283 L255 275 L249 270 L257 270 Z" fill="#FFD54F"/>
+  </g>
+
+  <!-- ARM-LEFT: Holding lucky star pajama charm tightly -->
+  <g id="arm-left" data-pivot="205 255">
+    <path d="M210 255 Q185 285 200 315 Q212 325 224 310 Q215 285 225 260 Z" fill="#BCAAA4"/>
+    <!-- Little paw clenched brave -->
+    <circle cx="206" cy="316" r="14" fill="#A1887F"/>
+    <!-- Blue glowing star charm -->
+    <polygon points="206,306 209,314 217,314 211,319 213,327 206,322 199,327 201,319 195,314 203,314" fill="#4DD0E1"/>
+  </g>
+
+  <!-- ARM-RIGHT: Bravely thrusting flashlight forward -->
+  <g id="arm-right" data-pivot="295 260">
+    <!-- Stretched arm -->
+    <path d="M290 255 Q330 265 350 305 Q340 318 325 312 Q310 285 282 272 Z" fill="#D7CCC8"/>
+    <circle cx="342" cy="310" r="14" fill="#BCAAA4"/>
+    <!-- Flashlight casing -->
+    <rect x="340" y="300" width="32" height="22" rx="4" fill="#26A69A" transform="rotate(12 340 300)"/>
+    <polygon points="368,296 382,290 386,330 371,324" fill="#80CBC4"/>
+    <!-- Glowing bulb rim -->
+    <ellipse cx="380" cy="310" rx="4" ry="16" fill="#FFF59D"/>
+  </g>
+
+  <!-- HEAD: Big expressive puppy head with spots and floppy ears -->
+  <g id="head" data-pivot="256 185">
+    <!-- Left Floppy Ear (alert, slightly trembling) -->
+    <path d="M195 125 C150 110 130 165 145 205 C155 225 175 220 180 195 C185 170 185 145 195 125 Z" fill="#8D6E63"/>
+    <path d="M185 135 C155 125 145 165 155 195 C162 205 172 200 175 185 Z" fill="#FFAB91"/>
+
+    <!-- Right Floppy Ear -->
+    <path d="M315 125 C360 110 380 165 365 205 C355 225 335 220 330 195 C325 170 325 145 315 125 Z" fill="#8D6E63"/>
+    <path d="M325 135 C355 125 365 165 355 195 C348 205 338 200 335 185 Z" fill="#FFAB91"/>
+
+    <!-- Head Shape -->
+    <ellipse cx="256" cy="170" rx="76" ry="68" fill="#D7CCC8"/>
+
+    <!-- Eye Patch (Brave pirate-dog look on right eye) -->
+    <path d="M260 145 Q295 120 320 150 Q335 180 300 200 Q265 195 260 145 Z" fill="#A1887F"/>
+
+    <!-- Cute Chubby Muzzle -->
+    <ellipse cx="256" cy="195" rx="38" ry="26" fill="#FFF8E1"/>
+    <!-- Soft Dog Nose -->
+    <path d="M246 182 Q256 176 266 182 Q270 192 256 197 Q242 192 246 182 Z" fill="#37474F"/>
+    <ellipse cx="252" cy="183" rx="3" ry="1.5" fill="#FFFFFF"/>
+
+    <!-- Nervous-but-brave sweat drop -->
+    <path d="M190 148 C186 142 193 134 193 134 C193 134 200 142 196 148 C194 151 191 151 190 148 Z" fill="#4DD0E1"/>
+  </g>
+
+  <!-- EYE-LEFT: Wide, worried but determined -->
+  <g id="eye-left" data-pivot="226 160">
+    <!-- Outer Eye White (huge kid-friendly eyes) -->
+    <ellipse cx="226" cy="160" rx="19" ry="22" fill="#FFFFFF"/>
+    <!-- Big warm iris -->
+    <ellipse cx="230" cy="162" rx="13" ry="15" fill="#5D4037"/>
+    <!-- Pupil -->
+    <circle cx="232" cy="162" r="9" fill="#212121"/>
+    <!-- Catchlights showing wonder and courage -->
+    <circle cx="228" cy="155" r="5" fill="#FFFFFF"/>
+    <circle cx="236" cy="166" r="2.5" fill="#FFFFFF"/>
+    <!-- Worried inner-raised Eyebrow -->
+    <path d="M210 138 Q228 132 244 142" stroke="#5D4037" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- EYE-RIGHT: Big, shining, facing the dark -->
+  <g id="eye-right" data-pivot="286 160">
+    <!-- Outer Eye White -->
+    <ellipse cx="286" cy="160" rx="19" ry="22" fill="#FFFFFF"/>
+    <!-- Big warm iris -->
+    <ellipse cx="290" cy="162" rx="13" ry="15" fill="#5D4037"/>
+    <!-- Pupil -->
+    <circle cx="292" cy="162" r="9" fill="#212121"/>
+    <!-- Catchlights -->
+    <circle cx="288" cy="155" r="5" fill="#FFFFFF"/>
+    <circle cx="296" cy="166" r="2.5" fill="#FFFFFF"/>
+    <!-- Worried inner-raised Eyebrow -->
+    <path d="M302 138 Q284 132 268 142" stroke="#4E342E" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+  </g>
+
+  <!-- MOUTH: Determined little wavy smile (a bit scared, very brave!) -->
+  <g id="mouth" data-pivot="256 206">
+    <!-- Wobbly courageous smile line -->
+    <path d="M242 206 Q249 204 256 208 Q263 212 270 206" stroke="#37474F" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+    <!-- Determined lower lip / tiny open breath -->
+    <path d="M250 209 Q256 217 263 209 Z" fill="#E57373"/>
+    <!-- Rosy cheek blush for cute vulnerable courage -->
+    <ellipse cx="204" cy="186" rx="9" ry="6" fill="#FF8A80" opacity="0.5"/>
+    <ellipse cx="308" cy="186" rx="9" ry="6" fill="#FF8A80" opacity="0.5"/>
+  </g>
+</svg>

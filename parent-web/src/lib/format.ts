@@ -1,4 +1,4 @@
-/** Time as the family sees it: marbles (one = 5 minutes), minutes, repeat rules and "2 min ago". Pure functions. */
+/** Time as the family sees it: marbles (one = 10 minutes), minutes, repeat rules and "2 min ago". Pure functions. */
 import type {Lang, Repeat} from '../api/types';
 import {translate} from '../i18n/strings';
 import {MIN_PER_MARBLE} from '../tokens';

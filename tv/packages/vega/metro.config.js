@@ -31,6 +31,8 @@ const config = {
       // Alias lottie-react-native to the Kepler-compatible version
       // so shared package code resolves to the correct native module
       'lottie-react-native': path.resolve(projectRoot, 'node_modules', '@amazon-devices', 'lottie-react-native'),
+      // Characters are drawn with react-native-svg: Amazon's port on Vega
+      'react-native-svg': path.resolve(projectRoot, 'node_modules', '@amazon-devices', 'react-native-svg'),
     },
     blockList: metroTools.blockList,
   },

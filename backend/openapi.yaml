@@ -3,12 +3,15 @@ info:
   title: MarbleTime API
   version: 0.1.0
   description: |
-    Kids earn TV time with real-life jobs (chores, approved by a parent) and brain games (checked by the TV).
+    Kids earn TV time with real-life jobs (chores, approved by a parent). Each kid has a daily budget from health
+    guidance (docs/08-evidence-based-design.md): a free base every day and a ceiling. Approved jobs fill the jar up
+    to the ceiling; a job approved when the jar is full earns a new character instead of time.
     Two callers:
       - the parent web app, signed in with Cognito (`Authorization: Bearer <access token>`);
       - a paired TV, with the device token it got when it was paired (`Authorization: Device <token>`).
     Words: the API says "children", "chores" and "parent"; the apps say "kids", "jobs" and "grown-ups".
-    Times are epoch milliseconds. Minutes are whole multiples of 5 (one marble = 5 minutes).
+    Times are epoch milliseconds. Minutes are whole multiples of 10 (one marble = 10 minutes: one short TV
+    session, after Estonia's TAI 2026 advice of sessions of at most 10–15 minutes for ages 3–5).
     Errors are `{"error": {"code": "...", "message": "..."}}` with a 4xx/5xx status.
     Design: docs/03-architecture.md §4.1 (earning), §4.3 (pairing), §6 (ledger), §7 (data model), §8.
 
@@ -22,11 +25,31 @@ servers:
 security:
   - parent: []
 
+x-realtime:
+  description: |
+    Live updates over WebSocket (API Gateway WebSocket API; its address is the stack output RealtimeUrl and
+    `realtimeUrl` in the parent app's /config.json). Clients connect with one query parameter:
+      TV:     wss://…?device=<device token>
+      parent: wss://…?token=<Cognito access or ID token>
+    and are tied to their family. Whenever anything in the family changes (claims, decisions, balances,
+    adjustments, settings, children, chores, devices, characters), the server sends every open connection
+    of that family `{"type": "changed"}` within a second, and clients fetch what they show
+    (TV: GET /device/state with its ETag; parent app: the screen's data). Clients reconnect with backoff and
+    keep polling slowly (TV every 15 s, parent app every 30 s) in case the connection drops. Messages from
+    clients are ignored except `{"type": "ping"}`, answered with `{"type": "pong"}`.
+
 paths:
   # ---------- Parent: family ----------
   /me:
     get:
       summary: Who is signed in, and their family (null until onboarding is done)
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Me'}}}}
+    patch:
+      summary: The parent's name as kids see it on the TV when this parent approves a job ("– Dad"). Works once signed in, before or after the family exists.
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object, required: [name], properties: {name: {type: string, minLength: 1, maxLength: 24}}}}}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Me'}}}}
   /family:
@@ -57,7 +80,7 @@ paths:
   /children/{childId}:
     parameters: [{$ref: '#/components/parameters/childId'}]
     patch:
-      summary: Edit a child (name, avatar, age, brain-game settings)
+      summary: Edit a child (name, avatar, age, daily budget)
       requestBody: {required: true, content: {application/json: {schema: {$ref: '#/components/schemas/ChildPatch'}}}}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Child'}}}}
@@ -81,7 +104,7 @@ paths:
               required: [deltaMin, reason]
               properties:
                 id: {type: string, description: client UUID; repeats are ignored}
-                deltaMin: {type: integer, minimum: -120, maximum: 120, multipleOf: 5, not: {const: 0}}
+                deltaMin: {type: integer, minimum: -120, maximum: 120, multipleOf: 10, not: {const: 0}, description: 'whole marbles (10 min each)'}
                 reason: {type: string, maxLength: 80}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Balance'}}}}
@@ -98,6 +121,55 @@ paths:
           content:
             application/json:
               schema: {type: object, required: [entries], properties: {entries: {type: array, items: {$ref: '#/components/schemas/LedgerEntry'}}}}
+  /children/{childId}/characters:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    get:
+      summary: The kid's characters, newest first (drawing, ready, or needs_help)
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {type: object, required: [characters], properties: {characters: {type: array, items: {$ref: '#/components/schemas/Character'}}}}}}}
+    post:
+      summary: Make a new character from the kid's own words (uses one character token)
+      description: |
+        The art director turns the words into a character card first (a few seconds, in this request): brands
+        and known characters are never copied, scary things become friendly, mild cartoon props are fine
+        (docs/08, Decisions 5). Drawing and checking then run in the background (median ~25 s); the family's
+        clients get `changed` when the character is ready. No ready-made character is ever swapped in.
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object, required: [description], properties: {description: {type: string, minLength: 1, maxLength: 200, description: 'the kid''s words, typed or from /speech-to-text'}}}}}
+      responses:
+        '202': {description: Accepted; status drawing, content: {application/json: {schema: {$ref: '#/components/schemas/Character'}}}}
+        '409': {description: 'no_tokens: the kid has no character token', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '422': {description: 'idea_not_ok: nothing safe and original could be made from these words; message is a kind sentence (in the family''s language) to read to the kid; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: 'too_many: too many tries for now; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '503': {description: 'unavailable: the drawing models can''t be reached right now; the token is kept, try later', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /children/{childId}/characters/{characterId}:
+    parameters: [{$ref: '#/components/parameters/childId'}, {$ref: '#/components/parameters/characterId'}]
+    delete:
+      summary: A grown-up removes a character, in any state
+      description: |
+        A drawing in progress is dropped. The token of a drawing or ready character goes back to the kid, who can make
+        another (a needs_help try already gave it back). Kids never lose an earned character to a removal.
+      responses:
+        '204': {description: Removed}
+  /speech-to-text:
+    post:
+      summary: The kid's spoken idea from the parent's phone → text in the family's language (Gemini listens). The audio is not stored or logged.
+      description: |
+        The parent app records, then converts in the browser to a 16 kHz mono 16-bit PCM WAV (at most 15 s). The backend
+        checks the header and asks Gemini for an exact transcript in the family's language (en, et, de or es; words in
+        another language are kept as said). The body arrives base64-encoded through API Gateway: decode it to bytes,
+        never to text.
+      requestBody:
+        required: true
+        content:
+          audio/wav: {schema: {type: string, format: binary}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {type: object, required: [text], properties: {text: {type: string, description: 'empty when nothing was heard'}}}}}}
+        '400': {description: 'bad_audio: not a 16 kHz mono 16-bit PCM WAV', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '413': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
+        '503': {description: 'unavailable: the speech model can''t be reached right now', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
   /children/{childId}/handoff:
     parameters: [{$ref: '#/components/parameters/childId'}]
     get:
@@ -105,7 +177,12 @@ paths:
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Handoff'}}}}
     post:
-      summary: Mark hand-off entries done (added in Amazon Kids) or skipped
+      summary: Mark hand-off entries done (added in Amazon Kids) or skipped (settled another way)
+      description: |
+        Either way the minutes are settled and leave the kid's jar at the family's next local midnight: until then they
+        are today's TV (the daily maximum holds and the TV's marbles stay). After that midnight, the kid's first read
+        or write takes them out of balanceSec with a HANDOFF ledger entry, so the jar has room for new marbles. Earned
+        minutes otherwise wait in the jar until used (strict mode) or handed off; nothing else empties it.
       requestBody:
         required: true
         content:
@@ -164,6 +241,51 @@ paths:
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '409': {$ref: '#/components/responses/Error'}
+
+  # ---------- Parent: notifications ----------
+  /push/key:
+    get:
+      summary: The Web Push (VAPID) public key the parent app subscribes with
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: {type: object, required: [publicKey], properties: {publicKey: {type: string, description: base64url}}}
+  /push/subscriptions:
+    post:
+      summary: This browser wants notifications (a kid says "I did it!"). Repeats with the same endpoint update it.
+      description: |
+        The server sends a Web Push to every subscribed browser of the family's parents when a claim is made:
+        title "<child>: <job> is done", body "+<minutes> min · tap to answer", data {url: "/", claimId}.
+        Subscriptions the push service reports gone (404/410) are deleted.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [endpoint, keys]
+              properties:
+                endpoint: {type: string, maxLength: 1000}
+                keys:
+                  type: object
+                  required: [p256dh, auth]
+                  properties:
+                    p256dh: {type: string}
+                    auth: {type: string}
+      responses:
+        '201': {description: Saved}
+        '400': {$ref: '#/components/responses/Error'}
+    delete:
+      summary: Stop notifications for this browser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {type: object, required: [endpoint], properties: {endpoint: {type: string}}}
+      responses: {'204': {description: Deleted (or already gone)}}
 
   # ---------- Parent: devices and pairing ----------
   /pairings/{code}/confirm:
@@ -313,9 +435,40 @@ paths:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '403': {$ref: '#/components/responses/Error'}
         '429': {$ref: '#/components/responses/Error'}
-  /device/games/results:
+  /device/characters/{characterId}:
+    parameters: [{$ref: '#/components/parameters/characterId'}]
+    get:
+      summary: A ready character's art for the TV to draw and animate (never changes once ready; cache forever)
+      security: [{device: []}]
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/CharacterArt'}}}}
+        '404': {$ref: '#/components/responses/Error'}
+  /device/speech:
     post:
-      summary: A finished brain game. The server applies the child's daily game cap. Idempotent on `id`.
+      summary: A short line spoken by a character, or by the narrator (read-aloud), in the family's language (Gemini voices), with the mouth's movement
+      description: |
+        The TV fills its own templates ("You did it, Mia!", in en, et, de or es) and asks for the audio. Gemini-TTS
+        speaks it in character: the character's voice, with a speaking style the backend composes from fixed parts
+        (what the character is, its mood and its voiceStyle; never AI-written words). The audio is loudness-normalised
+        (about -16 LUFS, like the read-aloud) and the same text, character and language always give the same audio
+        (cached), so a line is made once. Only short lines; rate-limited per TV.
+
+        Without `characterId` the **narrator** says it: the TV's read-aloud voice (the same voice and style as its
+        recorded clips, scripts/make-voices.py), for the family's own words that can't be recorded ahead (kids'
+        names, job titles, "Feed the cat: done! – Dad", a bonus reason).
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object, required: [text, lang], properties: {text: {type: string, minLength: 1, maxLength: 160}, lang: {$ref: '#/components/schemas/Lang'}, characterId: {type: string, description: 'a ready character of this TV''s family, whose voice, mood and voiceStyle shape the speech; left out = the narrator'}}}}}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Speech'}}}}
+        '404': {description: 'not_found: no such ready character in this family', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: 'too_many: more than 60 new lines this hour on this TV (cached lines don''t count)', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '503': {description: 'unavailable: speech can''t be made right now; the TV stays silent. A new line not ready in the request''s 24 s goes on in the background: asked again later, it comes from the cache', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /device/settings:
+    post:
+      summary: A grown-up changes the family's TV settings on the TV, with the family PIN (same PIN limit as decisions)
+      description: The phone app sees the change on its next load; the last change wins, wherever it was made.
       security: [{device: []}]
       requestBody:
         required: true
@@ -323,25 +476,17 @@ paths:
           application/json:
             schema:
               type: object
-              required: [id, childId, topic, correct, total, at]
+              required: [pin]
               properties:
-                id: {type: string, description: client UUID}
-                childId: {type: string}
-                topic: {$ref: '#/components/schemas/Topic'}
-                correct: {type: integer, minimum: 0}
-                total: {type: integer, minimum: 1, maximum: 10}
-                at: {type: integer}
+                pin: {type: string, pattern: '^[0-9]{4}$'}
+                lang: {$ref: '#/components/schemas/Lang'}
+                caps: {type: boolean}
+                voice: {type: boolean}
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                required: [marbles, balanceSec]
-                properties:
-                  marbles: {type: integer, description: 'marbles credited (0 when the daily cap is reached)'}
-                  balanceSec: {type: integer}
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Family'}}}}
+        '400': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
   /device/heartbeat:
     post:
       summary: The TV is alive (shown as "last seen" in the parent app)
@@ -369,6 +514,7 @@ components:
     choreId: {name: choreId, in: path, required: true, schema: {type: string}}
     claimId: {name: claimId, in: path, required: true, schema: {type: string}}
     deviceId: {name: deviceId, in: path, required: true, schema: {type: string}}
+    characterId: {name: characterId, in: path, required: true, schema: {type: string}}
     code: {name: code, in: path, required: true, schema: {type: string, pattern: '^[A-HJ-NP-Z2-9]{6}$'}}
 
   responses:
@@ -391,7 +537,6 @@ components:
     Lang: {type: string, enum: [en, et, de, es]}
     Color: {type: string, enum: [peach, mint, sky, lilac, gold], description: card and avatar colours from the TV design}
     Avatar: {type: string, enum: [bear, bunny]}
-    Topic: {type: string, enum: [numbers, words, puzzles]}
     Platform: {type: string, enum: [fireos, vega, web]}
     DeviceMode: {type: string, enum: [amazon_kids, strict, api_mock], default: amazon_kids}
     ClaimStatus: {type: string, enum: [waiting, approved, rejected]}
@@ -406,7 +551,7 @@ components:
       type: object
       required: [parent, family]
       properties:
-        parent: {type: object, required: [id], properties: {id: {type: string}, email: {type: string}}}
+        parent: {type: object, required: [id], properties: {id: {type: string}, email: {type: string}, name: {type: string, maxLength: 24, description: 'as kids see it; unset until the parent picks one'}}}
         family: {oneOf: [{$ref: '#/components/schemas/Family'}, {type: 'null'}]}
 
     Family:
@@ -416,7 +561,7 @@ components:
         id: {type: string}
         name: {type: string, maxLength: 40}
         lang: {$ref: '#/components/schemas/Lang'}
-        timezone: {type: string, example: Europe/Tallinn, description: 'IANA zone; "today" (daily jobs, game cap) is this zone''s day'}
+        timezone: {type: string, example: Europe/Tallinn, description: 'IANA zone; "today" (daily jobs, the daily budget) is this zone''s day'}
         caps: {type: boolean, description: kid text in CAPITAL LETTERS on the TV}
         voice: {type: boolean, description: read aloud on the TV}
         hasPin: {type: boolean}
@@ -447,34 +592,40 @@ components:
         chores: {type: array, items: {$ref: '#/components/schemas/Chore'}}
         devices: {type: array, items: {$ref: '#/components/schemas/Device'}}
 
-    GameSettings:
-      type: object
-      required: [topics, dailyCapMarbles]
-      properties:
-        topics: {type: array, items: {$ref: '#/components/schemas/Topic'}, uniqueItems: true}
-        dailyCapMarbles: {type: integer, minimum: 0, maximum: 12, default: 4}
     Child:
       type: object
-      required: [id, name, avatar, color, age, balanceSec, dailyBaseMin, games]
+      required: [id, name, avatar, color, age, balanceSec, dailyBaseMin, dailyMaxMin, characterTokens]
       properties:
         id: {type: string}
         name: {type: string, maxLength: 24}
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
-        balanceSec: {type: integer, minimum: 0, description: earned minutes × 60 (never below 0)}
+        balanceSec: {type: integer, minimum: 0, description: earned minutes × 60 not yet used or handed off (never below 0)}
         dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
-        games: {$ref: '#/components/schemas/GameSettings'}
+        dailyMaxMin: {$ref: '#/components/schemas/DailyMax'}
+        characterTokens: {type: integer, minimum: 0, description: 'new characters earned (jobs approved while the jar was full) and not yet made'}
     DailyBase:
       type: integer
       minimum: 0
-      maximum: 240
-      multipleOf: 5
-      default: 30
+      maximum: 120
+      multipleOf: 10
       description: |
-        Screen time every day, before anything is earned, so TV isn't only a prize. Not in the ledger and
-        not handed off: in Amazon Kids mode the parent sets the same daily limit there; in strict mode the
-        TV starts each day with it.
+        Screen time every day, before anything is earned, so TV isn't only a prize: an allowance, the parenting
+        practice linked to less screen time (docs/08 §1.3). Default: half of dailyMaxMin rounded up to the next 10
+        (60 → 30, 90 → 50, 120 → 60), so a third to a half of the jar is earnable (docs/08 §1.5). Never above dailyMaxMin.
+        Not in the ledger and not handed off: in Amazon Kids mode the parent sets the same daily limit there; in
+        strict mode the TV starts each day with it.
+    DailyMax:
+      type: integer
+      minimum: 10
+      maximum: 120
+      multipleOf: 10
+      description: |
+        The most TV a day for this kid, everything included: the jar's size. From national guidance (docs/08 §1.1):
+        default 60 under age 7 (WHO 2019; Estonia TAI 2025 "kuni 60 minutit"), 90 from age 7 (TAI 2025 "kuni kahe
+        tunnini"; Norway 60–90); never above 60 under 7 or 120 from 7. Changing the age clamps it, and so does the
+        server for values above the limit (no error).
     ChildInput:
       type: object
       required: [name, avatar, color, age]
@@ -484,7 +635,7 @@ components:
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
         dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
-        games: {$ref: '#/components/schemas/GameSettings'}
+        dailyMaxMin: {$ref: '#/components/schemas/DailyMax'}
     ChildPatch:
       type: object
       properties:
@@ -493,7 +644,7 @@ components:
         color: {$ref: '#/components/schemas/Color'}
         age: {type: integer, minimum: 3, maximum: 12}
         dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
-        games: {$ref: '#/components/schemas/GameSettings'}
+        dailyMaxMin: {$ref: '#/components/schemas/DailyMax'}
 
     Repeat:
       description: How often a job can be done. Every kind can be done at most once per day per child.
@@ -503,13 +654,14 @@ components:
         - {type: object, required: [kind], properties: {kind: {const: once}}, description: 'gone once approved'}
     Chore:
       type: object
-      required: [id, title, icon, color, minutes, repeat, childIds, createdAt]
+      required: [id, title, icon, color, minutes, routine, repeat, childIds, createdAt]
       properties:
         id: {type: string}
         title: {type: string, maxLength: 60}
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
-        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
+        routine: {type: boolean, default: false, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4)'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
         createdAt: {type: integer}
@@ -520,7 +672,8 @@ components:
         title: {type: string, minLength: 1, maxLength: 60}
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
-        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
+        routine: {type: boolean, default: false, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4)'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
     ChorePatch:
@@ -529,7 +682,8 @@ components:
         title: {type: string, minLength: 1, maxLength: 60}
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
-        minutes: {type: integer, minimum: 5, maximum: 120, multipleOf: 5}
+        minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
+        routine: {type: boolean, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4); left out = unchanged'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
 
@@ -546,6 +700,15 @@ components:
         createdAt: {type: integer}
         decidedAt: {type: integer}
         decidedBy: {type: string, enum: [parent, tv]}
+        approverName: {type: string, description: 'the approving parent''s name as kids see it ("– Dad"); absent when approved on the TV or unset'}
+        reward:
+          type: string
+          enum: [marbles, character, praise]
+          description: |
+            Set on approval: marbles = minutesCredited went into the jar (as much as fitted under dailyMaxMin);
+            character = the jar was full, so the kid earned a new character (characterTokens + 1);
+            praise = a routine job, praised without a marble.
+        minutesCredited: {type: integer, minimum: 0, description: 'minutes that went into the jar (≤ minutes; 0 for character and praise)'}
 
     LedgerEntry:
       type: object
@@ -554,9 +717,9 @@ components:
         id: {type: string}
         childId: {type: string}
         deltaSec: {type: integer}
-        type: {type: string, enum: [ALLOWANCE, CHORE, GAME, BONUS, PENALTY, USAGE, ADJUST]}
+        type: {type: string, enum: [ALLOWANCE, CHORE, GAME, BONUS, PENALTY, USAGE, ADJUST, HANDOFF], description: 'HANDOFF: minutes settled by the hand-off, which leave the jar at the family''s next local midnight (createdBy "system", dated at that midnight). GAME only in history from before Oct 7, 2026 (brain games were removed)'}
         reason: {type: string}
-        refId: {type: string, description: claim id or game result id}
+        refId: {type: string, description: 'claim id (old GAME entries: game result id)'}
         createdBy: {type: string, description: '"parent:<id>", "tv:<deviceId>" or "system"'}
         createdAt: {type: integer}
         handoff: {type: string, enum: [PENDING, DONE, SKIPPED], description: 'Amazon Kids hand-off, positive entries only'}
@@ -566,6 +729,85 @@ components:
       properties:
         balanceSec: {type: integer}
         entry: {$ref: '#/components/schemas/LedgerEntry'}
+    CharacterVoice:
+      type: string
+      enum: [Puck, Zephyr, Fenrir, Leda, Aoede, Laomedeia, Achird, Sadachbia, Autonoe, Algenib, Achernar, Vindemiatrix]
+      description: 'Gemini-TTS voices (Google Cloud Text-to-Speech), picked by the art director to suit the character: Puck upbeat, Zephyr bright, Fenrir excitable, Leda youthful, Aoede breezy, Laomedeia upbeat, Achird friendly, Sadachbia lively, Autonoe bright, Algenib gravelly, Achernar soft, Vindemiatrix gentle'
+    CharacterMood: {type: string, enum: [happy, silly, brave, sleepy, proud, curious, calm]}
+    CharacterVoiceStyle:
+      type: object
+      required: [pitch, pace, energy, texture]
+      description: How the character sounds, picked by the art director to fit it (a tiny dragon squeaks and bounces, a sleepy bear rumbles slowly). Fixed words only, so the kid's idea never reaches the speech model as instructions.
+      properties:
+        pitch: {type: string, enum: [high, medium, low]}
+        pace: {type: string, enum: [quick, normal, slow]}
+        energy: {type: string, enum: [bouncy, cheerful, calm, sleepy, bold]}
+        texture: {type: string, enum: [squeaky, clear, soft, breathy, gravelly, booming]}
+    CharacterPart: {type: string, enum: [body, head, eye-left, eye-right, mouth, arm-left, arm-right, legs, extra]}
+    Character:
+      type: object
+      required: [id, childId, status, description, createdAt]
+      properties:
+        id: {type: string}
+        childId: {type: string}
+        status:
+          type: string
+          enum: [drawing, ready, needs_help]
+          description: 'needs_help: drawing and checking did not succeed within their repair rounds; the token went back to the kid, a grown-up can try other words'
+        description: {type: string, description: 'the kid''s words'}
+        name: {type: string, maxLength: 24, description: 'from the art director, in the family''s language, e.g. "Pancake Dragon" or "Pannkoogidraakon"'}
+        card: {$ref: '#/components/schemas/CharacterCard'}
+        voice: {$ref: '#/components/schemas/CharacterVoice'}
+        voiceStyle: {$ref: '#/components/schemas/CharacterVoiceStyle'}
+        svg: {type: string, description: 'the full, checked SVG (ready only), for the parent app to show'}
+        createdAt: {type: integer}
+        readyAt: {type: integer}
+    CharacterCard:
+      type: object
+      description: The art director's reading of the kid's words; this, never the raw words, is what gets drawn.
+      required: [what, colours, outfit, mood, detail]
+      properties:
+        what: {type: string, maxLength: 40, description: 'e.g. "a dragon"'}
+        colours: {type: array, items: {type: string, maxLength: 16}, maxItems: 3}
+        outfit: {type: string, maxLength: 60}
+        mood: {$ref: '#/components/schemas/CharacterMood'}
+        detail: {type: string, maxLength: 60, description: 'one fun detail, e.g. "loves pancakes, wears rollerskates"'}
+    CharacterArt:
+      type: object
+      required: [id, viewBox, layers, voice]
+      properties:
+        id: {type: string}
+        name: {type: string}
+        voice: {$ref: '#/components/schemas/CharacterVoice'}
+        viewBox: {type: string, example: 0 0 512 512}
+        layers:
+          type: array
+          description: In drawing order. Each layer is a complete small SVG (same viewBox); a named part can be rotated or scaled around its pivot, a layer without a part never moves on its own.
+          items:
+            type: object
+            required: [svg]
+            properties:
+              part: {$ref: '#/components/schemas/CharacterPart'}
+              parent: {$ref: '#/components/schemas/CharacterPart', description: 'the named part this layer was drawn inside and rides on (eyes and mouth on the head, a held thing on an arm): the TV moves it with that part first'}
+              pivot: {type: array, items: {type: number}, minItems: 2, maxItems: 2, description: '[x, y] in viewBox units'}
+              svg: {type: string}
+    Speech:
+      type: object
+      required: [audioUrl, durationMs, mouth]
+      properties:
+        audioUrl: {type: string, description: 'https URL of the audio (WAV, 24 kHz mono 16-bit), valid for at least a day'}
+        durationMs: {type: integer}
+        mouth:
+          type: object
+          required: [stepMs, open]
+          description: How open the mouth is, every stepMs from the start (0 shut … 1 wide open), from the audio's loudness
+          properties:
+            stepMs: {type: integer, minimum: 10, maximum: 100}
+            open: {type: array, items: {type: number, minimum: 0, maximum: 1}}
+        visemes:
+          type: array
+          description: Viseme marks, when the voice gives them (none of the Gemini voices does)
+          items: {type: object, required: [time, value], properties: {time: {type: integer, description: ms from the start}, value: {type: string}}}
     Handoff:
       type: object
       required: [pendingMinutes, entries]
@@ -587,7 +829,7 @@ components:
     DeviceState:
       type: object
       description: Small on purpose; the TV replaces its local copy with it (claims it has not uploaded yet stay local).
-      required: [family, device, children, chores, claims, adjustments, gameMarblesToday, today, serverTime]
+      required: [family, device, children, chores, claims, adjustments, today, serverTime]
       properties:
         family:
           type: object
@@ -625,6 +867,20 @@ components:
               reason: {type: string}
               at: {type: integer}
         claims: {type: array, items: {$ref: '#/components/schemas/Claim'}, description: 'waiting, plus decided in the last 7 days'}
-        gameMarblesToday: {type: object, additionalProperties: {type: integer}, description: childId → game marbles earned today}
+        characters:
+          type: array
+          description: the kids' characters that are drawing or ready (art from GET /device/characters/{id})
+          items:
+            type: object
+            required: [id, childId, status, createdAt]
+            properties:
+              id: {type: string}
+              childId: {type: string}
+              status: {type: string, enum: [drawing, ready]}
+              name: {type: string}
+              voice: {$ref: '#/components/schemas/CharacterVoice'}
+              mood: {$ref: '#/components/schemas/CharacterMood'}
+              createdAt: {type: integer}
         today: {type: string, description: 'the family''s local date, YYYY-MM-DD'}
+        realtimeUrl: {type: string, description: 'wss:// address for live updates (x-realtime); absent where there is none'}
         serverTime: {type: integer}

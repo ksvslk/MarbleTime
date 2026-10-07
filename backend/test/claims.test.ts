@@ -107,7 +107,7 @@ describe('claims', () => {
 
   it('puts weekday jobs on the board only on their days (ISO weekdays, family time zone)', async () => {
     const f = await family();
-    const {body: swim} = await f.mom.post('/chores', {title: 'Swim bag', minutes: 5, childIds: [f.leo.id], repeat: {kind: 'weekdays', days: [3, 5]}});
+    const {body: swim} = await f.mom.post('/chores', {title: 'Swim bag', minutes: 10, childIds: [f.leo.id], repeat: {kind: 'weekdays', days: [3, 5]}});
     const monday = await f.claim(f.leo.id, swim.id);
     expect(monday.status).toBe(409);
     expect(monday.body.error.code).toBe('not_today');

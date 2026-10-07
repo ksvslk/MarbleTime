@@ -10,8 +10,9 @@ import {Icon} from '../ui/Icon';
 import {Page} from '../ui/Page';
 import {useShowError, useToast} from '../ui/Toast';
 import {LangChips, PinFields, TimeZoneSelect} from './FamilyFields';
+import {NotifyRow} from './Notify';
 
-/** Family name, language, time zone, the TV's text settings, the grown-ups PIN, and signing out. */
+/** The grown-up's name for the kids, family name, language, time zone, the TV's text settings, the grown-ups PIN, and signing out. */
 export function Settings() {
   const api = useApi();
   const {me, bundle, update} = useFamily();
@@ -41,6 +42,8 @@ export function Settings() {
 
   return (
     <Page title={t('tabSettings')}>
+      <ParentNameCard />
+
       <section className="card form">
         <h2 className="card-title">{t('family')}</h2>
         <form className="inline-form" onSubmit={saveName}>
@@ -72,6 +75,14 @@ export function Settings() {
         </SettingRow>
       </section>
 
+      <section className="card form">
+        <h2 className="card-title">
+          <Icon name="bell" />
+          {t('notifications')}
+        </h2>
+        <NotifyRow />
+      </section>
+
       <PinCard />
 
       <section className="card form">
@@ -82,6 +93,53 @@ export function Settings() {
         </button>
       </section>
     </Page>
+  );
+}
+
+/** The grown-up's own name as kids see it on the TV when this grown-up says yes: "You fed Rex! – Dad" (PATCH /me). */
+function ParentNameCard() {
+  const api = useApi();
+  const {me, setMe} = useFamily();
+  const {t} = useI18n();
+  const toast = useToast();
+  const showError = useShowError();
+  const current = me.parent.name ?? '';
+  const [name, setName] = useState(current);
+  const [busy, setBusy] = useState(false);
+  const trimmed = name.trim();
+
+  const save = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!trimmed || trimmed === current) return;
+    setBusy(true);
+    try {
+      const next = await api.patchMe({name: trimmed});
+      setMe(next);
+      setName(next.parent.name ?? trimmed);
+      toast(t('saved'));
+    } catch (error) {
+      showError(error);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <section className="card form">
+      <h2 className="card-title">
+        <Icon name="heart" />
+        {t('parentName')}
+      </h2>
+      <form className="inline-form" onSubmit={save}>
+        <Field label={t('name')} counter={`${name.length}/24`}>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder={t('parentNamePlaceholder')} maxLength={24} required autoComplete="nickname" />
+        </Field>
+        <button className="btn btn-soft" disabled={busy || !trimmed || trimmed === current}>
+          {t('save')}
+        </button>
+      </form>
+      <p className="hint">{t('parentNameHint')}</p>
+    </section>
   );
 }
 

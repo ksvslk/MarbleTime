@@ -116,6 +116,8 @@ sequenceDiagram
 
 ### 4.4 Brain games
 
+> **Removed on Oct 7, 2026** (docs/08, Decisions): kids no longer earn time with brain games; jobs fill today's jar, and a job done once the jar is full earns a new character. Kept for the record.
+
 ```mermaid
 sequenceDiagram
   participant Gen as Generator (nightly)
@@ -238,7 +240,7 @@ flowchart LR
 | | `POST /device/heartbeat` | liveness + installed apps (Fire OS) |
 | Mock | `POST /mock-earned-time/grant` | stand-in for the proposed Amazon API ([07](07-earned-time-api.md)) |
 
-**Real-time:** polling first (TV every 3 s on screen, 30 s in background; PWA every 3 s on approvals). If time allows, **AppSync Events** (WebSocket pub/sub, works on Fire OS and Vega).
+**Real-time:** an **API Gateway WebSocket API** (`realtimeUrl` in `GET /device/state` and the PWA's `config.json`). TVs connect with `?device=<token>`, parents with `?token=<Cognito token>`. After any write a family can see, the backend sends each of its connections one `{"type":"changed"}`, and clients fetch their state at once (the TV with its ETag). The message carries no data, so nothing about the family travels outside authenticated HTTP. Polling stays as a safety net: the TV every 15 s with the socket up (3 s without, 30 s in the background), the PWA every 30 s (3 s without). **Web Push** (VAPID) tells parents when a kid claims a job; the key pair is made by the stack and the private key lives only in SSM Parameter Store.
 
 ## 9. Security and privacy (kids' data)
 
@@ -265,6 +267,8 @@ CLAUDE.md · FRICTION_LOG.md · FEEDBACK.md · FEATURE_REQUESTS.md
 ```
 
 ## 11. Brain games
+
+> **Removed on Oct 7, 2026** (docs/08, Decisions): kids no longer earn time with brain games; jobs fill today's jar, and a job done once the jar is full earns a new character. Kept for the record.
 
 **Who writes what:** parents write the real-life jobs. AI writes the brain games, and it only fills the slots of one fixed screen template (design canvas, screen 8).
 
@@ -314,23 +318,44 @@ CLAUDE.md · FRICTION_LOG.md · FEEDBACK.md · FEATURE_REQUESTS.md
 
 **Model:** chosen in M4. Claude on Bedrock supports structured output, and because code checks every set, the model can be swapped later.
 
+## 11b. Characters (from Oct 7)
+
+**Earning.** A job approved while the kid's jar is full gives a **character token** instead of marbles (docs/08, Decisions 4). The kid tells a grown-up what to make; the parent app records it (16 kHz mono WAV → `POST /speech-to-text`, Amazon Transcribe streaming, en-US; audio and words are never stored) or the grown-up types it.
+
+**Making** (backend; `POST /children/{id}/characters`, then a background worker):
+1. **Art director** (in the request, ≤ 12 s): the kid's words → a character card (what, up to 3 colours, outfit, mood, one detail) under a strict schema. Brands and known characters become original ones, scary things friendly; mild cartoon props are fine. Nothing usable → 422 with a kind sentence to read to the kid; the token is kept.
+2. **Drawing worker** (at most 3 rounds): the drawing model draws from the card, never the raw words: one SVG with named parts (`body`, `head`, `eye-left`, `eye-right`, `mouth`, `arm-left`, `arm-right`, `legs`, `extra`) and their pivots. **Code checks** (parts, pivots, a filled mouth, left/right as the viewer sees them, standing on the floor, allowed elements) send the exact problems back for a repair. Then the SVG is sanitised and rendered to PNG (`@napi-rs/canvas`), and a **second model checks the picture** (friendly, original, matches the card); a "no" means a fresh drawing with the reason. If every round fails: `needs_help`, and the token goes back.
+3. **Layers:** each named part becomes its own small SVG (same viewBox, its own gradients); a part drawn inside another names it as `parent`. Recompositing the layers reproduces the picture.
+
+**Showing** (TV, `CharacterView`): the art is fetched once and kept on the device. Layers are drawn with react-native-svg and move around their pivots on the native driver: idle (breathe, blink, head tilt, arm sway), a cheer (two hops, arms flapping) when marbles land, a wave when it's new. The kid's newest character stands on their board; a new one is introduced once ("Your new character").
+
+**Speaking:** lines are pre-written templates in the family's language (`characters.ts`: en, et, de, es), never AI-written; the TV asks `POST /device/speech` for each with the character's id. Gemini-TTS speaks it **in character**: the character's own Gemini voice (one of 12, picked by the art director) and a speaking style composed from fixed words (what it is, its mood, and its voice traits: pitch, pace, energy, texture, also picked by the art director), so the kid's idea never reaches the speech model as instructions. The audio is loudness-normalised to about −16 LUFS (like the read-aloud), returned as WAV with the mouth's opening every 40 ms, cached per character, language and text. The line plays after the read-aloud; MarbleAudio's `onLine` event starts the mouth.
+
+**Listening:** the kid's idea, recorded on the parent's phone, goes to Gemini as audio for an exact transcript in the family's language (no audio or words are kept).
+
+**Models:** Gemini 3.8 Flash on Vertex AI for local runs; Bedrock (Claude Haiku 4.5) in the cloud once AWS lifts the account block (FRICTION_LOG). Measured before the art director and picture check existed: 100 of 100 drawings valid after at most one repair, median 23.5 s, p90 44 s, 1.26 ¢ each.
+
+**Never:** a ready-made character swapped in, a copy of a known character, dialogue, scenes or AI-written words. Grown-ups can remove any character; the kid gets the token back.
+
 ## 12. TV design rules
 
 The [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh) has all 13 screens. It is built for kids of about 4–8, many of whom can't read yet.
 
-- **Time is marbles.** One gold marble = 5 minutes. Rewards show as marbles; minutes appear small, for parents.
+- **Time is marbles.** One gold marble = 10 minutes. Rewards show as marbles; minutes appear small, for parents. The jar is today's budget: its size is the kid's daily ceiling, and faint empty places show what jobs can still add (docs/08). Marbles grow with the jar's size, so a full jar of any size looks full to the top (6 big marbles for 60 minutes, 12 smaller ones for 120).
 - **Gold** means only two things: time (marbles) and the main button.
 - **The white ring** means only "selected" (D-pad focus).
 - **Card colours mean nothing.** They only help kids tell cards apart.
 - **Waiting for a grown-up** is shown only by an hourglass on the card.
-- **One row, two groups.** Jobs, games and answers sit in one row, so left/right and OK are enough. On the board, real-life jobs come first under a house icon ("Jobs"), then a divider, then TV games under a game-controller icon ("Games"), so kids can tell a thing to do at home from a game on the TV. Picking the kid is its own screen ("Who's here?").
+- **One row.** Jobs sit in one row, so left/right and OK are enough. Picking the kid is its own screen ("Who's here?").
+- **Each card shows what it gives now:** its marbles while today's jar has room; a sparkle (a new character) once the jar is full; a heart for a routine job (a thank-you, no marble). Only marbles are gold.
 - **Few words, spoken.** 1–3 word labels, questions read out loud, one big action per screen.
-- **The label under the selected card says what OK does:** "I did it!" for a job (a grown-up checks) or "Let's play!" for a game (the app checks).
+- **The label under the selected card says what OK does:** "I did it!" (a grown-up checks).
 - **Words:** the UI says "job" and "grown-up"; docs and code say "chore" and "parent".
 - **Type and layout:** Fredoka; text at least 24 px at 1080p; 5% overscan-safe margins.
-- **Any text must fit, and look good.** Names and jobs come from parents, questions from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines (and in the box's height, where it has one, like a card title above the marbles), and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
+- **Any text must fit, and look good.** Names and jobs come from parents, character names from the AI, and four languages differ in length. Every such text uses `FitText`: the largest size that fits its box in N lines (and in the box's height, where it has one, like a card title above the marbles), and an ellipsis only at the minimum size. Check layouts with the stress family (`stress=1`).
 - **Languages:** English, Estonian, German, Spanish (a family setting). Optional **CAPITAL LETTERS** for kid-facing text.
-- **Positive first.** The jar shows the daily base plus what was earned. A bonus from the phone is a "Yay!" with the parent's reason; minutes taken away show as a calm line with the reason on the kid's board for the rest of the day. No red, no sad sounds.
-- **Motion marks the moments that matter, briefly** (`tv/packages/shared/src/marble/motion.tsx`): screens fade in; cards and answers arrive one after another; the selected item springs up and squishes on OK; "I did it!" pops the job in and turns the hourglass over; a wrong answer shakes gently, then fades; a right one grows, gets a check and counts the apples; each marble lands with a clink and adds its 5 minutes to the clock as it lands. Transform and opacity only, on the native driver, so it stays smooth on the stick. Animations never block the remote: everything stays focusable and pressable while it moves.
+- **Positive first.** The jar shows the daily base plus what was earned. "Yay!" names the job and who noticed ("Feed the cat: done! – Dad"), never the kid's traits. A bonus from the phone is a "Yay!" with the parent's reason; minutes taken away show as a calm line with the reason on the kid's board for the rest of the day. No red, no sad sounds.
+- **Motion marks the moments that matter, briefly** (`tv/packages/shared/src/marble/motion.tsx`): screens fade in; cards and answers arrive one after another; the selected item springs up and squishes on OK; "I did it!" pops the job in and turns the hourglass over; each marble lands with a clink and adds its 10 minutes to the clock as it lands. Transform and opacity only, on the native driver, so it stays smooth on the stick. Animations never block the remote: everything stays focusable and pressable while it moves.
 - **Sounds** are short game effects (Android SoundPool via our `marble-audio` module), never a media session, so the remote's play/pause stays with the video apps.
-- **Read-aloud** plays recorded clips only (`scripts/make-voices.py`: Polly for en/de/es, Neurokõne for Estonian), one line after another; a line without a clip stays silent rather than using a robot voice. On by default; grown-ups can turn it off.
+- **Characters** (the kid's own, drawn from their words; docs/08): the newest stands at the top right of the board and idles (breathes, blinks, sways); on "Yay!" it hops when the marbles are in and says one short pre-written line in the family's language after the read-aloud, in its own voice, its mouth following the audio; a new one says hello once on its own screen. Up from the jobs selects the character on the board ("Play!"); OK opens the kid's **characters**: one row, the selected one comes alive, and each OK makes it wave or hop and say its next line. Never gold, no dialogue, no AI-written words. Chips in a few words say when one is being drawn or one is waiting to be asked for.
+- **Read-aloud** is one warm narrator voice (Gemini-TTS) in all four languages: fixed phrases are recorded clips (`scripts/make-voices.py`); a family's own words (names, jobs, "done! – Dad", reasons) come from the backend in the same voice, made once and cached, and play in order with the clips. Characters' lines are made the same way, in each character's own voice. **Every line is checked before anyone hears it:** the voice gets a short description naming the language ("A native Estonian speaker: warm, clear and friendly, to a young child."; measured: without the language, "Jee!" came out as English "gee", and imperative instructions were sometimes read aloud), then Gemini listens back in that language. The transcript must match the line (letters compared, ≥ 0.85; right lines measured 0.96–1.00, wrong ones 0.25–0.69) and the speech mustn't run long (short lines were sometimes said twice), or it's made again. A line that never matches stays silent: no wrong words, no per-word rules. On by default; turning read-aloud off also silences the characters.

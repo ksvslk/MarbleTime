@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fire OS loop on the Fire TV stick over Wi-Fi ADB: connect, install, launch, keys, shot, logs.
-# Usage: scripts/fire.sh build|connect|install [apk]|launch|open <params>|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs
+# Usage: scripts/fire.sh build|connect|install [apk]|launch|open <params>|backend local|cloud|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs
 # The stick's address comes from .env.local: FIRETV=<ip>:5555
 set -euo pipefail
 
@@ -23,6 +23,16 @@ case "$cmd" in
   open)    # scripts/fire.sh open 'screen=board&kid=mia&lang=et'  (MarbleTime test link)
     adb -s "$FIRETV" shell input keyevent KEYCODE_WAKEUP   # a screensaver ("dreaming") blocks app launches
     adb -s "$FIRETV" shell am start -a android.intent.action.VIEW -d "'marbletime://open?${1:-screen=who}'" "$APP_ID" >/dev/null ;;
+  backend) # point the TV at this Mac's dev server (backend: npm run dev) or the cloud. Its pairing stays with the old
+           # backend, so the TV shows the welcome screen: pair it again from that backend's parent app.
+    case "${1:-}" in
+      local) api="http://$(ipconfig getifaddr en0 || ipconfig getifaddr en1):8787" ;;
+      cloud) api="https://ny4o9o0um2.execute-api.us-east-1.amazonaws.com" ;;
+      *) echo "usage: $0 backend local|cloud" >&2; exit 2 ;;
+    esac
+    # A running app ignores a link sent to it while in front, so start it afresh (its saved state stays).
+    adb -s "$FIRETV" shell am force-stop "$APP_ID"
+    "$0" open "api=$api" && echo "TV backend: $api" ;;
   grant)   # strict-mode grants: scripts/fire.sh grant <package> [accessibility service class, e.g. .WatchdogService]
     pkg="${1:?package}"; a11y="${2:-}"
     adb -s "$FIRETV" shell appops set "$pkg" GET_USAGE_STATS allow
@@ -42,5 +52,5 @@ case "$cmd" in
     mkdir -p "$SHOTS"; out="$SHOTS/fire-${1:-shot}.png"
     adb -s "$FIRETV" exec-out screencap -p > "$out" && echo "$out" ;;
   logs)    adb -s "$FIRETV" logcat -d -s ReactNativeJS:* MarbleTime:* Strict:* ;;
-  *) echo "usage: $0 build|connect|install [apk]|launch|open <params>|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs" >&2; exit 2 ;;
+  *) echo "usage: $0 build|connect|install [apk]|launch|open <params>|backend local|cloud|grant <pkg> [a11y]|ungrant|keys <KEYCODE>...|shot [name]|logs" >&2; exit 2 ;;
 esac

@@ -4,6 +4,8 @@
 > - The TV is designed for young kids: the [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh), rules in [03 §12](03-architecture.md#12-tv-design-rules).
 > - **Brain games** written by AI were added ([03 §11](03-architecture.md#11-brain-games)).
 > - The **photo check was dropped.** Parents approve on the phone or on the TV.
+>
+> **Re-planned Oct 7** after the evidence review ([08](08-evidence-based-design.md), Decisions): **brain games are out.** The jar is today's budget (a daily maximum by age, half of it free, 1 marble = 10 min, jobs worth 1–3 marbles, routine jobs praised). A job done when the jar is full earns a **character token**: the kid describes a character, AI draws it (checked by code and a second model), and it lives on the TV, animated and talking ([03 §11b](03-architecture.md#11b-characters-from-oct-7)).
 
 ## Principles
 
@@ -11,7 +13,7 @@
    - Does Amazon Kids on your stick do what Amazon Kids mode needs?
    - Do the React Native builds run on Fire OS and on the Vega simulator?
    - Does strict mode lock reliably?
-2. **Always have something to demo.** The TV core works **on its own** (PIN approvals, brain games from the built-in bank) on the stick by **Oct 10**.
+2. **Always have something to demo.** The TV core works **on its own** (PIN approvals, the budget jar) on the stick by **Oct 10**.
 3. **Fire OS first, Vega second.** If Vega isn't running by **Oct 12**, ship Fire OS only and call the shared code "Vega-ready".
 4. **Feature freeze Mon Oct 19. Submit Thu Oct 22.**
 
@@ -27,7 +29,7 @@ gantt
   M1 TV core (shared RN) on Fire OS :m1, 2026-10-07, 4d
   M2 Backend + PWA + hand-off       :m2, 2026-10-09, 6d
   M3 Strict mode + Vega + polish    :m3, 2026-10-12, 6d
-  M4 Brain-game AI + voice + API    :m4, 2026-10-15, 5d
+  M4 Characters + voice + API      :m4, 2026-10-15, 5d
   section Ship
   Feature freeze                    :milestone, 2026-10-19, 0d
   M5 Video + write-up + feedback    :m5, 2026-10-19, 4d
@@ -102,7 +104,7 @@ Done early on the stick (screens from the canvas, PIN approval, built-in brain g
 - [x] **Sound effects** on Fire OS (marble clinks timed to the physics, lid, yay, right, try again, tap; synthesised by `scripts/make-sounds.py`, MP3). Played by our own small native module (`tv/packages/expotv/modules/marble-audio`, Android SoundPool): `expo-audio` gave every player a media session, so MarbleTime kept the remote's play/pause after Home.
 - [ ] Sound effects and read-aloud on Vega (M3): `@amazon-devices/react-native-w3cmedia` `AudioPlayer` with our MP3s. (`keplerscript-audio-lib` only plays built-in system sounds or raw PCM streams.)
 - [ ] **Vega parity (Oct 5 check):** the Vega build runs the new code (screens, focus, entrance motion, icons). Scripted OK presses on the VVD only deliver `onPressIn` (FRICTION_LOG), so check presses, saved state and the game by hand with the on-screen remote.
-- [x] **Read-aloud in four languages** on Fire OS: recorded clips only, nothing synthesised on the TV. `scripts/make-voices.py` asks the app for every line it speaks (`spokenLines()`), records the new ones (Polly neural Ruth/Vicki/Lucia for en/de/es, TartuNLP Neurokõne "mari" for Estonian, terms to confirm before launch), evens out loudness and writes `voices.ts`. 44 lines × 4 languages, ~2 MB. The TV says "Who's here?", each card's name as the D-pad lands on it, "Great job, Mia! A grown-up will check.", why marbles came, each question, "Try again!" and the praise; the speaker button repeats the question. A line without a clip is skipped (no robot voice); in M2 the backend records each family's names and jobs. Grown-ups can turn "Read aloud" off. Pico is no longer needed. Estonian stays on Neurokõne "mari" for now (the user finds all Neurokõne voices weak); the upgrade path is Google Chirp 3 HD `et-EE` (free under 1M characters a month; Polly has no Estonian, see FEATURE_REQUESTS.md). Line endings are kept whole: the clip keeps its natural fade plus 300 ms of silence.
+- [x] **Read-aloud in four languages** on Fire OS: recorded clips only, nothing synthesised on the TV. `scripts/make-voices.py` asks the app for every line it speaks (`spokenLines()`), records the new ones (since Oct 7 with Gemini-TTS, one narrator voice for all four languages), evens out loudness and writes `voices.ts`. 44 lines × 4 languages, ~2 MB. The TV says "Who's here?", each card's name as the D-pad lands on it, "Great job, Mia! A grown-up will check.", why marbles came, each question, "Try again!" and the praise; the speaker button repeats the question. A line without a clip is skipped (no robot voice); in M2 the backend records each family's names and jobs. Grown-ups can turn "Read aloud" off. Pico is no longer needed. Polly has no Estonian (FEATURE_REQUESTS.md); TartuNLP is not used. Line endings are kept whole: the clip keeps its natural fade plus 300 ms of silence.
 - [x] **Marble physics** (seeded, computed up front, played back natively) and the jar lid opening and closing.
 - [x] **More animations at key moments**: claim, right and wrong answers, counting, approval, Yay with the minutes counting up as marbles land, PIN shake, focus spring (rules in [03 §12](03-architecture.md#12-tv-design-rules)). Checked frame by frame on the stick with `screenrecord`.
 - [x] **Job icons:** 43 icons (5 of ours + 38 from Lucide, ISC, see THIRD_PARTY_NOTICES.md), each with a hint for the AI (`JOB_ICONS` in `data.ts`); the AI picks one per job in M2, the parent can change it. AI-drawn icons in our style only as an extra.
@@ -112,7 +114,7 @@ Done early on the stick (screens from the canvas, PIN approval, built-in brain g
 
 Added on Oct 5: the parent app speaks the same four languages; **recurring jobs** (every day, or chosen weekdays; at most once per day; back on the TV board when due); length limits on names and job titles as a second safety net; the AI picks each job's icon from our set.
 
-- [x] `backend/openapi.yaml` (contract first), then the CDK stack (written and synthesised; **not deployed yet**, waiting for the user's go):
+- [x] `backend/openapi.yaml` (contract first), then the CDK stack, **deployed Oct 6** as `MarbleTime-dev` (us-east-1): parent app https://d3uyrtcal2s4t9.cloudfront.net, API https://ny4o9o0um2.execute-api.us-east-1.amazonaws.com. Bedrock is blocked on the account until AWS Support lifts a new-account restriction (FRICTION_LOG); until then games use the built-in questions:
   - HTTP API, one Lambda, DynamoDB single table
   - Cognito (managed login, code + PKCE), S3 + CloudFront for the PWA
   - $10 budget alarm (when an email is given)
@@ -126,6 +128,9 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
   - [ ] optional kid view
 - [x] **Daily base, positive first** (decided Oct 5 after reading the research on screen time as reward/punishment): each kid has a daily base (default 30 min) on top of which jobs and games earn; "Give minutes" is the main action; taking away only takes earned minutes, never below an empty jar, with a reason the TV shows calmly; bonuses get a "Yay!" on the TV. Checked end to end on the stick.
 - [x] **TV:** pairing screen (QR), sync (state poll every 3 s, claim and game-result upload), outbox kept across restarts, the family's own PIN. Checked on the stick against the local backend: a claim reaches the backend in 1.5 s; an approval comes back as "Yay!".
+- [x] **No made-up data on a real TV** (Oct 6): an unpaired TV opens on a welcome screen (QR code, language choice) and nothing else; the kids appear with the first sync after pairing; "Disconnect" goes back there and keeps only the TV's settings; "Add your kids in the phone app" / "No jobs yet" when the family is empty. The sample family (Mia and Leo) and the demo PIN only come with a test link (`marbletime://open?stress=0`), for layout checks and the demo. Checked on the stick (paired, real family kept across the update).
+- [x] **Brain games tried with Gemini 3.8 Flash** (Oct 7, local only, while Bedrock is blocked): `MODEL_ID=gemini-3.8-flash npm run try-generator -- 6-7`. Numbers and words: 39 of 40 candidates passed the checks in four languages, natural Estonian, ~7 s per call. Shape puzzles: 9 of 35 passed outside German; Gemini marks the pattern's first shape instead of the next one, and the checker caught every case.
+- [x] **Live updates and parent notifications** (deployed Oct 6): an API Gateway WebSocket sends `{"type":"changed"}` to the family's TVs and open parent apps after every write they can see, and they fetch at once (polling stays as a safety net: TV 15 s, phone 30 s). Web Push (VAPID keys made by the stack, private key only in SSM) tells parents when a kid says "I did it!", in the family language. The parent app's files are now uploaded with cache headers (hashed assets kept a year, pages checked on every visit), so a deploy reaches phones at once.
 
 **Done when:**
 - A claim on the TV shows up on the phone, is approved, and the TV updates within ≤ 5 s.
@@ -146,7 +151,8 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 
 ## M4 · AI, voice and the API story (Oct 15–19), in priority order
 
-1. **Brain-game generator** ([03 §11](03-architecture.md#11-brain-games)): a nightly Lambda → Bedrock (structured output) → code checks → DynamoDB. The TV swaps the built-in bank for the generated sets, and parents can preview them. Targets AWS Builder.
+1. **Characters** ([03 §11b](03-architecture.md#11b-characters-from-oct-7)): art director → drawing → code checks + repair → picture check → layers; speech-to-text for the kid's idea; Polly lines with mouth timings; the TV draws, animates and lip-syncs them. Targets AWS Builder.
+   - [x] **Built early (Oct 7).** Backend: 293 tests, a live run with Gemini 3.8 Flash (5 characters, Polly, Transcribe). Parent app: maker screen with the mic, 127 tests. TV: board, "Yay!" and "Your new character" with idle, cheer, wave and lip-sync, checked on the stick against a mock with real Polly audio. Not deployed yet; Bedrock is still blocked, so cloud drawing waits for AWS Support.
 2. **Voice claim.** Either an Alexa custom skill (dev stage, your devices) or a **chores MCP server** + web "Alexa+ simulator", which is also eligible for the Alexa+ track. In Amazon Kids mode it is also how kids claim while the TV is locked.
 3. **Earned Time API mock + adapter.** `mode = api_mock` shows the automatic flow without sideloading. Finalize [07](07-earned-time-api.md).
 4. **Open-source extraction** of the strict-mode module (MIT, tests) for the Open Source mini-challenge.
@@ -170,10 +176,10 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 | 0:00–0:15 | The problem: screen time is a daily negotiation. Amazon Kids gives limits, not motivation. |
 | 0:15–0:35 | On the stick: "Who's here?" → Mia's board. She picks "Toys away" with the remote: "I did it!" |
 | 0:35–0:55 | Parent's phone: one tap on "Yes" → the marbles drop into the jar on the TV 🎉 |
-| 0:55–1:20 | A brain game: "Numbers" for a 5-year-old, made by AI, read out loud, checked by the app → 2 marbles at once. Then the parent's settings: age, topics, daily cap. |
+| 0:55–1:20 | Mia's jar is full (the daily maximum for a 5-year-old). One more job → "WOW! A new character!" She tells Dad "a dragon who loves pancakes"; his phone hears it. Half a minute later the TV shows her character: it waves and says "Hi Mia!", lip-synced. |
 | 1:20–1:50 | **Strict mode** (labelled "Fire OS prototype"): Demo Cartoons counts down → 1-min banner → "Jar is empty" lock → "Do a job" → approve → unlocks by itself |
 | 1:50–2:10 | **Appstore mode:** the same app on the Vega simulator. The parent taps "Add 15 min in Amazon Kids". |
-| 2:10–2:30 | How it works: one React Native codebase (Fire OS + Vega), Kotlin strict module, AWS + Bedrock (AI writes the games, code checks them) |
+| 2:10–2:30 | How it works: one React Native codebase (Fire OS + Vega), Kotlin strict module, AWS (Lambda, DynamoDB, Polly, Transcribe) + AI that draws from the kid's words, checked by code and a second model |
 | 2:30–2:55 | The ask: the **Earned Time API**. One call, and every Fire TV family gets this safely, on Fire OS and Vega. |
 
 ## What to cut if we're behind
@@ -182,11 +188,12 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 |---|---|---|
 | Oct 12 | Vega not running | Fire OS only + "Vega-ready" |
 | Oct 14 | Backend late | Demo local mode (PIN + ticket codes). The hand-off is just the parent opening the Parent Dashboard. |
-| Oct 16 | AI or voice late | Drop voice first. If the generator is late, games keep the built-in question bank. |
+| Oct 16 | AI or voice late | Drop lip-sync first, then character speech; characters still appear. If the cloud can't draw (Bedrock blocked), film character making against the local backend (Gemini). |
 
 **Never cut:**
 - the claim → approve → marbles loop on the stick
-- one playable brain game (the built-in bank is enough)
+- the jar as today's budget (a daily maximum by age)
+- one character made from a kid's own words
 - strict-mode lock and unlock
 - the video quality
 - the API write-up

@@ -23,22 +23,26 @@ function useOnce(make: (v: Animated.Value) => Animated.CompositeAnimation) {
   return v;
 }
 
-/** Repeats forever: v runs 0 → 1 over `period` ms, linearly, as one native loop. */
-function useForever(period: number, delay = 0) {
+/** Repeats forever: v runs 0 → 1 over `period` ms, linearly, as one native loop (paused, at 0, while `run` is false). */
+export function useForever(period: number, delay = 0, run = true) {
   const v = useRef(new Animated.Value(0)).current;
   useEffect(() => {
+    if (!run) {
+      v.setValue(0);
+      return;
+    }
     const loop = Animated.loop(Animated.timing(v, {toValue: 1, duration: period, easing: Easing.linear, useNativeDriver: true}));
     const timer = setTimeout(() => loop.start(), delay);
     return () => {
       clearTimeout(timer);
       loop.stop();
     };
-  }, [v, period, delay]);
+  }, [v, period, delay, run]);
   return v;
 }
 
 /** A smooth there-and-back (cosine) between `lo` and `hi` as v runs 0 → 1, for native loops. */
-function wave(v: Animated.Value, lo: number, hi: number) {
+export function wave(v: Animated.Value, lo: number, hi: number) {
   const inputRange = Array.from({length: 9}, (_, i) => i / 8);
   return v.interpolate({inputRange, outputRange: inputRange.map(x => lo + ((hi - lo) * (1 - Math.cos(2 * Math.PI * x))) / 2)});
 }
@@ -82,14 +86,11 @@ export function Shake({trigger, style, children}: Props & {trigger: unknown}) {
   return <Animated.View style={[style, {transform: [{translateX}]}]}>{children}</Animated.View>;
 }
 
-/** Pulses and turns a little, forever (sparkles). */
+/** Pulses and turns a little, forever (sparkles on a moment's screen, not on the board). */
 export function Twinkle({delay = 0, style, children}: Props & {delay?: number}) {
   const v = useForever(1500, delay);
-  return (
-    <Animated.View style={[style, {opacity: wave(v, 0.55, 1), transform: [{scale: wave(v, 0.7, 1.15)}, {rotate: v.interpolate({inputRange: [0, 1], outputRange: ['0deg', '90deg']})}]}]}>
-      {children}
-    </Animated.View>
-  );
+  const transform = useRef([{scale: wave(v, 0.7, 1.15)}, {rotate: v.interpolate({inputRange: [0, 1], outputRange: ['0deg', '90deg']})}]).current;
+  return <Animated.View style={[style, {transform}]}>{children}</Animated.View>;
 }
 
 /** Turns over every few seconds, like an hourglass: "waiting". (Our hourglass icon looks the same upside down.) */

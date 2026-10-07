@@ -1,9 +1,15 @@
 /** Every route in openapi.yaml, with who may call it. infra/stack.ts creates the same routes in API Gateway. */
+import {characterArt, createCharacter, listCharacters, removeCharacter} from '../domain/characters';
 import {claimChore, decide, decideOnTv, listClaims, takeBack} from '../domain/claims';
 import {authenticateDevice, confirmPairing, deviceState, heartbeat, listDevices, patchDevice, pollPairing, removeDevice, startPairing} from '../domain/devices';
 import {ApiError} from '../domain/errors';
-import {addChild, addChore, createFamily, familyBundle, me, patchChild, patchChore, patchFamily, removeChild, removeChore, requireFamily} from '../domain/family';
-import {adjust, handoff, history, recordGame, settleHandoff} from '../domain/ledger';
+import {
+  addChild, addChore, changeSettingsOnTv, createFamily, familyBundle, me, patchChild, patchChore, patchFamily, patchMe, removeChild, removeChore,
+  requireFamily,
+} from '../domain/family';
+import {adjust, handoff, history, settleHandoff} from '../domain/ledger';
+import {subscribe, unsubscribe} from '../domain/push';
+import {speak, speechToText} from '../domain/speech';
 import type {Device, Family, Parent} from '../domain/types';
 import * as check from '../domain/validate';
 import {type Context, type HttpResponse, json, noContent, type Route} from './router';
@@ -15,8 +21,8 @@ type Handler<C> = (ctx: C) => Promise<HttpResponse>;
 
 const open = (method: Route['method'], path: string, handle: Handler<Context>): Route => ({method, path, auth: 'none', handle});
 
-const parent = (method: Route['method'], path: string, handle: Handler<ParentContext>): Route => ({
-  method, path, auth: 'parent',
+const parent = (method: Route['method'], path: string, handle: Handler<ParentContext>, raw = false): Route => ({
+  method, path, auth: 'parent', ...(raw && {raw}),
   handle: async ctx => {
     if (!ctx.req.parent) throw new ApiError(401, 'unauthorized', 'Sign in first');
     return handle({...ctx, parent: ctx.req.parent});
@@ -24,8 +30,8 @@ const parent = (method: Route['method'], path: string, handle: Handler<ParentCon
 });
 
 /** A parent route that needs the parent's family (404 no_family before onboarding). */
-const family = (method: Route['method'], path: string, handle: Handler<FamilyContext>): Route =>
-  parent(method, path, async ctx => handle({...ctx, family: await requireFamily(ctx.deps, ctx.parent)}));
+const family = (method: Route['method'], path: string, handle: Handler<FamilyContext>, raw = false): Route =>
+  parent(method, path, async ctx => handle({...ctx, family: await requireFamily(ctx.deps, ctx.parent)}), raw);
 
 const device = (method: Route['method'], path: string, handle: Handler<DeviceContext>): Route => ({
   method, path, auth: 'device',
@@ -36,9 +42,14 @@ const device = (method: Route['method'], path: string, handle: Handler<DeviceCon
 const etagMatches = (header: string | undefined, etag: string) =>
   header !== undefined && header.split(',').some(tag => ['*', etag].includes(tag.trim().replace(/^W\//, '')));
 
+/** A ready character's art never changes: the TV may keep it for good. */
+const FOREVER = {'cache-control': 'private, max-age=31536000, immutable'};
+
+// GET /me stays first: API Gateway's Lambda integration is named after the first route that uses it (infra/stack.ts).
 export const routes: Route[] = [
   // Parent: family
   parent('GET', '/me', async ({deps, parent}) => json(200, await me(deps, parent))),
+  parent('PATCH', '/me', async ({deps, parent, body}) => json(200, await patchMe(deps, parent, check.meInput(body, 'body')))),
   parent('POST', '/family', async ({deps, parent, body}) => json(201, await createFamily(deps, parent, check.familyCreate(body, 'body')))),
   family('GET', '/family', async ({deps, family}) => json(200, await familyBundle(deps, family))),
   family('PATCH', '/family', async ({deps, family, body}) => json(200, await patchFamily(deps, family, check.familyPatch(body, 'body')))),
@@ -55,6 +66,14 @@ export const routes: Route[] = [
     json(200, await adjust(deps, family, parent, params.childId, check.adjustInput(body, 'body')))),
   family('GET', '/children/{childId}/ledger', async ({deps, family, params, req}) =>
     json(200, await history(deps, family, params.childId, check.ledgerLimit(req.query.limit)))),
+  family('GET', '/children/{childId}/characters', async ({deps, family, params}) => json(200, await listCharacters(deps, family, params.childId))),
+  family('POST', '/children/{childId}/characters', async ({deps, family, params, body}) =>
+    json(202, await createCharacter(deps, family, params.childId, check.characterInput(body, 'body')))),
+  family('DELETE', '/children/{childId}/characters/{characterId}', async ({deps, family, params}) => {
+    await removeCharacter(deps, family, params.childId, params.characterId);
+    return noContent();
+  }),
+  family('POST', '/speech-to-text', async ({deps, family, raw}) => json(200, await speechToText(deps, family, raw)), true),
   family('GET', '/children/{childId}/handoff', async ({deps, family, params}) => json(200, await handoff(deps, family, params.childId))),
   family('POST', '/children/{childId}/handoff', async ({deps, family, params, body}) =>
     json(200, await settleHandoff(deps, family, params.childId, check.handoffInput(body, 'body')))),
@@ -77,6 +96,17 @@ export const routes: Route[] = [
     json(200, await decide(deps, family, params.claimId, true, {by: 'parent', sub: parent.sub}))),
   family('POST', '/claims/{claimId}/reject', async ({deps, parent, family, params}) =>
     json(200, await decide(deps, family, params.claimId, false, {by: 'parent', sub: parent.sub}))),
+
+  // Parent: notifications
+  open('GET', '/push/key', async ({deps}) => json(200, {publicKey: await deps.push.publicKey()})),
+  family('POST', '/push/subscriptions', async ({deps, parent, family, body}) => {
+    await subscribe(deps, family, parent, check.pushSubscriptionInput(body, 'body'));
+    return {status: 201};
+  }),
+  family('DELETE', '/push/subscriptions', async ({deps, family, body}) => {
+    await unsubscribe(deps, family, check.pushEndpointInput(body, 'body').endpoint);
+    return noContent();
+  }),
 
   // Parent: devices and pairing
   family('POST', '/pairings/{code}/confirm', async ({deps, family, params, body}) => {
@@ -110,8 +140,11 @@ export const routes: Route[] = [
   }),
   device('POST', '/device/claims/{claimId}/decide', async ({deps, family, device, params, body}) =>
     json(200, await decideOnTv(deps, family, device, params.claimId, check.decideInput(body, 'body')))),
-  device('POST', '/device/games/results', async ({deps, family, device, body}) =>
-    json(200, await recordGame(deps, family, device, check.gameInput(body, 'body')))),
+  device('GET', '/device/characters/{characterId}', async ({deps, family, params}) =>
+    json(200, await characterArt(deps, family, params.characterId), FOREVER)),
+  device('POST', '/device/speech', async ({deps, family, device, body}) => json(200, await speak(deps, family, device, check.speechInput(body, 'body')))),
+  device('POST', '/device/settings', async ({deps, family, device, body}) =>
+    json(200, await changeSettingsOnTv(deps, family, device, check.tvSettingsInput(body, 'body')))),
   device('POST', '/device/heartbeat', async ({deps, family, device, body}) => {
     await heartbeat(deps, family, device, body === undefined ? undefined : check.heartbeatInput(body, 'body').appVersion);
     return noContent();

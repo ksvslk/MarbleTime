@@ -1,30 +1,34 @@
 /**
  * What the backend stores. The API shapes are in views.ts; the contract is backend/openapi.yaml.
- * Times are epoch milliseconds. Job minutes are multiples of 5: one marble = 5 minutes = 300 s.
+ * Times are epoch milliseconds. Minutes are whole marbles: one marble = 10 minutes = 600 s (docs/08 §1.6).
  */
 import type {JobIconName} from '../icons';
+import type {VoiceStyle} from './voice-style';
 
 export const LANGS = ['en', 'et', 'de', 'es'] as const;
 export const COLORS = ['peach', 'mint', 'sky', 'lilac', 'gold'] as const;
 export const AVATARS = ['bear', 'bunny'] as const;
-export const TOPICS = ['numbers', 'words', 'puzzles'] as const;
 export const PLATFORMS = ['fireos', 'vega', 'web'] as const;
 export const DEVICE_MODES = ['amazon_kids', 'strict', 'api_mock'] as const;
 export const CLAIM_STATUSES = ['waiting', 'approved', 'rejected'] as const;
 
 export type Lang = (typeof LANGS)[number];
+/** Each language's English name, as prompts say it. */
+export const LANGUAGE_NAMES: Record<Lang, string> = {en: 'English', et: 'Estonian', de: 'German', es: 'Spanish'};
 export type Color = (typeof COLORS)[number];
 export type Avatar = (typeof AVATARS)[number];
-export type Topic = (typeof TOPICS)[number];
 export type Platform = (typeof PLATFORMS)[number];
 export type DeviceMode = (typeof DEVICE_MODES)[number];
 export type ClaimStatus = (typeof CLAIM_STATUSES)[number];
-export type EntryType = 'ALLOWANCE' | 'CHORE' | 'GAME' | 'BONUS' | 'PENALTY' | 'USAGE' | 'ADJUST';
+/**
+ * HANDOFF: minutes settled by the Amazon Kids hand-off, which leave the jar. GAME stays for the history of the brain
+ * games this API used to have.
+ */
+export type EntryType = 'ALLOWANCE' | 'CHORE' | 'GAME' | 'BONUS' | 'PENALTY' | 'USAGE' | 'ADJUST' | 'HANDOFF';
 export type HandoffStatus = 'PENDING' | 'DONE' | 'SKIPPED';
 
-export const MARBLE_SEC = 300;
-/** Screen time a kid gets every day before earning anything (DailyBase in the contract). */
-export const DAILY_BASE_MIN = 30;
+/** One marble: one short TV session (docs/08 §1.6). */
+export const MARBLE_SEC = 600;
 
 /** A signed-in parent: the Cognito `sub` (the dev server: "dev-<name>"). */
 export interface Parent {
@@ -42,17 +46,12 @@ export interface Family {
   id: string;
   name: string;
   lang: Lang;
-  /** IANA zone; "today" (daily jobs, the game cap) is this zone's day. */
+  /** IANA zone; "today" (daily jobs) is this zone's day. */
   timezone: string;
   caps: boolean;
   voice: boolean;
   pin: PinHash | null;
   createdAt: number;
-}
-
-export interface GameSettings {
-  topics: Topic[];
-  dailyCapMarbles: number;
 }
 
 export interface Child {
@@ -61,17 +60,25 @@ export interface Child {
   avatar: Avatar;
   color: Color;
   age: number;
-  games: GameSettings;
   createdAt: number;
-  /** Earned time; never below 0 (taking minutes away stops at an empty jar). */
+  /** Earned time not yet used; never below 0 (taking minutes away stops at an empty jar). */
   balanceSec: number;
-  /** Minutes every day before anything is earned: a setting, not in the ledger, not handed off. Missing on kids stored before it existed (= DAILY_BASE_MIN). */
+  /**
+   * The daily budget (budget.ts). Stored as last written; older kids may lack the maximum (then the default for the
+   * age) or have a base in steps of 5 (then the nearest marble): budgetOf() reads them by today's rules.
+   */
+  dailyMaxMin?: number;
   dailyBaseMin?: number;
+  /** New characters earned (jobs approved while the jar was full) and not yet made. Missing on older kids (= 0). */
+  characterTokens?: number;
   /** Penalty time not yet netted against an Amazon Kids hand-off (ledger.ts). */
   debtSec: number;
-  /** Game marbles earned on `gameDay` (the family's local date), for the daily cap. */
-  gameDay?: string;
-  gameMarbles?: number;
+  /**
+   * Minutes marked handed off (DONE or SKIPPED) on `handoffDueDay` (the family's local date): they stay in the jar for
+   * the rest of that day and leave it at the next local midnight, when a HANDOFF entry settles them (ledger.ts).
+   */
+  handoffDueSec?: number;
+  handoffDueDay?: string;
 }
 
 export type Repeat = {kind: 'daily'} | {kind: 'weekdays'; days: number[]} | {kind: 'once'};
@@ -81,13 +88,18 @@ export interface Chore {
   title: string;
   icon: JobIconName;
   color: Color;
+  /** As stored; older jobs may hold 5–120 in steps of 5, read by jobMinutes() (budget.ts). */
   minutes: number;
+  /** Praised, no marble (docs/08 §2.4). Missing on older jobs (= false). */
+  routine?: boolean;
   repeat: Repeat;
   childIds: string[];
   createdAt: number;
   /** Bumped on every write; writes that read the chore first check it (optimistic locking). */
   updatedAt: number;
 }
+
+export type RewardKind = 'marbles' | 'character' | 'praise';
 
 export interface Claim {
   /** The TV's client UUID: a resend finds the same claim. */
@@ -97,10 +109,17 @@ export interface Claim {
   /** Copied at claim time, so history and approvals survive edits. */
   choreTitle: string;
   minutes: number;
+  /** The job was routine at claim time (missing on claims made before routine jobs existed). */
+  routine?: boolean;
   status: ClaimStatus;
   createdAt: number;
   decidedAt?: number;
   decidedBy?: 'parent' | 'tv';
+  /** Approved by a parent who has set a name ("– Dad"). */
+  approverName?: string;
+  /** Set on approval (budget.ts rewardFor). */
+  reward?: RewardKind;
+  minutesCredited?: number;
   /** The "at most once per day" slot the claim holds: the family's local day, or "once" for a one-off job. */
   slot: string;
 }
@@ -111,7 +130,7 @@ export interface LedgerEntry {
   deltaSec: number;
   type: EntryType;
   reason: string;
-  /** Claim id or game result id. */
+  /** Claim id (or, in old history, a game result id). */
   refId?: string;
   /** "parent:<sub>", "tv:<deviceId>" or "system". */
   createdBy: string;
@@ -120,7 +139,10 @@ export interface LedgerEntry {
   handoff?: HandoffStatus;
 }
 
-/** What a request with a client UUID produced, so a repeat gets the same answer and changes nothing. */
+/**
+ * What a request with a client UUID produced, so a repeat gets the same answer and changes nothing.
+ * "game" refs are old brain-game results, still in storage for up to 30 days.
+ */
 export type Ref = {kind: 'adjust'; entry: LedgerEntry} | {kind: 'game'; marbles: number};
 
 export interface Device {
@@ -153,3 +175,93 @@ export type Pairing = {
       tokenIssued?: boolean;
     }
 );
+
+// ---------- Characters (docs/08, Decisions 4–6) ----------
+
+/**
+ * Gemini-TTS voices (Google Cloud Text-to-Speech), which speak en, et, de and es; the art director picks one to suit
+ * the character. Puck upbeat, Zephyr bright, Fenrir excitable, Leda youthful, Aoede breezy, Laomedeia upbeat, Achird
+ * friendly, Sadachbia lively, Autonoe bright, Algenib gravelly, Achernar soft, Vindemiatrix gentle.
+ */
+export const VOICES = ['Puck', 'Zephyr', 'Fenrir', 'Leda', 'Aoede', 'Laomedeia', 'Achird', 'Sadachbia', 'Autonoe', 'Algenib', 'Achernar', 'Vindemiatrix'] as const;
+export type Voice = (typeof VOICES)[number];
+
+/** The Amazon Polly voices characters had before (Oct 7), as the Gemini voices they read as. */
+const OLD_VOICES: Record<string, Voice> = {Ivy: 'Leda', Justin: 'Puck', Kevin: 'Fenrir'};
+
+/** A stored voice as it reads today: a Gemini voice, or an old Polly one mapped to its Gemini voice. */
+export const voiceOf = (stored: string): Voice => (VOICES.includes(stored as Voice) ? (stored as Voice) : (OLD_VOICES[stored] ?? 'Puck'));
+
+/** The named, pivoted groups every drawing has; the TV moves each around its pivot. */
+export const PARTS = ['body', 'head', 'eye-left', 'eye-right', 'mouth', 'arm-left', 'arm-right', 'legs', 'extra'] as const;
+export type Part = (typeof PARTS)[number];
+
+export const MOODS = ['happy', 'silly', 'brave', 'sleepy', 'proud', 'curious', 'calm'] as const;
+export type Mood = (typeof MOODS)[number];
+
+/** The art director's reading of the kid's words; this, never the raw words, is what gets drawn. */
+export interface CharacterCard {
+  what: string;
+  colours: string[];
+  outfit: string;
+  mood: Mood;
+  detail: string;
+}
+
+export type CharacterStatus = 'drawing' | 'ready' | 'needs_help';
+
+export interface Character {
+  id: string;
+  childId: string;
+  status: CharacterStatus;
+  /** The kid's words. */
+  description: string;
+  name: string;
+  /** Characters made before the Gemini voices hold a Polly name (Ivy, Justin, Kevin): read it with voiceOf. */
+  voice: Voice | string;
+  /** How it sounds (voice-style.ts); missing on characters made before voice styles (then the mood's default). */
+  voiceStyle?: VoiceStyle;
+  card: CharacterCard;
+  createdAt: number;
+  readyAt?: number;
+}
+
+/** One layer of a ready character, in drawing order: a complete small SVG; a named part moves around its pivot. */
+export interface Layer {
+  part?: Part;
+  /** The named part this layer's part was drawn inside and rides on (the TV moves it with that part first). */
+  parent?: Part;
+  pivot?: [number, number];
+  svg: string;
+}
+
+/** A ready character's pictures, stored apart from the character so lists stay small. Never changes. */
+export interface CharacterArt {
+  id: string;
+  childId: string;
+  viewBox: string;
+  /** The whole checked SVG, for the parent app. */
+  svg: string;
+  layers: Layer[];
+}
+
+// ---------- Live updates and notifications ----------
+
+/** An open realtime (WebSocket) connection of a TV or a parent, tied to a family. */
+export interface Connection {
+  id: string;
+  familyId: string;
+  kind: 'tv' | 'parent';
+  connectedAt: number;
+  /** API Gateway closes a connection after 2 hours at most; the stored one goes an hour later. */
+  expiresAt: number;
+}
+
+/** A parent's browser that wants a notification when a kid says "I did it!" (Web Push). */
+export interface PushSubscription {
+  endpoint: string;
+  keys: {p256dh: string; auth: string};
+  /** The parent who subscribed (Cognito sub). */
+  sub: string;
+  createdAt: number;
+}

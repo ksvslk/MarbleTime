@@ -1,23 +1,33 @@
-/** Parent side: the family, its kids and its jobs. */
+/** Parent side: the parent's name, the family, its kids and its jobs. */
+import {budgetOf, changedBudget} from './budget';
 import type {Deps} from './deps';
 import {ApiError, busy, conflict, invalid, notFound} from './errors';
+import {currentChildren, settleDue} from './ledger';
+import {checkTvPin} from './pin';
 import {hashPin, newId} from './secrets';
-import {type Chore, type Child, type Color, DAILY_BASE_MIN, type Family, type GameSettings, type Parent, type Topic} from './types';
-import type {ChildInput, ChildPatch, ChoreInput, ChorePatch, FamilyCreate, FamilyPatch} from './validate';
+import type {Chore, Child, Color, Device, Family, Parent} from './types';
+import type {ChildInput, ChildPatch, ChoreInput, ChorePatch, FamilyCreate, FamilyPatch, MeInput, TvSettingsInput} from './validate';
 import {byCreated, childView, choreView, deviceView, familyView} from './views';
-
-/** Default daily cap on game marbles (4 = 20 min), so real-life jobs stay the main way to earn (docs/03 §11). */
-const DAILY_GAME_MARBLES = 4;
 
 /** Card colours for new jobs, in turn, so neighbouring cards differ. Gold stays for time and the main button (docs/03 §12). */
 const CARD_COLORS: Color[] = ['peach', 'mint', 'sky', 'lilac'];
 
 export async function me(deps: Deps, parent: Parent) {
-  const family = await findFamily(deps, parent);
+  const [family, name] = await Promise.all([findFamily(deps, parent), deps.repo.getParentName(parent.sub)]);
   return {
-    parent: {id: parent.sub, ...(parent.email !== undefined && {email: parent.email})},
+    parent: {id: parent.sub, ...(parent.email !== undefined && {email: parent.email}), ...(name !== undefined && {name})},
     family: family ? familyView(family) : null,
   };
+}
+
+/** The parent's name as kids see it when this parent approves a job ("– Dad"). Works before onboarding too. */
+export async function patchMe(deps: Deps, parent: Parent, input: MeInput) {
+  const [familyId, before] = await Promise.all([deps.repo.familyIdOf(parent.sub), deps.repo.getParentName(parent.sub)]);
+  if (input.name !== before) {
+    await deps.repo.setParentName(parent.sub, input.name);
+    if (familyId !== undefined) deps.changed(familyId);
+  }
+  return me(deps, parent);
 }
 
 async function findFamily(deps: Deps, parent: Parent): Promise<Family | undefined> {
@@ -41,9 +51,7 @@ export async function createFamily(deps: Deps, parent: Parent, input: FamilyCrea
 }
 
 export async function familyBundle(deps: Deps, family: Family) {
-  const [children, chores, devices] = await Promise.all([
-    deps.repo.listChildren(family.id), deps.repo.listChores(family.id), deps.repo.listDevices(family.id),
-  ]);
+  const [children, chores, devices] = await Promise.all([currentChildren(deps, family), deps.repo.listChores(family.id), deps.repo.listDevices(family.id)]);
   return {
     family: familyView(family),
     children: children.sort(byCreated).map(childView),
@@ -52,40 +60,54 @@ export async function familyBundle(deps: Deps, family: Family) {
   };
 }
 
+/** Changes only the given fields, so changes made at once on a TV and in the parent app don't undo each other. */
 export async function patchFamily(deps: Deps, family: Family, input: FamilyPatch) {
   const {pin, ...fields} = input;
-  const next: Family = {...family, ...fields, ...(pin !== undefined && {pin: hashPin(pin)})};
-  await deps.repo.putFamily(next);
+  const next = await deps.repo.updateFamily(family.id, {...fields, ...(pin !== undefined && {pin: hashPin(pin)})});
+  if (!next) throw notFound('family');
+  deps.changed(family.id);
   return familyView(next);
 }
 
-/** Without a choice from the parent: the built-in question bank has word games only for ages 7 and up. */
-const defaultGames = (age: number): GameSettings => ({
-  topics: age <= 6 ? ['numbers', 'puzzles'] : ['numbers', 'words', 'puzzles'],
-  dailyCapMarbles: DAILY_GAME_MARBLES,
-});
+/**
+ * A grown-up changes language, CAPITAL LETTERS or read-aloud on the TV, with the family PIN (pin.ts: the same
+ * per-TV wrong-PIN limit as decisions). It's the family's setting: other TVs get a new ETag, the parent app sees it
+ * on its next load, and the last change wins wherever it was made.
+ */
+export async function changeSettingsOnTv(deps: Deps, family: Family, device: Device, input: TvSettingsInput) {
+  const {pin, ...settings} = input;
+  await checkTvPin(deps, family, device, pin);
+  return patchFamily(deps, family, settings);
+}
 
-const gameSettings = (games: {topics: Topic[]; dailyCapMarbles?: number}): GameSettings => ({
-  topics: games.topics,
-  dailyCapMarbles: games.dailyCapMarbles ?? DAILY_GAME_MARBLES,
-});
-
+/**
+ * A new kid. The daily budget defaults by age (60 minutes under 7, 90 from 7; the base half of it) and is clamped to
+ * the rules (budget.ts): never above the age's ceiling, the base never above the maximum.
+ */
 export async function addChild(deps: Deps, family: Family, input: ChildInput) {
   const child: Child = {
     id: newId(), name: input.name, avatar: input.avatar, color: input.color, age: input.age,
-    dailyBaseMin: input.dailyBaseMin ?? DAILY_BASE_MIN,
-    games: input.games ? gameSettings(input.games) : defaultGames(input.age),
-    createdAt: deps.now(), balanceSec: 0, debtSec: 0,
+    ...changedBudget(undefined, input.age, input),
+    characterTokens: 0, createdAt: deps.now(), balanceSec: 0, debtSec: 0,
   };
   await deps.repo.putChild(family.id, child);
+  deps.changed(family.id);
   return childView(child);
 }
 
+/** Changes only what's given; a new age or maximum clamps the budget (budget.ts changedBudget). */
 export async function patchChild(deps: Deps, family: Family, childId: string, input: ChildPatch) {
-  const {games, ...profile} = input;
-  const child = await deps.repo.updateChildProfile(family.id, childId, {...profile, ...(games && {games: gameSettings(games)})});
-  if (!child) throw notFound('child');
-  return childView(child);
+  const {dailyMaxMin, dailyBaseMin, ...profile} = input;
+  let budget = {};
+  if (input.age !== undefined || dailyMaxMin !== undefined || dailyBaseMin !== undefined) {
+    const current = await deps.repo.getChild(family.id, childId);
+    if (!current) throw notFound('child');
+    budget = changedBudget(budgetOf(current), input.age ?? current.age, {dailyMaxMin, dailyBaseMin});
+  }
+  const updated = await deps.repo.updateChildProfile(family.id, childId, {...profile, ...budget});
+  if (!updated) throw notFound('child');
+  deps.changed(family.id);
+  return childView((await settleDue(deps, family, updated)).child);
 }
 
 /** Removes a kid and everything about them. Their jobs lose them; a job left with no kids goes too. */
@@ -94,6 +116,7 @@ export async function removeChild(deps: Deps, family: Family, childId: string) {
     if (chore.childIds.includes(childId)) await changeChore(deps, family.id, chore.id, k => withoutChild(k, childId));
   }
   await deps.repo.deleteChild(family.id, childId);
+  deps.changed(family.id);
 }
 
 /** The job without one kid; null when nobody is left on it. */
@@ -138,12 +161,14 @@ export async function addChore(deps: Deps, family: Family, input: ChoreInput) {
     icon: input.icon ?? (await deps.pickIcon(input.title)),
     color: input.color ?? CARD_COLORS[count % CARD_COLORS.length],
     minutes: input.minutes,
+    routine: input.routine ?? false,
     repeat: input.repeat ?? {kind: 'daily'},
     childIds,
     createdAt: now,
     updatedAt: now,
   };
   await deps.repo.putChore(family.id, chore);
+  deps.changed(family.id);
   return choreView(chore);
 }
 
@@ -153,10 +178,12 @@ export async function patchChore(deps: Deps, family: Family, choreId: string, in
   if (childIds) await checkChildren(deps, family.id, childIds);
   const chore = await changeChore(deps, family.id, choreId, k => ({...k, ...input, ...(childIds && {childIds})}));
   if (!chore) throw notFound('job');
+  deps.changed(family.id);
   return choreView(chore);
 }
 
 /** Its claims and ledger entries stay (they carry the title and minutes). */
 export async function removeChore(deps: Deps, family: Family, choreId: string) {
   await deps.repo.deleteChore(family.id, choreId);
+  deps.changed(family.id);
 }

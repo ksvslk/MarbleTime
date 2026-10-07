@@ -16,7 +16,8 @@
   "peerDependencies": {
     "lottie-react-native": "*",
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

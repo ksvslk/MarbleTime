@@ -2,27 +2,30 @@ import {useCallback, useEffect, useRef, useState, type FormEvent} from 'react';
 import {Link, useParams} from 'react-router';
 import {useApi} from '../api/ApiContext';
 import {ApiError} from '../api/client';
-import {topicValues, type Child, type ChildPatch, type LedgerEntry, type Topic} from '../api/types';
+import type {Child, ChildPatch, LedgerEntry} from '../api/types';
 import {useFamily} from '../family';
 import type {IconName} from '../icons';
 import type {Key} from '../i18n/strings';
 import {useI18n} from '../i18n/I18n';
+import {budgetOf, type Budget} from '../lib/budget';
 import {formatMinutes, minutesFromSec, timeAgo} from '../lib/format';
 import {usesAmazonKids} from '../lib/handoff';
 import {newId} from '../lib/ids';
 import {clampStep, MAX_CHANGE_MIN, maxTakeMin} from '../lib/time';
 import {useAutosave} from '../lib/useAutosave';
+import {useOnChanged} from '../live/LiveContext';
 import {Avatar} from '../ui/Avatar';
-import {Chip, Field, Group, SavedNote, Stepper} from '../ui/controls';
+import {Field, SavedNote, Stepper} from '../ui/controls';
 import {Icon} from '../ui/Icon';
 import {KidTime, TimeLabel} from '../ui/Marbles';
 import {NotFound, Page} from '../ui/Page';
 import {useShowError, useToast} from '../ui/Toast';
 import {MIN_PER_MARBLE} from '../tokens';
-import {DailyBaseHint, DailyBaseStepper} from './DailyBase';
+import {BudgetFields} from './Budget';
+import {CharacterPrompt, CharactersCard} from './Characters';
 import {HandoffCard, useHandoffs} from './Handoff';
 
-/** One kid: their time, the Amazon Kids hand-off, giving (or taking) minutes, the daily base, brain games, history. */
+/** One kid: their time, a new character to make, the Amazon Kids hand-off, giving (or taking) minutes, the daily budget, characters, history. */
 export function KidDetail() {
   const {id = ''} = useParams();
   const {bundle} = useFamily();
@@ -36,9 +39,10 @@ function KidPage({child, amazonKids}: {child: Child; amazonKids: boolean}) {
   const {t} = useI18n();
   // Bumped after anything that adds ledger entries, so history and the hand-off load again.
   const [version, setVersion] = useState(0);
-  // The balance changes on the TV too (brain games, approvals there).
+  // The balance changes on the TV too (approvals there, TV time used).
   useEffect(() => void refresh(), [refresh]);
   const changed = () => setVersion(v => v + 1);
+  useOnChanged(changed);
   return (
     <Page
       title={child.name}
@@ -52,10 +56,11 @@ function KidPage({child, amazonKids}: {child: Child; amazonKids: boolean}) {
         <Avatar avatar={child.avatar} color={child.color} size={88} />
         <KidTime child={child} max={10} />
       </div>
+      <CharacterPrompt child={child} />
       {amazonKids ? <KidHandoff child={child} version={version} onChange={changed} /> : null}
       <TimeCard child={child} onDone={changed} />
-      <DailyBaseCard child={child} amazonKids={amazonKids} />
-      <GamesCard child={child} />
+      <BudgetCard child={child} amazonKids={amazonKids} />
+      <CharactersCard child={child} />
       <HistoryCard child={child} version={version} amazonKids={amazonKids} />
     </Page>
   );
@@ -229,72 +234,23 @@ function usePatchChild(childId: string) {
   );
 }
 
-/** The daily base (dailyBaseMin): TV time every day before anything is earned. Saved as the grown-up taps. */
-function DailyBaseCard({child, amazonKids}: {child: Child; amazonKids: boolean}) {
+/**
+ * The daily budget: the most TV a day (the jar's size) and the free base in it, saved as the grown-up taps.
+ * The age sets the ceiling's limit; it's changed in the kid's form.
+ */
+function BudgetCard({child, amazonKids}: {child: Child; amazonKids: boolean}) {
   const {t} = useI18n();
   const patch = usePatchChild(child.id);
-  const [base, setBase] = useState(child.dailyBaseMin);
-  const saved = useAutosave(base, dailyBaseMin => patch({dailyBaseMin}));
+  const [budget, setBudget] = useState<Budget>(() => budgetOf(child));
+  const saved = useAutosave(budget, value => patch(value));
   return (
     <section className="card form">
       <h2 className="card-title">
         <Icon name="sun" />
-        {t('everyDay')}
+        {t('budgetTitle')}
         {saved ? <SavedNote /> : null}
       </h2>
-      <DailyBaseStepper value={base} onChange={setBase} />
-      <div className="field">
-        <DailyBaseHint amazonKids={amazonKids} />
-      </div>
-    </section>
-  );
-}
-
-const TOPIC_NAMES: Record<Topic, Key> = {numbers: 'topicNumbers', words: 'topicWords', puzzles: 'topicPuzzles'};
-
-/** Age, allowed topics and the daily game-marble cap. Saved as the grown-up taps, like on the TV. */
-function GamesCard({child}: {child: Child}) {
-  const {t, lang} = useI18n();
-  const patch = usePatchChild(child.id);
-  const [draft, setDraft] = useState({age: child.age, topics: child.games.topics, cap: child.games.dailyCapMarbles});
-  const saved = useAutosave(draft, value => patch({age: value.age, games: {topics: value.topics, dailyCapMarbles: value.cap}}));
-
-  const toggle = (topic: Topic) =>
-    setDraft(current => {
-      const on = new Set(current.topics);
-      if (on.has(topic)) on.delete(topic);
-      else on.add(topic);
-      return {...current, topics: topicValues.filter(x => on.has(x))};
-    });
-
-  return (
-    <section className="card form">
-      <h2 className="card-title">
-        <Icon name="shapes" />
-        {t('brainGames')}
-        {saved ? <SavedNote /> : null}
-      </h2>
-      <Group label={t('age')} hint={t('ageHint')}>
-        <Stepper value={draft.age} min={3} max={12} onChange={age => setDraft(current => ({...current, age}))}>
-          <span className="stepper-number">{draft.age}</span>
-        </Stepper>
-      </Group>
-      <Group label={t('games')} hint={t('gamesHint')}>
-        <div className="chips">
-          {topicValues.map(topic => (
-            <Chip key={topic} selected={draft.topics.includes(topic)} onClick={() => toggle(topic)}>
-              {draft.topics.includes(topic) ? <Icon name="check" size={18} /> : null}
-              {t(TOPIC_NAMES[topic])}
-            </Chip>
-          ))}
-        </div>
-      </Group>
-      <Group label={t('dailyCap')} hint={t('dailyCapHint')}>
-        <Stepper value={draft.cap} min={0} max={12} onChange={cap => setDraft(current => ({...current, cap}))}>
-          <span className="stepper-number">{draft.cap}</span>
-          <span className="muted-ink">= {formatMinutes(lang, draft.cap * MIN_PER_MARBLE)}</span>
-        </Stepper>
-      </Group>
+      <BudgetFields age={child.age} value={budget} amazonKids={amazonKids} onChange={setBudget} />
     </section>
   );
 }
@@ -307,6 +263,7 @@ const ENTRY: Record<LedgerEntry['type'], {icon: IconName; label: Key}> = {
   USAGE: {icon: 'tv', label: 'entryUsage'},
   ALLOWANCE: {icon: 'sun', label: 'entryAllowance'},
   ADJUST: {icon: 'pencil', label: 'entryAdjust'},
+  HANDOFF: {icon: 'tv', label: 'entryHandoff'},
 };
 
 const HANDOFF_LABEL: Record<NonNullable<LedgerEntry['handoff']>, Key> = {

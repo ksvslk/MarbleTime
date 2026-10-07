@@ -76,8 +76,6 @@ def main():
     render("lid-close", [tone(240, 0.14, 0.04, glide=-300), noise_burst(0.02, 0.008, 0.5, seed=2)], 0.18, gain=0.7)
     # "Yay!": C-E-G-C bells.
     render("yay", bell(523.25, 0) + bell(659.25, 0.11) + bell(783.99, 0.22) + bell(1046.5, 0.33, 1.2), 1.4, gain=0.75)
-    # Right answer: a bright double ding.
-    render("right", bell(1318.5, 0) + bell(1760, 0.09, 0.9), 0.9, gain=0.7)
     # Try again: two soft, low notes going down. Gentle, never scary.
     render("try-again", [tone(392, 0.25, 0.12, 0.8), tone(329.6, 0.35, 0.16, 0.8, 0.18)], 0.6, gain=0.55)
     # "I did it!": a quick upward whoop.

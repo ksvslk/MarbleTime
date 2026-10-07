@@ -38,7 +38,8 @@ export const phoneColors = {
 /** The darker gold under a marble's shine (the TV's Marble component). */
 export const MARBLE_BASE = '#E2A92A';
 
-export const MIN_PER_MARBLE = 5;
+/** One marble is one short TV session: 10 minutes (backend/openapi.yaml; docs/08 §1.6). */
+export const MIN_PER_MARBLE = 10;
 
 /** Card and avatar colours by their API name (`Color` in backend/openapi.yaml). */
 export const CARD_COLORS: Record<Color, string> = {

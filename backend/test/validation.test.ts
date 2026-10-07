@@ -14,21 +14,26 @@ const cases: [string, string, (ids: {mia: string; claim: string}) => unknown, st
   ['age not whole', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 5.5}), 'age'],
   ['unknown avatar', '/children', () => ({name: 'A', avatar: 'cat', color: 'mint', age: 5}), 'avatar'],
   ['unknown colour', '/children', () => ({name: 'A', avatar: 'bear', color: 'red', age: 5}), 'color'],
-  ['topic twice', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 5, games: {topics: ['words', 'words']}}), 'games.topics'],
-  ['game cap over 12', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 5, games: {topics: [], dailyCapMarbles: 13}}), 'games.dailyCapMarbles'],
+  ['daily maximum not in marbles', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 5, dailyMaxMin: 45}), 'dailyMaxMin'],
+  ['daily maximum over 120', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 9, dailyMaxMin: 130}), 'dailyMaxMin'],
+  ['daily base below 0', '/children', () => ({name: 'A', avatar: 'bear', color: 'mint', age: 5, dailyBaseMin: -10}), 'dailyBaseMin'],
   ['missing field', '/children', () => ({avatar: 'bear', color: 'mint', age: 5}), 'name'],
   ['job title over 60 characters', '/chores', ({mia}) => ({title: 'x'.repeat(61), minutes: 10, childIds: [mia]}), 'title'],
-  ['minutes not in 5s', '/chores', ({mia}) => ({title: 'Job', minutes: 7, childIds: [mia]}), 'minutes'],
-  ['minutes over 120', '/chores', ({mia}) => ({title: 'Job', minutes: 125, childIds: [mia]}), 'minutes'],
+  ['minutes not whole marbles', '/chores', ({mia}) => ({title: 'Job', minutes: 15, childIds: [mia]}), 'minutes'],
+  ['minutes over 3 marbles', '/chores', ({mia}) => ({title: 'Job', minutes: 40, childIds: [mia]}), 'minutes'],
+  ['minutes under a marble', '/chores', ({mia}) => ({title: 'Job', minutes: 5, childIds: [mia]}), 'minutes'],
+  ['routine not a boolean', '/chores', ({mia}) => ({title: 'Job', minutes: 10, routine: 'yes', childIds: [mia]}), 'routine'],
   ['no kids', '/chores', () => ({title: 'Job', minutes: 10, childIds: []}), 'childIds'],
   ['unknown icon', '/chores', ({mia}) => ({title: 'Job', icon: 'unicorn', minutes: 10, childIds: [mia]}), 'icon'],
   ['weekday 8', '/chores', ({mia}) => ({title: 'Job', minutes: 10, childIds: [mia], repeat: {kind: 'weekdays', days: [8]}}), 'repeat.days[0]'],
   ['weekdays without days', '/chores', ({mia}) => ({title: 'Job', minutes: 10, childIds: [mia], repeat: {kind: 'weekdays'}}), 'repeat.days'],
   ['unknown repeat', '/chores', ({mia}) => ({title: 'Job', minutes: 10, childIds: [mia], repeat: {kind: 'monthly'}}), 'repeat.kind'],
   ['zero minutes adjust', '/children/{mia}/adjust', () => ({deltaMin: 0, reason: 'x'}), 'deltaMin'],
-  ['adjust not in 5s', '/children/{mia}/adjust', () => ({deltaMin: 3, reason: 'x'}), 'deltaMin'],
+  ['adjust not in marbles', '/children/{mia}/adjust', () => ({deltaMin: 5, reason: 'x'}), 'deltaMin'],
   ['adjust over 120', '/children/{mia}/adjust', () => ({deltaMin: -125, reason: 'x'}), 'deltaMin'],
-  ['reason over 80 characters', '/children/{mia}/adjust', () => ({deltaMin: 5, reason: 'x'.repeat(81)}), 'reason'],
+  ['reason over 80 characters', '/children/{mia}/adjust', () => ({deltaMin: 10, reason: 'x'.repeat(81)}), 'reason'],
+  ['character idea empty', '/children/{mia}/characters', () => ({description: '  '}), 'description'],
+  ['character idea over 200 characters', '/children/{mia}/characters', () => ({description: 'a'.repeat(201)}), 'description'],
   ['hand-off status', '/children/{mia}/handoff', () => ({entryIds: [ID], status: 'PENDING'}), 'status'],
   ['hand-off without ids', '/children/{mia}/handoff', () => ({entryIds: [], status: 'DONE'}), 'entryIds'],
   ['TV name empty', '/pairings/ABCDEF/confirm', () => ({name: ''}), 'name'],
@@ -38,8 +43,12 @@ const cases: [string, string, (ids: {mia: string; claim: string}) => unknown, st
   ['claim id with odd characters', '/device/claims', ({mia}) => ({id: 'a#b', childId: mia, choreId: ID, at: 1}), 'id'],
   ['PIN letters', '/device/claims/{claim}/decide', () => ({yes: true, pin: 'abcd'}), 'pin'],
   ['yes not a boolean', '/device/claims/{claim}/decide', () => ({yes: 'yes', pin: '1234'}), 'yes'],
-  ['game total over 10', '/device/games/results', ({mia}) => ({id: ID, childId: mia, topic: 'numbers', correct: 3, total: 11, at: 1}), 'total'],
-  ['unknown topic', '/device/games/results', ({mia}) => ({id: ID, childId: mia, topic: 'art', correct: 3, total: 3, at: 1}), 'topic'],
+  ['speech line over 160 characters', '/device/speech', () => ({text: 'x'.repeat(161), lang: 'en', characterId: ID}), 'text'],
+  ['empty speech line', '/device/speech', () => ({text: '', lang: 'en'}), 'text'],
+  ['speech without a language', '/device/speech', () => ({text: 'Hi!', characterId: ID}), 'lang'],
+  ['speech in an unknown language', '/device/speech', () => ({text: 'Hi!', lang: 'fr'}), 'lang'],
+  ['an empty character id', '/device/speech', () => ({text: 'Hi!', lang: 'en', characterId: ''}), 'characterId'],
+  ['a character id that is not a string', '/device/speech', () => ({text: 'Hi!', lang: 'en', characterId: 7}), 'characterId'],
 ];
 
 describe('validation', () => {
@@ -57,6 +66,15 @@ describe('validation', () => {
   it('counts characters, not bytes: 24 letters with accents fit', async () => {
     const f = await family();
     expect((await f.mom.post('/children', {name: 'Õ'.repeat(24), avatar: 'bear', color: 'mint', age: 5})).status).toBe(201);
+  });
+
+  it('checks the parent name (PATCH /me)', async () => {
+    const f = await family();
+    for (const name of ['', '   ', 'x'.repeat(25), 7]) {
+      const res = await f.mom.patch('/me', {name});
+      expect(res.status).toBe(400);
+      expect(res.body.error.message).toMatch(/^name /);
+    }
   });
 
   it('checks query parameters', async () => {

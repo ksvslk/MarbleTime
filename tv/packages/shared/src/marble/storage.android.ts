@@ -6,4 +6,6 @@ const KEY = 'marbletime.state';
 export const Storage = {
   load: (): Promise<string | null> => AsyncStorage.getItem(KEY),
   save: (value: string): Promise<void> => AsyncStorage.setItem(KEY, value),
+  get: (key: string): Promise<string | null> => AsyncStorage.getItem(`marbletime.${key}`),
+  set: (key: string, value: string): Promise<void> => AsyncStorage.setItem(`marbletime.${key}`, value),
 };

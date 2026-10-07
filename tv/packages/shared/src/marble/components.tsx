@@ -1,9 +1,9 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Animated, Easing, Image, ImageStyle, StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle} from 'react-native';
-import {IconName, Shape} from './data';
+import {IconName} from './data';
 import {CAPS_WIDTH, CHAR_WIDTH, fitFontSize, LINE_HEIGHT, linesAllowed} from './fit';
 import {Sound} from './sound';
-import {JAR, JAR_CAPACITY, jarDrops} from './physics';
+import {JAR, JAR_CAPACITY, jarDrops, radiusFor} from './physics';
 import {colors, s} from './theme';
 
 const ICONS: Record<IconName, number> = {
@@ -80,8 +80,28 @@ export function Icon({name, size, color = colors.ink, style}: {name: IconName; s
   return <Image source={ICONS[name]} style={[{width: size, height: size, tintColor: color}, style]} resizeMode="contain" />;
 }
 
+/**
+ * Fredoka (docs/03 §12), one file per weight: the family name picks the weight, so the platform adds no fake bold.
+ * A build without the files (Vega, for now) falls back to the system font.
+ */
+const FREDOKA: Record<string, string> = {
+  '300': 'Fredoka-Regular',
+  '400': 'Fredoka-Regular',
+  normal: 'Fredoka-Regular',
+  '500': 'Fredoka-Medium',
+  '600': 'Fredoka-SemiBold',
+  '700': 'Fredoka-Bold',
+  '800': 'Fredoka-Bold',
+  '900': 'Fredoka-Bold',
+  bold: 'Fredoka-Bold',
+};
+function fredoka(style: StyleProp<TextStyle>): TextStyle {
+  const {fontWeight, ...rest} = StyleSheet.flatten(style) ?? {};
+  return {...rest, fontFamily: FREDOKA[String(fontWeight ?? '600')] ?? 'Fredoka-SemiBold'};
+}
+
 export function T({style, children, numberOfLines}: {style?: StyleProp<TextStyle>; children: React.ReactNode; numberOfLines?: number}) {
-  return <Text style={[styles.text, style]} numberOfLines={numberOfLines}>{children}</Text>;
+  return <Text style={fredoka([styles.text, style])} numberOfLines={numberOfLines}>{children}</Text>;
 }
 
 /**
@@ -100,7 +120,7 @@ export function FitText({text: raw, width, height, max, min, lines = 1, caps, st
   useEffect(() => setSize(estimate), [estimate]);
   return (
     <Text
-      style={[styles.text, style, {fontSize: size, lineHeight: Math.round(size * LINE_HEIGHT), maxWidth: width}]}
+      style={fredoka([styles.text, style, {fontSize: size, lineHeight: Math.round(size * LINE_HEIGHT), maxWidth: width}])}
       numberOfLines={linesAllowed(size, lines, height)}
       ellipsizeMode="tail"
       onTextLayout={e => {
@@ -179,8 +199,9 @@ export function Button({title, icon, onPress, primary, preferred, size = 1}: {ti
 
 /** One gold marble: 5 minutes of TV. */
 export function Marble({size, style}: {size: number; style?: StyleProp<ViewStyle>}) {
+  // Drawn once into a texture: round clipping is costly on the stick, and marbles move or sit under animations.
   return (
-    <View style={[{width: size, height: size, borderRadius: size / 2, backgroundColor: '#E2A92A', borderWidth: Math.max(1, size * 0.04), borderColor: colors.goldEdge, overflow: 'hidden'}, style]}>
+    <View renderToHardwareTextureAndroid style={[{width: size, height: size, borderRadius: size / 2, backgroundColor: '#E2A92A', borderWidth: Math.max(1, size * 0.04), borderColor: colors.goldEdge, overflow: 'hidden'}, style]}>
       <View style={{position: 'absolute', left: -size * 0.04, top: -size * 0.06, width: size * 0.92, height: size * 0.92, borderRadius: size, backgroundColor: colors.gold}} />
       <View style={{position: 'absolute', left: size * 0.2, top: size * 0.16, width: size * 0.3, height: size * 0.2, borderRadius: size, backgroundColor: 'rgba(255,255,255,0.7)'}} />
     </View>
@@ -203,10 +224,18 @@ export function MarbleRow({count, size}: {count: number; size: number}) {
  * rolls into place with a clink at every knock, then the lid closes. All native-driver animation.
  * `onLand(landed, of)` fires as each fresh marble lands.
  */
-export function Jar({marbles, fresh = 0, k = 1, onLand}: {marbles: number; fresh?: number; k?: number; onLand?: (landed: number, of: number) => void}) {
+/**
+ * The jar. `size` is today's ceiling in marbles: its empty places show as faint slots, exactly where the next
+ * marbles will land (the drop physics is deterministic), so a kid sees how much today's jar holds.
+ */
+export function Jar({marbles, size = 0, fresh = 0, k = 1, onLand}: {marbles: number; size?: number; fresh?: number; k?: number; onLand?: (landed: number, of: number) => void}) {
   const d = (px: number) => s(px * k);
-  const count = Math.min(marbles, JAR_CAPACITY);
-  const drops = useMemo(() => jarDrops(count), [count]);
+  // The marbles' size follows the jar's: a full jar of any size is full to the top.
+  const capacity = size > 0 ? Math.min(size, JAR_CAPACITY) : JAR_CAPACITY;
+  const r = size > 0 ? radiusFor(capacity) : JAR.radius;
+  const count = Math.min(marbles, capacity);
+  const drops = useMemo(() => jarDrops(count, r), [count, r]);
+  const slots = useMemo(() => (capacity > count ? jarDrops(capacity, r).slice(count) : []), [capacity, count, r]);
   const freshCount = Math.max(0, Math.min(fresh, count));
   const firstFresh = count - freshCount;
   const lid = useRef(new Animated.Value(0)).current;
@@ -246,7 +275,6 @@ export function Jar({marbles, fresh = 0, k = 1, onLand}: {marbles: number; fresh
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const r = JAR.radius;
   // Marbles are drawn in an overlay above the glass (so falling ones are visible in the neck);
   // the overlay origin is the inside of the glass: 60 lid + 20 neck + 8 border down, 8 border in.
   const originTop = 88;
@@ -269,6 +297,7 @@ export function Jar({marbles, fresh = 0, k = 1, onLand}: {marbles: number; fresh
       />
       <View style={{width: d(280), height: d(20), borderLeftWidth: d(8), borderRightWidth: d(8), borderColor: colors.glassEdge, backgroundColor: colors.glass}} />
       <View
+        renderToHardwareTextureAndroid
         style={{
           width: d(400),
           height: d(480),
@@ -282,6 +311,9 @@ export function Jar({marbles, fresh = 0, k = 1, onLand}: {marbles: number; fresh
         }}
       />
       <View pointerEvents="none" style={{position: 'absolute', left: d(originLeft), top: d(originTop), width: d(JAR.width), height: d(JAR.height), zIndex: 2}}>
+        {slots.map((slot, i) => (
+          <View key={`slot-${i}`} style={{position: 'absolute', left: d(slot.final.x - r), top: d(slot.final.y - r), width: d(2 * r), height: d(2 * r), borderRadius: d(r), backgroundColor: colors.jarSlot}} />
+        ))}
         {drops.map((drop, i) => {
           if (i < firstFresh) {
             return <Marble key={i} size={d(2 * r)} style={{position: 'absolute', left: d(drop.final.x - r), top: d(drop.final.y - r)}} />;
@@ -317,16 +349,6 @@ export function Avatar({art, bg, size}: {art: keyof typeof ART; bg: string; size
   return (
     <View style={{width: size, height: size, borderRadius: size / 2, backgroundColor: bg, alignItems: 'center', justifyContent: 'center'}}>
       <Image source={ART[art]} style={{width: size * 0.8, height: size * 0.8}} resizeMode="contain" />
-    </View>
-  );
-}
-
-export function ShapeView({shape, size, color}: {shape: Shape; size: number; color: string}) {
-  if (shape === 'circle') return <View style={{width: size, height: size, borderRadius: size / 2, backgroundColor: color}} />;
-  if (shape === 'square') return <View style={{width: size * 0.84, height: size * 0.84, margin: size * 0.08, borderRadius: size * 0.12, backgroundColor: color}} />;
-  return (
-    <View style={{width: size, height: size, alignItems: 'center', justifyContent: 'center'}}>
-      <View style={{width: 0, height: 0, borderLeftWidth: size / 2, borderRightWidth: size / 2, borderBottomWidth: size * 0.86, borderLeftColor: 'transparent', borderRightColor: 'transparent', borderBottomColor: color}} />
     </View>
   );
 }

@@ -5,25 +5,35 @@ import {ApiError} from '../api/client';
 import type {Child, Chore, Claim} from '../api/types';
 import {useFamily} from '../family';
 import {useI18n} from '../i18n/I18n';
-import {formatMinutes, timeAgo} from '../lib/format';
+import {timeAgo} from '../lib/format';
 import {usesAmazonKids} from '../lib/handoff';
+import {rewardText} from '../lib/rewards';
 import {usePolling} from '../lib/usePolling';
+import {useLive, useOnChanged} from '../live/LiveContext';
 import {Avatar} from '../ui/Avatar';
 import {Icon} from '../ui/Icon';
-import {JobTile} from '../ui/JobTile';
+import {JobTile, RoutineLabel} from '../ui/JobTile';
 import {TimeLabel} from '../ui/Marbles';
 import {Empty, Page} from '../ui/Page';
 import {isOffline, useShowError, useToast} from '../ui/Toast';
+import {CharacterPrompt} from './Characters';
 import {HandoffCard, useHandoffs} from './Handoff';
+import {NotifyCard} from './Notify';
 
+/** Without a live connection, look for new claims every 3 s; with one, the server says when (polling is the backup). */
 const POLL_MS = 3000;
+const LIVE_POLL_MS = 30000;
 const HANDOFF_POLL_MS = 30000;
 /** How long a decided card takes to lift away (matches .claim.leaving in styles.css). */
 const LEAVE_MS = 260;
 
 const newestFirst = (a: Claim, b: Claim) => b.createdAt - a.createdAt;
 
-/** Home: jobs the kids say are done, one tap each. Then, in Amazon Kids mode, the time to hand off. */
+/**
+ * Home: jobs the kids say are done, one tap each, and what each "Yes" gave (marbles, a new character when the
+ * jar was full, or praise for a routine job). Then new characters to make, and in Amazon Kids mode the time to
+ * hand off.
+ */
 export function Approvals() {
   const api = useApi();
   const {bundle, refresh} = useFamily();
@@ -37,8 +47,9 @@ export function Approvals() {
   const lastIds = useRef<string[]>([]);
   const amazonKids = usesAmazonKids(bundle.devices);
   const handoffs = useHandoffs(amazonKids ? bundle.children.map(child => child.id) : []);
+  const {connected} = useLive();
 
-  usePolling(async () => {
+  const poll = async () => {
     try {
       const list = await api.claims('waiting');
       setProblem(null);
@@ -54,19 +65,24 @@ export function Approvals() {
     } catch (error) {
       setProblem(isOffline(error) ? 'offline' : 'error');
     }
-  }, POLL_MS);
-  // Brain games add hand-off time without any claim changing, so look now and then as well.
+  };
+  usePolling(poll, connected ? LIVE_POLL_MS : POLL_MS);
+  // Bonuses from another grown-up and decisions on the TV change hand-offs without any claim here, so look now and then as well.
   usePolling(() => handoffs.refresh(), HANDOFF_POLL_MS);
+  useOnChanged(() => {
+    void poll();
+    void handoffs.refresh();
+  });
 
   /** Called once the card has lifted away: drop it, tell the server, and put it back if that fails. */
   const decide = async (claim: Claim, yes: boolean) => {
     decided.current.add(claim.id);
     setClaims(list => list?.filter(c => c.id !== claim.id) ?? list);
     try {
-      await (yes ? api.approve(claim.id) : api.reject(claim.id));
+      const decided = await (yes ? api.approve(claim.id) : api.reject(claim.id));
       if (yes) {
         const kid = bundle.children.find(child => child.id === claim.childId);
-        toast(`${kid?.name ?? ''} ${formatMinutes(lang, claim.minutes, true)}`.trim());
+        toast(rewardText(lang, decided ?? claim, kid?.name ?? '').trim());
         void handoffs.refresh([claim.childId]);
       }
       void refresh();
@@ -85,9 +101,11 @@ export function Approvals() {
   };
 
   const pending = bundle.children.filter(child => (handoffs.byChild[child.id]?.pendingMinutes ?? 0) > 0);
+  const withCharacters = bundle.children.filter(child => (child.characterTokens ?? 0) > 0);
 
   return (
     <Page title={t('waitingTitle')}>
+      <NotifyCard />
       {problem ? (
         <p className="banner" role="status">
           {t(problem === 'offline' ? 'errorOffline' : 'errorGeneric')}
@@ -115,6 +133,10 @@ export function Approvals() {
           ))}
         </ul>
       )}
+
+      {withCharacters.map(child => (
+        <CharacterPrompt key={child.id} child={child} />
+      ))}
 
       {pending.length ? (
         <section className="section">
@@ -153,7 +175,7 @@ function ClaimCard({claim, kid, job, onDecide}: {claim: Claim; kid?: Child; job?
         <div className="grow">
           <h2 className="claim-title">{claim.choreTitle ?? job?.title ?? ''}</h2>
           <p className="meta">{t('saysDone', {kid: kid?.name ?? '', ago: timeAgo(lang, claim.createdAt, Date.now())})}</p>
-          <TimeLabel minutes={claim.minutes} signed />
+          {job?.routine ? <RoutineLabel label={t('routine')} /> : <TimeLabel minutes={claim.minutes} signed />}
         </div>
       </div>
       <div className="button-row">

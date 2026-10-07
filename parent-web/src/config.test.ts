@@ -8,6 +8,34 @@ const COGNITO = {
 };
 
 describe('config', () => {
+  it('reads the config.json the CDK stack writes (its own key names)', () => {
+    const file = {
+      apiUrl: 'https://ny4o9o0um2.execute-api.us-east-1.amazonaws.com',
+      region: 'us-east-1',
+      userPoolId: 'us-east-1_GgccsHMyo',
+      userPoolClientId: '6c4vor9joadnccf2n67vaqka70',
+      cognitoDomain: 'https://marbletime-dev-713072916910.auth.us-east-1.amazoncognito.com',
+    };
+    expect(resolveConfig({}, file)).toEqual({
+      ok: true,
+      config: {
+        apiUrl: file.apiUrl,
+        auth: 'cognito',
+        cognito: {authority: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_GgccsHMyo', clientId: file.userPoolClientId, domain: file.cognitoDomain},
+      },
+    });
+  });
+
+  it('reads the live-updates address when there is one (config.json realtimeUrl, or VITE_REALTIME_URL)', () => {
+    const wss = 'wss://abc.execute-api.us-east-1.amazonaws.com/live';
+    const fromFile = resolveConfig({VITE_AUTH: 'dev', VITE_API_URL: 'http://localhost:8787'}, {realtimeUrl: wss});
+    expect(fromFile.ok && fromFile.config.realtimeUrl).toBe(wss);
+    const fromEnv = resolveConfig({...COGNITO, VITE_REALTIME_URL: ` ${wss} `});
+    expect(fromEnv.ok && fromEnv.config.realtimeUrl).toBe(wss);
+    const without = resolveConfig(COGNITO);
+    expect(without.ok && 'realtimeUrl' in without.config).toBe(false);
+  });
+
   it('dev mode needs only the API address (trailing slash dropped)', () => {
     expect(resolveConfig({VITE_AUTH: 'dev', VITE_API_URL: 'http://192.168.0.100:8787/'})).toEqual({
       ok: true,

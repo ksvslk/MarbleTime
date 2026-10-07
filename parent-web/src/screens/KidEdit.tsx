@@ -9,9 +9,9 @@ import {Confirm} from '../ui/Confirm';
 import {Icon} from '../ui/Icon';
 import {NotFound, Page} from '../ui/Page';
 import {useShowError} from '../ui/Toast';
-import {DEFAULT_GAMES, KidFields, newKidDraft, type KidDraft} from './KidFields';
+import {KidFields, kidDraftFrom, newKidDraft, type KidDraft} from './KidFields';
 
-/** /kids/new and /kids/:id/edit: name, animal, colour, age; and removing a kid. */
+/** /kids/new and /kids/:id/edit: name, animal, colour, age and the daily budget; and removing a kid. */
 export function KidEdit() {
   const {id} = useParams();
   const {bundle} = useFamily();
@@ -26,11 +26,7 @@ function KidForm({existing}: {existing?: Child}) {
   const {t} = useI18n();
   const navigate = useNavigate();
   const showError = useShowError();
-  const [kid, setKid] = useState<KidDraft>(() =>
-    existing
-      ? {name: existing.name, avatar: existing.avatar, color: existing.color, age: existing.age, dailyBaseMin: existing.dailyBaseMin}
-      : newKidDraft(bundle.children),
-  );
+  const [kid, setKid] = useState<KidDraft>(() => (existing ? kidDraftFrom(existing) : newKidDraft(bundle.children)));
   const [busy, setBusy] = useState(false);
   const [confirming, setConfirming] = useState(false);
 
@@ -40,7 +36,7 @@ function KidForm({existing}: {existing?: Child}) {
     if (!name) return;
     setBusy(true);
     try {
-      const saved = existing ? await api.patchChild(existing.id, {...kid, name}) : await api.addChild({...kid, name, games: DEFAULT_GAMES});
+      const saved = existing ? await api.patchChild(existing.id, {...kid, name}) : await api.addChild({...kid, name});
       update(b => ({...b, children: existing ? b.children.map(c => (c.id === saved.id ? saved : c)) : [...b.children, saved]}));
       navigate(`/kids/${saved.id}`, {replace: true});
     } catch (error) {
@@ -67,7 +63,7 @@ function KidForm({existing}: {existing?: Child}) {
   return (
     <Page title={existing ? existing.name : t('newKid')} back={existing ? `/kids/${existing.id}` : '/kids'}>
       <form className="card form" onSubmit={save}>
-        <KidFields value={kid} amazonKids={usesAmazonKids(bundle.devices)} onChange={setKid} />
+        <KidFields value={kid} amazonKids={usesAmazonKids(bundle.devices)} isNew={!existing} onChange={setKid} />
         <button className="btn btn-gold btn-block" disabled={busy || !kid.name.trim()}>
           {t('save')}
         </button>

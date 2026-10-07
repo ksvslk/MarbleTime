@@ -7,7 +7,7 @@ import {JOB_ICON_NAMES} from '../icons';
 import {ApiError} from './errors';
 import {PAIRING_CODE} from './secrets';
 import {isTimezone} from './time';
-import {AVATARS, CLAIM_STATUSES, COLORS, DEVICE_MODES, LANGS, PLATFORMS, type Repeat, TOPICS} from './types';
+import {AVATARS, CLAIM_STATUSES, COLORS, DEVICE_MODES, type Lang, LANGS, PLATFORMS, type Repeat} from './types';
 
 export type Check<T> = (value: unknown, path: string) => T;
 
@@ -77,8 +77,11 @@ const timezone: Check<string> = (value, path) => {
   if (typeof value !== 'string' || !isTimezone(value)) throw fail(path, 'must be an IANA time zone, e.g. Europe/Tallinn');
   return value;
 };
-const minutes = integer(5, 120, 5);
-const dailyBase = integer(0, 240, 5);
+/** Job minutes: 1–3 marbles (docs/08 §2). */
+const minutes = integer(10, 30, 10);
+/** The daily budget (budget.ts clamps them to the kid's age and to each other). */
+const dailyBase = integer(0, 120, 10);
+const dailyMax = integer(10, 120, 10);
 const time = integer(0, Number.MAX_SAFE_INTEGER);
 
 const repeat: Check<Repeat> = (value, path) => {
@@ -88,22 +91,22 @@ const repeat: Check<Repeat> = (value, path) => {
   return {kind, days: days.sort((a, b) => a - b)};
 };
 
-// dailyCapMarbles is required in the schema but has a default (4); a missing one gets the default (family.ts).
-const games = object({topics: list(oneOf(TOPICS), 0, TOPICS.length, true), dailyCapMarbles: integer(0, 12)}, ['topics']);
-
 export const familyCreate = object({name: text(1, 40), lang: oneOf(LANGS), timezone, pin}, ['name', 'lang', 'timezone', 'pin']);
 export const familyPatch = object({name: text(1, 40), lang: oneOf(LANGS), timezone, caps: boolean, voice: boolean, pin});
 
-const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), dailyBaseMin: dailyBase, games};
+export const meInput = object({name: text(1, 24)}, ['name']);
+
+const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), dailyBaseMin: dailyBase, dailyMaxMin: dailyMax};
 export const childInput = object(child, ['name', 'avatar', 'color', 'age']);
 export const childPatch = object(child);
 
-const chore = {title: text(1, 60), icon: oneOf(JOB_ICON_NAMES), color: oneOf(COLORS), minutes, repeat, childIds: list(id, 1, 100)};
+const chore = {title: text(1, 60), icon: oneOf(JOB_ICON_NAMES), color: oneOf(COLORS), minutes, routine: boolean, repeat, childIds: list(id, 1, 100)};
 export const choreInput = object(chore, ['title', 'minutes', 'childIds']);
 export const chorePatch = object(chore);
 
+/** Bonus or minus in whole marbles. */
 const deltaMin: Check<number> = (value, path) => {
-  const delta = integer(-120, 120, 5)(value, path);
+  const delta = integer(-120, 120, 10)(value, path);
   if (delta === 0) throw fail(path, 'must not be 0');
   return delta;
 };
@@ -117,14 +120,40 @@ export const devicePatch = object({name: text(1, 40), mode: oneOf(DEVICE_MODES)}
 
 export const claimInput = object({id, childId: id, choreId: id, at: time}, ['id', 'childId', 'choreId', 'at']);
 export const decideInput = object({yes: boolean, pin}, ['yes', 'pin']);
-export const gameInput = object(
-  {id, childId: id, topic: oneOf(TOPICS), correct: integer(0, Number.MAX_SAFE_INTEGER), total: integer(1, 10), at: time},
-  ['id', 'childId', 'topic', 'correct', 'total', 'at'],
-);
+
+/** A grown-up changes the TV settings on the TV: the PIN and at least one setting. */
+export const tvSettingsInput: Check<{pin: string; lang?: Lang; caps?: boolean; voice?: boolean}> = (value, path) => {
+  const input = object({pin, lang: oneOf(LANGS), caps: boolean, voice: boolean}, ['pin'])(value, path);
+  if (input.lang === undefined && input.caps === undefined && input.voice === undefined) {
+    throw fail(path, 'must change at least one of lang, caps, voice');
+  }
+  return input;
+};
+/** The kid's idea for a character, typed or from /speech-to-text. */
+export const characterInput = object({description: text(1, 200)}, ['description']);
+/** A short line a character says on the TV, in the family's language; the character's voice, mood and style shape it. */
+/** A line for the TV: said by a character, or by the narrator (no characterId). */
+export const speechInput = object({text: text(1, 160), lang: oneOf(LANGS), characterId: text(1, 64)}, ['text', 'lang']);
 export const heartbeatInput = object({appVersion: text(0, 40)});
+
+/** A browser's push service address: https only (that's where pushes go), at most 1000 characters. */
+const pushEndpoint: Check<string> = (value, path) => {
+  const url = typeof value === 'string' && value.length <= 1000 && URL.canParse(value) ? new URL(value) : undefined;
+  if (url?.protocol !== 'https:') throw fail(path, 'must be an https URL of at most 1000 characters');
+  return value as string;
+};
+const pushKey = matches(/^[A-Za-z0-9_-]{1,200}={0,2}$/, 'base64url');
+export const pushSubscriptionInput = object(
+  {endpoint: pushEndpoint, keys: object({p256dh: pushKey, auth: pushKey}, ['p256dh', 'auth'])},
+  ['endpoint', 'keys'],
+);
+export const pushEndpointInput = object({endpoint: pushEndpoint}, ['endpoint']);
 
 /** A pairing code from a URL; parents may type it in lower case. */
 export const pairingCode = (value: string) => matches(PAIRING_CODE, '6 characters from A–Z (no I, O) and 2–9')(value.toUpperCase(), 'code');
+
+/** An id from a URL (characters): unknown ones are simply not found. */
+export const isId = (value: string) => ID.test(value);
 
 /** `?limit=` for the ledger: 1–200, default 50. */
 export function ledgerLimit(value: string | undefined): number {
@@ -144,4 +173,7 @@ export type ConfirmInput = ReturnType<typeof confirmInput>;
 export type DevicePatch = ReturnType<typeof devicePatch>;
 export type ClaimInput = ReturnType<typeof claimInput>;
 export type DecideInput = ReturnType<typeof decideInput>;
-export type GameInput = ReturnType<typeof gameInput>;
+export type TvSettingsInput = ReturnType<typeof tvSettingsInput>;
+export type MeInput = ReturnType<typeof meInput>;
+export type CharacterInput = ReturnType<typeof characterInput>;
+export type SpeechInput = ReturnType<typeof speechInput>;

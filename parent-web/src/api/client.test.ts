@@ -42,6 +42,58 @@ describe('API client', () => {
     expect(calls[0].init.body).toBeUndefined();
   });
 
+  it('sets the grown-up’s name as kids see it (PATCH /me) and returns who is signed in', async () => {
+    const {fetch, calls} = fakeFetch(json(200, {parent: {id: 'p1', name: 'Dad'}, family: null}));
+    const me = await api(fetch).patchMe({name: 'Dad'});
+    expect(me.parent.name).toBe('Dad');
+    expect(`${calls[0].init.method} ${calls[0].url}`).toBe('PATCH http://api.test/me');
+    expect(JSON.parse(calls[0].init.body as string)).toEqual({name: 'Dad'});
+  });
+
+  it('lists, makes and removes a kid’s characters', async () => {
+    const drawing = {id: 'ch1', childId: 'k1', status: 'drawing', description: 'a dragon who loves pancakes', createdAt: 1};
+    const {fetch, calls} = fakeFetch(json(200, {characters: [drawing]}), json(202, drawing), new Response(null, {status: 204}));
+    const client = api(fetch);
+    expect(await client.characters('k1')).toEqual([drawing]);
+    expect(await client.addCharacter('k1', {description: 'a dragon who loves pancakes'})).toEqual(drawing);
+    await client.removeCharacter('k1', 'ch 1');
+    expect(calls.map(call => `${call.init.method} ${call.url}`)).toEqual([
+      'GET http://api.test/children/k1/characters',
+      'POST http://api.test/children/k1/characters',
+      'DELETE http://api.test/children/k1/characters/ch%201',
+    ]);
+    expect(JSON.parse(calls[1].init.body as string)).toEqual({description: 'a dragon who loves pancakes'});
+  });
+
+  it('sends a recording as audio/wav as it is (not JSON), and returns the words', async () => {
+    const {fetch, calls} = fakeFetch(json(200, {text: 'a dragon who loves pancakes'}));
+    const wav = new Blob([new Uint8Array(44)], {type: 'audio/wav'});
+    expect(await api(fetch).speechToText(wav)).toBe('a dragon who loves pancakes');
+    expect(`${calls[0].init.method} ${calls[0].url}`).toBe('POST http://api.test/speech-to-text');
+    expect(header(calls[0].init, 'Content-Type')).toBe('audio/wav');
+    expect(header(calls[0].init, 'Authorization')).toBe('Bearer dev-mia');
+    expect(calls[0].init.body).toBe(wav);
+  });
+
+  it('passes on 413 when a recording is too long', async () => {
+    const {fetch} = fakeFetch(json(413, {error: {code: 'too_large', message: 'At most 15 seconds'}}));
+    await expect(api(fetch).speechToText(new Blob([]))).rejects.toMatchObject({status: 413});
+  });
+
+  it('fetches the push key, and sends a subscription in (POST) and out (DELETE with the endpoint)', async () => {
+    const {fetch, calls} = fakeFetch(json(200, {publicKey: 'BKey'}), new Response(null, {status: 201}), new Response(null, {status: 204}));
+    const client = api(fetch);
+    expect(await client.pushKey()).toBe('BKey');
+    await client.addPushSubscription({endpoint: 'https://push.example/1', keys: {p256dh: 'p', auth: 'a'}});
+    await client.removePushSubscription({endpoint: 'https://push.example/1'});
+    expect(calls.map(call => `${call.init.method} ${call.url}`)).toEqual([
+      'GET http://api.test/push/key',
+      'POST http://api.test/push/subscriptions',
+      'DELETE http://api.test/push/subscriptions',
+    ]);
+    expect(JSON.parse(calls[2].init.body as string)).toEqual({endpoint: 'https://push.example/1'});
+  });
+
   it('turns the contract’s error body into an ApiError with status, code and message', async () => {
     const {fetch} = fakeFetch(json(410, {error: {code: 'expired', message: 'The code expired'}}));
     const error = await api(fetch).confirmPairing('K7QX4M', {name: 'Living room TV'}).catch(e => e);

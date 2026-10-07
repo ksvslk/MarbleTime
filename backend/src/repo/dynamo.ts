@@ -6,28 +6,42 @@
  *   FAM#<f>       META                            family
  *   FAM#<f>       PARENT#<sub>                    parent
  *   USER#<sub>    FAM#<f>                         a parent's family
- *   FAM#<f>       CHILD#<c>                       child (balance, penalty debt, today's game marbles)
+ *   USER#<sub>    PROFILE                         the parent's name as kids see it ("– Dad")
+ *   FAM#<f>       CHILD#<c>                       child (balance, daily budget, character tokens, penalty debt, minutes
+ *                                                 marked handed off today, which leave the jar at the next midnight)
  *   FAM#<f>       CHORE#<k>                       job
  *   FAM#<f>       CLAIM#<id>                      claim (id = the TV's UUID)
  *   FAM#<f>       SLOT#<c>#<k>#<day|once>         the claim holding a job's day ("at most once per day")
- *   FAM#<f>       LEDGER#<c>#<createdAt>#<id>     ledger entry (time-ordered per child)
- *   FAM#<f>       REF#<c>#<client id>             what an adjust or game result produced (repeats get it back)
+ *   FAM#<f>       LEDGER#<c>#<createdAt>#<id>     ledger entry (time-ordered per child; HANDOFF entries too)
+ *   FAM#<f>       REF#<c>#<client id>             what an adjust produced (repeats get it back)
+ *   FAM#<f>       CHAR#<id>                       character (status, the kid's words, the card; small)
+ *   FAM#<f>       ART#<id>                        a ready character's SVG and layers (written once, ~10–40 KB)
+ *   FAM#<f>       RATE#<key>#<window start>       uses of a rate-limited thing in a window (a TV's new speech lines)
  *   FAM#<f>       DEV#<d>                         TV
+ *   FAM#<f>       PUSH#<sha256 of the endpoint>   a parent's browser that wants notifications (Web Push)
+ *   CONN#<f>      <connection id>                 an open realtime (WebSocket) connection of the family
+ *   CONNID#<id>   META                            which family a connection belongs to (for $disconnect)
  *   PAIR#<code>   META                            pairing
+ *   LEASE#<name>  META                            who is making something only one may make at a time (a speech line), until when
  *
  * GSI1 (all attributes): GSI1PK TOKEN#<sha256 of the device token> / GSI1SK DEV finds a TV by its token;
  * GSI1PK CLAIMS#<f> / GSI1SK W#<createdAt>#<id> (waiting) or D#<decidedAt>#<id> (decided) lists claims;
  * GSI1PK ADJ#<f> / GSI1SK <createdAt>#<id> lists bonuses and taken-away minutes (BONUS and PENALTY entries).
- * TTL attribute `ttl` (seconds): pairings (a day after expiry), day slots (3 days), refs (30 days).
+ * TTL attribute `ttl` (seconds): pairings (a day after expiry), day slots (3 days), refs (30 days), rate windows
+ * (an hour after the window), connections (3 hours), leases (an hour after they run out). Items of the old brain games (POOL#, FILL#, gameDay and
+ * gameMarbles on children) are ignored; their TTLs remove the pools and marks.
  */
 import {DynamoDBClient} from '@aws-sdk/client-dynamodb';
 import {
-  BatchWriteCommand, DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, type QueryCommandInput,
-  TransactWriteCommand, type TransactWriteCommandInput, UpdateCommand,
+  BatchWriteCommand, DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, type QueryCommandInput, TransactWriteCommand,
+  type TransactWriteCommandInput, UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import type {ChildProfile, Decision, GameCredit, Repo} from '../domain/repo';
-import {DAY} from '../domain/time';
-import type {Chore, Child, Claim, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, Ref} from '../domain/types';
+import type {ChildProfile, Decision, FamilyFields, Repo} from '../domain/repo';
+import {sha256Hex} from '../domain/secrets';
+import {DAY, HOUR} from '../domain/time';
+import type {
+  Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushSubscription, Ref,
+} from '../domain/types';
 
 type Item = Record<string, unknown>;
 type TransactItem = NonNullable<TransactWriteCommandInput['TransactItems']>[number];
@@ -44,6 +58,12 @@ const entryKey = (familyId: string, e: LedgerEntry) => key(fam(familyId), `LEDGE
 const refKey = (familyId: string, childId: string, id: string) => key(fam(familyId), `REF#${childId}#${id}`);
 const deviceKey = (familyId: string, deviceId: string) => key(fam(familyId), `DEV#${deviceId}`);
 const pairingKey = (code: string) => key(`PAIR#${code}`, 'META');
+const connectionKey = (c: Pick<Connection, 'id' | 'familyId'>) => key(`CONN#${c.familyId}`, c.id);
+const connectionIdKey = (connectionId: string) => key(`CONNID#${connectionId}`, 'META');
+const pushKey = (familyId: string, endpoint: string) => key(fam(familyId), `PUSH#${sha256Hex(endpoint)}`);
+const characterKey = (familyId: string, characterId: string) => key(fam(familyId), `CHAR#${characterId}`);
+const artKey = (familyId: string, characterId: string) => key(fam(familyId), `ART#${characterId}`);
+const profileKey = (sub: string) => key(`USER#${sub}`, 'PROFILE');
 const claimIndexKey = (c: Claim) => (c.status === 'waiting' ? `W#${pad(c.createdAt)}#${c.id}` : `D#${pad(c.decidedAt ?? 0)}#${c.id}`);
 /** Bonuses and taken-away minutes are also listed per family, for the TV's state. */
 const adjustmentIndex = (familyId: string, e: LedgerEntry) =>
@@ -168,8 +188,13 @@ export class DynamoRepo implements Repo {
     }
   }
 
-  /** The ledger entry and the child's balance (and penalty debt) in one go; with `minBalanceSec`, only if the balance is that high. */
-  private credit(familyId: string, entry: LedgerEntry, debtSec = 0, minBalanceSec?: number): TransactItem[] {
+  /**
+   * The ledger entry and the child's balance (and penalty debt) in one go. With `minBalanceSec`, only if the balance is
+   * that high; with `balanceSec`, only if the balance is exactly that (nobody changed the jar since it was read).
+   */
+  private credit(familyId: string, entry: LedgerEntry, options: {debtSec?: number; minBalanceSec?: number; balanceSec?: number} = {}): TransactItem[] {
+    const {debtSec = 0, minBalanceSec, balanceSec} = options;
+    const conditions = ['attribute_exists(PK)', ...(minBalanceSec === undefined ? [] : ['balanceSec >= :min']), ...(balanceSec === undefined ? [] : ['balanceSec = :read'])];
     return [
       {Put: {
         TableName: this.table,
@@ -180,9 +205,10 @@ export class DynamoRepo implements Repo {
         TableName: this.table,
         Key: childKey(familyId, entry.childId),
         UpdateExpression: debtSec > 0 ? 'ADD balanceSec :delta, debtSec :debt' : 'ADD balanceSec :delta',
-        ConditionExpression: minBalanceSec === undefined ? 'attribute_exists(PK)' : 'attribute_exists(PK) AND balanceSec >= :min',
+        ConditionExpression: conditions.join(' AND '),
         ExpressionAttributeValues: {
           ':delta': entry.deltaSec, ...(debtSec > 0 && {':debt': debtSec}), ...(minBalanceSec !== undefined && {':min': minBalanceSec}),
+          ...(balanceSec !== undefined && {':read': balanceSec}),
         },
       }},
     ];
@@ -191,7 +217,9 @@ export class DynamoRepo implements Repo {
   // ---------- families and parents ----------
 
   async familyIdOf(sub: string) {
-    const [link] = await this.queryItems({KeyConditionExpression: 'PK = :pk', ExpressionAttributeValues: {':pk': `USER#${sub}`}, Limit: 1}, 1);
+    const [link] = await this.queryItems({
+      KeyConditionExpression: 'PK = :pk AND begins_with(SK, :family)', ExpressionAttributeValues: {':pk': `USER#${sub}`, ':family': 'FAM#'}, Limit: 1,
+    }, 1);
     return link?.familyId as string | undefined;
   }
 
@@ -208,8 +236,16 @@ export class DynamoRepo implements Repo {
     return this.get<Family>(key(fam(familyId), 'META'));
   }
 
-  async putFamily(family: Family) {
-    await this.db.send(new PutCommand({TableName: this.table, Item: {...key(fam(family.id), 'META'), ...family}}));
+  async updateFamily(familyId: string, fields: FamilyFields) {
+    return this.update<Family>(key(fam(familyId), 'META'), fields);
+  }
+
+  async getParentName(sub: string) {
+    return (await this.get<{name?: string}>(profileKey(sub)))?.name;
+  }
+
+  async setParentName(sub: string, name: string) {
+    await this.db.send(new PutCommand({TableName: this.table, Item: {...profileKey(sub), name}}));
   }
 
   // ---------- children ----------
@@ -238,6 +274,8 @@ export class DynamoRepo implements Repo {
       this.keysWithPrefix(familyId, `SLOT#${childId}#`),
       this.keysWithPrefix(familyId, `REF#${childId}#`),
       this.keysWithPrefix(familyId, 'CLAIM#', {expression: 'childId = :child', values: {':child': childId}}),
+      this.keysWithPrefix(familyId, 'CHAR#', {expression: 'childId = :child', values: {':child': childId}}),
+      this.keysWithPrefix(familyId, 'ART#', {expression: 'childId = :child', values: {':child': childId}}),
     ]);
     await this.deleteAll([...groups.flat(), childKey(familyId, childId)]);
   }
@@ -307,17 +345,33 @@ export class DynamoRepo implements Repo {
     return failed.length === 0;
   }
 
-  async decideClaim(familyId: string, {claim, releaseSlot, entry, chore}: Decision) {
+  async decideClaim(familyId: string, {claim, releaseSlot, entry, token, balanceSec, chore}: Decision) {
+    // What a decision sets on the claim; fields it doesn't have stay unset.
+    const fields = {
+      status: claim.status, decidedAt: claim.decidedAt, decidedBy: claim.decidedBy, approverName: claim.approverName, reward: claim.reward,
+      minutesCredited: claim.minutesCredited, GSI1SK: claimIndexKey(claim),
+    };
+    const names = Object.keys(fields).filter(name => fields[name as keyof typeof fields] !== undefined);
     const items: TransactItem[] = [{Update: {
       TableName: this.table,
       Key: claimKey(familyId, claim.id),
-      UpdateExpression: 'SET #status = :status, decidedAt = :at, decidedBy = :by, GSI1SK = :index',
+      UpdateExpression: `SET ${names.map((_, i) => `#f${i} = :v${i}`).join(', ')}`,
       ConditionExpression: '#status = :waiting',
-      ExpressionAttributeNames: {'#status': 'status'},
-      ExpressionAttributeValues: {':status': claim.status, ':at': claim.decidedAt, ':by': claim.decidedBy, ':index': claimIndexKey(claim), ':waiting': 'waiting'},
+      ExpressionAttributeNames: {'#status': 'status', ...Object.fromEntries(names.map((name, i) => [`#f${i}`, name]))},
+      ExpressionAttributeValues: {':waiting': 'waiting', ...Object.fromEntries(names.map((name, i) => [`:v${i}`, fields[name as keyof typeof fields]]))},
     }}];
     if (releaseSlot) items.push({Delete: {TableName: this.table, Key: slotKey(familyId, claim)}});
-    if (entry) items.push(...this.credit(familyId, entry));
+    const childAt = entry ? items.length + 1 : items.length;
+    if (entry) items.push(...this.credit(familyId, entry, {balanceSec}));
+    if (token) {
+      items.push({Update: {
+        TableName: this.table,
+        Key: childKey(familyId, claim.childId),
+        UpdateExpression: 'ADD characterTokens :one',
+        ConditionExpression: 'attribute_exists(PK) AND balanceSec = :read',
+        ExpressionAttributeValues: {':one': 1, ':read': balanceSec},
+      }});
+    }
     const choreAt = items.length;
     if (chore) {
       const unchanged = {ConditionExpression: 'updatedAt = :expected', ExpressionAttributeValues: {':expected': chore.before.updatedAt}};
@@ -327,7 +381,9 @@ export class DynamoRepo implements Repo {
     }
     const failed = await this.transact(items);
     if (!failed.length) return 'ok';
-    return chore && failed.length === 1 && failed[0] === choreAt ? 'chore_changed' : 'not_waiting';
+    if (failed.includes(0)) return 'not_waiting';
+    if ((entry || token) && failed.includes(childAt)) return 'changed';
+    return chore && failed.includes(choreAt) ? 'chore_changed' : 'not_waiting';
   }
 
   async waitingClaims(familyId: string) {
@@ -353,7 +409,7 @@ export class DynamoRepo implements Repo {
   // ---------- ledger ----------
 
   async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number} = {}) {
-    const items = this.credit(familyId, entry, options.debtSec, options.minBalanceSec);
+    const items = this.credit(familyId, entry, {debtSec: options.debtSec, minBalanceSec: options.minBalanceSec});
     if (options.ref) {
       items.push({Put: {
         TableName: this.table,
@@ -363,31 +419,6 @@ export class DynamoRepo implements Repo {
     }
     const failed = await this.transact(items);
     return !failed.length ? 'ok' : failed.includes(2) ? 'duplicate' : 'changed';
-  }
-
-  async creditGame(familyId: string, ref: string, {childId, marbles, before, after, entry}: GameCredit) {
-    const items: TransactItem[] = [{Put: {
-      TableName: this.table,
-      Item: {...refKey(familyId, childId, ref), kind: 'game', marbles, ttl: seconds(Date.now() + 30 * DAY)},
-      ConditionExpression: 'attribute_not_exists(PK)',
-    }}];
-    if (entry) {
-      const counter = before.day === undefined
-        ? {condition: 'attribute_not_exists(gameDay)', values: {}}
-        : {condition: 'gameDay = :beforeDay AND gameMarbles = :beforeMarbles', values: {':beforeDay': before.day, ':beforeMarbles': before.marbles ?? 0}};
-      items.push(
-        {Put: {TableName: this.table, Item: {...entryKey(familyId, entry), ...entry}, ConditionExpression: 'attribute_not_exists(PK)'}},
-        {Update: {
-          TableName: this.table,
-          Key: childKey(familyId, childId),
-          UpdateExpression: 'SET gameDay = :day, gameMarbles = :marbles ADD balanceSec :delta',
-          ConditionExpression: `attribute_exists(PK) AND ${counter.condition}`,
-          ExpressionAttributeValues: {':day': after.day, ':marbles': after.marbles, ':delta': entry.deltaSec, ...counter.values},
-        }},
-      );
-    }
-    const failed = await this.transact(items);
-    return !failed.length ? 'ok' : failed.includes(0) ? 'duplicate' : 'changed';
   }
 
   async getRef(familyId: string, childId: string, id: string) {
@@ -418,7 +449,10 @@ export class DynamoRepo implements Repo {
     return items.map(item => record<LedgerEntry>(item));
   }
 
-  async settleEntries(familyId: string, childId: string, entries: LedgerEntry[], status: Exclude<HandoffStatus, 'PENDING'>, debtPaidSec: number) {
+  async settleEntries(
+    familyId: string, childId: string, entries: LedgerEntry[], status: Exclude<HandoffStatus, 'PENDING'>, debtPaidSec: number,
+    due: {sec: number; day: string},
+  ) {
     const items: TransactItem[] = entries.map(entry => ({Update: {
       TableName: this.table,
       Key: entryKey(familyId, entry),
@@ -426,16 +460,167 @@ export class DynamoRepo implements Repo {
       ConditionExpression: 'handoff = :pending',
       ExpressionAttributeValues: {':status': status, ':pending': 'PENDING'},
     }}));
-    if (debtPaidSec > 0) {
+    if (debtPaidSec > 0 || due.sec > 0) {
+      // The debt it pays and the minutes due to leave the jar after `due.day`, on the child in one update.
+      const adds = [...(debtPaidSec > 0 ? ['debtSec :minus'] : []), ...(due.sec > 0 ? ['handoffDueSec :due'] : [])];
+      const conditions = [
+        'attribute_exists(PK)', ...(debtPaidSec > 0 ? ['debtSec >= :paid'] : []),
+        ...(due.sec > 0 ? ['(attribute_not_exists(handoffDueDay) OR handoffDueDay = :day)'] : []),
+      ];
       items.push({Update: {
         TableName: this.table,
         Key: childKey(familyId, childId),
-        UpdateExpression: 'ADD debtSec :minus',
-        ConditionExpression: 'debtSec >= :paid',
-        ExpressionAttributeValues: {':minus': -debtPaidSec, ':paid': debtPaidSec},
+        UpdateExpression: `${due.sec > 0 ? 'SET handoffDueDay = :day ' : ''}ADD ${adds.join(', ')}`,
+        ConditionExpression: conditions.join(' AND '),
+        ExpressionAttributeValues: {
+          ...(debtPaidSec > 0 && {':minus': -debtPaidSec, ':paid': debtPaidSec}),
+          ...(due.sec > 0 && {':due': due.sec, ':day': due.day}),
+        },
       }});
     }
     return !items.length || (await this.transact(items)).length === 0;
+  }
+
+  async settleDue(familyId: string, childId: string, {entry, debtPaidSec, read}: {
+    entry?: LedgerEntry; debtPaidSec: number; read: Pick<Child, 'balanceSec' | 'debtSec' | 'handoffDueSec' | 'handoffDueDay'>;
+  }) {
+    const items: TransactItem[] = [];
+    if (entry) items.push({Put: {TableName: this.table, Item: {...entryKey(familyId, entry), ...entry}, ConditionExpression: 'attribute_not_exists(PK)'}});
+    const adds = [...(entry ? ['balanceSec :delta'] : []), ...(debtPaidSec > 0 ? ['debtSec :minus'] : [])];
+    items.push({Update: {
+      TableName: this.table,
+      Key: childKey(familyId, childId),
+      UpdateExpression: `${adds.length ? `ADD ${adds.join(', ')} ` : ''}REMOVE handoffDueSec, handoffDueDay`,
+      ConditionExpression: 'balanceSec = :balance AND debtSec = :debt AND handoffDueSec = :due AND handoffDueDay = :day',
+      ExpressionAttributeValues: {
+        ':balance': read.balanceSec, ':debt': read.debtSec, ':due': read.handoffDueSec, ':day': read.handoffDueDay,
+        ...(entry && {':delta': entry.deltaSec}), ...(debtPaidSec > 0 && {':minus': -debtPaidSec}),
+      },
+    }});
+    return (await this.transact(items)).length === 0;
+  }
+
+  // ---------- characters ----------
+
+  async startCharacter(familyId: string, character: Character) {
+    const failed = await this.transact([
+      {Update: {
+        TableName: this.table,
+        Key: childKey(familyId, character.childId),
+        UpdateExpression: 'ADD characterTokens :minus',
+        ConditionExpression: 'attribute_exists(PK) AND characterTokens >= :one',
+        ExpressionAttributeValues: {':minus': -1, ':one': 1},
+      }},
+      {Put: {TableName: this.table, Item: {...characterKey(familyId, character.id), ...character}, ConditionExpression: 'attribute_not_exists(PK)'}},
+    ]);
+    if (failed.includes(1)) throw new Error(`Character ${character.id} exists already`);
+    return failed.length ? 'no_tokens' : 'ok';
+  }
+
+  async getCharacter(familyId: string, characterId: string) {
+    return this.get<Character>(characterKey(familyId, characterId));
+  }
+
+  async listCharacters(familyId: string, childId?: string) {
+    return this.family<Character>(familyId, 'CHAR#', childId === undefined ? undefined : {expression: 'childId = :child', values: {':child': childId}});
+  }
+
+  async getCharacterArt(familyId: string, characterId: string) {
+    return this.get<CharacterArt>(artKey(familyId, characterId));
+  }
+
+  async listCharacterArt(familyId: string, childId?: string) {
+    return this.family<CharacterArt>(familyId, 'ART#', childId === undefined ? undefined : {expression: 'childId = :child', values: {':child': childId}});
+  }
+
+  async finishCharacter(familyId: string, art: CharacterArt, readyAt: number) {
+    const failed = await this.transact([
+      {Update: {
+        TableName: this.table,
+        Key: characterKey(familyId, art.id),
+        UpdateExpression: 'SET #status = :ready, readyAt = :at',
+        ConditionExpression: '#status = :drawing',
+        ExpressionAttributeNames: {'#status': 'status'},
+        ExpressionAttributeValues: {':ready': 'ready', ':at': readyAt, ':drawing': 'drawing'},
+      }},
+      {Put: {TableName: this.table, Item: {...artKey(familyId, art.id), ...art}}},
+    ]);
+    return failed.length === 0;
+  }
+
+  async failCharacter(familyId: string, character: Character) {
+    const failed = await this.transact([
+      {Update: {
+        TableName: this.table,
+        Key: characterKey(familyId, character.id),
+        UpdateExpression: 'SET #status = :help',
+        ConditionExpression: '#status = :drawing',
+        ExpressionAttributeNames: {'#status': 'status'},
+        ExpressionAttributeValues: {':help': 'needs_help', ':drawing': 'drawing'},
+      }},
+      {Update: {
+        TableName: this.table,
+        Key: childKey(familyId, character.childId),
+        UpdateExpression: 'ADD characterTokens :one',
+        ConditionExpression: 'attribute_exists(PK)',
+        ExpressionAttributeValues: {':one': 1},
+      }},
+    ]);
+    return failed.length === 0;
+  }
+
+  async removeCharacter(familyId: string, character: Character) {
+    const items: TransactItem[] = [
+      {Delete: {
+        TableName: this.table,
+        Key: characterKey(familyId, character.id),
+        ConditionExpression: '#status = :status',
+        ExpressionAttributeNames: {'#status': 'status'},
+        ExpressionAttributeValues: {':status': character.status},
+      }},
+      {Delete: {TableName: this.table, Key: artKey(familyId, character.id)}},
+    ];
+    if (character.status !== 'needs_help') {
+      items.push({Update: {
+        TableName: this.table,
+        Key: childKey(familyId, character.childId),
+        UpdateExpression: 'ADD characterTokens :one',
+        ConditionExpression: 'attribute_exists(PK)',
+        ExpressionAttributeValues: {':one': 1},
+      }});
+    }
+    return (await this.transact(items)).length === 0;
+  }
+
+  async takeRate(familyId: string, rateKey: string, windowStart: number, windowMs: number, limit: number) {
+    return this.conditional(() => this.db.send(new UpdateCommand({
+      TableName: this.table,
+      Key: key(fam(familyId), `RATE#${rateKey}#${pad(windowStart)}`),
+      UpdateExpression: 'ADD #count :one SET #ttl = :ttl',
+      ConditionExpression: 'attribute_not_exists(#count) OR #count < :limit',
+      ExpressionAttributeNames: {'#count': 'count', '#ttl': 'ttl'},
+      ExpressionAttributeValues: {':one': 1, ':limit': limit, ':ttl': seconds(windowStart + windowMs + HOUR)},
+    })));
+  }
+
+  async takeLease(name: string, holder: string, until: number, now: number) {
+    return this.conditional(() => this.db.send(new PutCommand({
+      TableName: this.table,
+      Item: {...key(`LEASE#${name}`, 'META'), holder, until, ttl: seconds(until + HOUR)},
+      ConditionExpression: 'attribute_not_exists(PK) OR #holder = :holder OR #until <= :now',
+      ExpressionAttributeNames: {'#holder': 'holder', '#until': 'until'},
+      ExpressionAttributeValues: {':holder': holder, ':now': now},
+    })));
+  }
+
+  async releaseLease(name: string, holder: string) {
+    await this.conditional(() => this.db.send(new DeleteCommand({
+      TableName: this.table,
+      Key: key(`LEASE#${name}`, 'META'),
+      ConditionExpression: '#holder = :holder',
+      ExpressionAttributeNames: {'#holder': 'holder'},
+      ExpressionAttributeValues: {':holder': holder},
+    })));
   }
 
   // ---------- pairing and devices ----------
@@ -499,6 +684,36 @@ export class DynamoRepo implements Repo {
       if (item) return record<Device>(item);
     }
     return undefined;
+  }
+
+  async addConnection(connection: Connection) {
+    const ttl = seconds(connection.expiresAt);
+    await this.transact([
+      {Put: {TableName: this.table, Item: {...connectionKey(connection), ...connection, ttl}}},
+      {Put: {TableName: this.table, Item: {...connectionIdKey(connection.id), familyId: connection.familyId, ttl}}},
+    ]);
+  }
+
+  async familyConnections(familyId: string, now: number) {
+    const items = await this.queryItems({KeyConditionExpression: 'PK = :pk', ExpressionAttributeValues: {':pk': `CONN#${familyId}`}});
+    return items.map(item => record<Connection>(item)).filter(c => c.expiresAt > now);
+  }
+
+  async removeConnection(connectionId: string) {
+    const link = await this.get<{familyId: string}>(connectionIdKey(connectionId));
+    await this.deleteAll([connectionIdKey(connectionId), ...(link ? [connectionKey({id: connectionId, familyId: link.familyId})] : [])]);
+  }
+
+  async putPushSubscription(familyId: string, subscription: PushSubscription) {
+    await this.db.send(new PutCommand({TableName: this.table, Item: {...pushKey(familyId, subscription.endpoint), ...subscription}}));
+  }
+
+  async deletePushSubscription(familyId: string, endpoint: string) {
+    await this.db.send(new DeleteCommand({TableName: this.table, Key: pushKey(familyId, endpoint)}));
+  }
+
+  async pushSubscriptions(familyId: string) {
+    return this.family<PushSubscription>(familyId, 'PUSH#');
   }
 
   async getDevice(familyId: string, deviceId: string) {

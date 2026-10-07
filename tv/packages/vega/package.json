@@ -26,6 +26,7 @@
     "@amazon-devices/lottie-react-native": "~3.0.9000000000+6.0.0-rc.1",
     "@amazon-devices/react-native-async-storage__async-storage": "~2.1.9000000001",
     "@amazon-devices/react-native-kepler": "~4.0.0+rn0.83.0",
+    "@amazon-devices/react-native-svg": "~3.0.9000000001",
     "@multitv/shared": "*",
     "@react-native/new-app-screen": "0.83.0",
     "babel-plugin-module-resolver": "^5.0.2",

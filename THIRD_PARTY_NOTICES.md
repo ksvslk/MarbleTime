@@ -58,10 +58,10 @@ The TV app started from [AmazonAppDev/react-native-multi-tv-helloworld](https://
 
 ## Voices
 
-The read-aloud clips (`tv/packages/shared/src/assets/voice/`) are synthesised by `scripts/make-voices.py`:
-English, German and Spanish with Amazon Polly (neural voices Ruth, Vicki, Lucia), Estonian with
-[TartuNLP Neurokõne](https://neurokone.ee) (University of Tartu, speaker "mari"). Neurokõne's public API is
-offered for research and testing: ask TartuNLP before a commercial launch.
+The read-aloud clips (`tv/packages/shared/src/assets/voice/`) are synthesised by `scripts/make-voices.py` with
+Google Gemini-TTS (Cloud Text-to-Speech, voice "Leda", model gemini-2.5-flash-tts) in English, Estonian, German and
+Spanish, under the project's Google Cloud terms. The characters' lines are made the same way by the backend, on
+demand.
 
 ## Video in the Demo Cartoons test app
 
@@ -72,4 +72,23 @@ the app shows this credit on screen.
 ## Libraries bundled in the TV app
 
 Beyond React Native, Expo and the Vega SDK: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator)
-(MIT, Kazuhiko Arase) draws the pairing QR code.
+(MIT, Kazuhiko Arase) draws the pairing QR code. [react-native-svg](https://github.com/software-mansion/react-native-svg)
+(MIT, with css-tree (MIT), css-select (BSD-2-Clause) and warn-once (MIT)) draws the kids' characters on Fire OS;
+on Vega the same API comes from the Vega SDK's `@amazon-devices/react-native-svg` (Amazon Program Materials
+License, like the SDK's other packages). The TV's typeface is [Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) (© 2016 The Fredoka
+Project Authors, SIL Open Font License 1.1; static weights instanced from the variable font with fontTools, licence
+in `tv/packages/expotv/assets/fonts/Fredoka-OFL.txt`).
+
+## Libraries added to the backend for characters and speech
+
+All permissive; installed from npm, not copied into the repo.
+
+| Library | Licence | Where | What for |
+|---|---|---|---|
+| [saxes](https://github.com/lddubeau/saxes) 6.0.0 | ISC | API, drawing worker | parsing and checking the drawings' SVG |
+| [xmlchars](https://github.com/lddubeau/xmlchars) 2.2.0 (used by saxes) | MIT | API, drawing worker | |
+| [@napi-rs/canvas](https://github.com/Brooooooklyn/canvas) 1.0.10 | MIT | drawing worker, tests | rendering drawings to PNG for the picture check |
+| [Skia](https://skia.org), inside @napi-rs/canvas's prebuilt binaries (`@napi-rs/canvas-linux-arm64-gnu` in Lambda, `-darwin-arm64` on Macs) | BSD-3-Clause | drawing worker | the renderer; the binary is built with [ICU](https://icu.unicode.org) (Unicode License), [libjpeg-turbo](https://libjpeg-turbo.org) (IJG and BSD-3-Clause), [HarfBuzz](https://harfbuzz.github.io) (MIT), [Expat](https://libexpat.github.io) (MIT) and [Brotli](https://github.com/google/brotli) (MIT) |
+| [AWS SDK for JavaScript v3](https://github.com/aws/aws-sdk-js-v3): `@aws-sdk/client-s3`, `@aws-sdk/cloudfront-signer` | Apache-2.0 | API | the cache of the characters' lines, signed links |
+| [libebur128](https://github.com/jiixyj/libebur128) (method only: the K-weighting filter's analogue prototype constants, reimplemented in `backend/src/speech/audio.ts`; no code copied) | MIT | API | measuring loudness (ITU-R BS.1770-4) to normalise the voices |
+| Python's [`difflib.SequenceMatcher`](https://docs.python.org/3/library/difflib.html) (method only: its matching-blocks ratio, reimplemented in `backend/src/domain/line-check.ts` to score lines exactly as `scripts/make-voices.py` does; no code copied) | PSF-2.0 | API | checking a new line heard back against its words |

@@ -20,6 +20,9 @@
       "expo-modules-core": [
         "../expotv/node_modules/expo-modules-core"
       ],
+      "react-native-svg": [
+        "../expotv/node_modules/react-native-svg"
+      ],
       "@react-native-async-storage/async-storage": [
         "../expotv/node_modules/@react-native-async-storage/async-storage"
       ],

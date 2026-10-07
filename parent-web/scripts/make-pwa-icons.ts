@@ -14,13 +14,13 @@ import {colors} from '../src/tokens.ts';
 
 const PUBLIC = join(dirname(fileURLToPath(import.meta.url)), '..', 'public');
 
-/** The logo centred on a 512 square; `logo` is its share of the side, `radius` rounds the corners. */
-function iconSvg({logo, radius}: {logo: number; radius: number}): string {
+/** The logo centred on a 512 square; `logo` is its share of the side, `radius` rounds the corners, no `radius`: no background. */
+function iconSvg({logo, radius}: {logo: number; radius?: number}): string {
   const size = 512 * logo;
   const offset = (512 - size) / 2;
   return [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">',
-    `<rect width="512" height="512" rx="${radius}" fill="${colors.bg}"/>`,
+    radius === undefined ? '' : `<rect width="512" height="512" rx="${radius}" fill="${colors.bg}"/>`,
     `<g transform="translate(${offset} ${offset}) scale(${size / 24})">${ART.logo.body}</g>`,
     '</svg>',
   ].join('');
@@ -37,10 +37,13 @@ const rounded = iconSvg({logo: 0.62, radius: 112});
 // Platforms crop maskable and Apple icons themselves: full-bleed, with the logo inside the safe circle.
 const fullBleed = iconSvg({logo: 0.62, radius: 0});
 const maskable = iconSvg({logo: 0.5, radius: 0});
+// Android draws a notification's small badge from its shape alone: the jar on transparent.
+const badge = iconSvg({logo: 0.9});
 
 writeFileSync(join(PUBLIC, 'favicon.svg'), rounded + '\n');
 png(rounded, 192, 'icons/icon-192.png');
 png(rounded, 512, 'icons/icon-512.png');
 png(maskable, 512, 'icons/maskable-512.png');
 png(fullBleed, 180, 'icons/apple-touch-icon.png');
-console.log(`wrote favicon.svg and 4 PNGs to ${PUBLIC}`);
+png(badge, 96, 'icons/badge-96.png');
+console.log(`wrote favicon.svg and 5 PNGs to ${PUBLIC}`);

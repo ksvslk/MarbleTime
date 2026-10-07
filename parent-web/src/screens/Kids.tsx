@@ -7,11 +7,11 @@ import {Icon} from '../ui/Icon';
 import {KidTime} from '../ui/Marbles';
 import {Empty, Page} from '../ui/Page';
 
-/** Every kid with their TV time: the daily base, plus what they earned. */
+/** Every kid with their TV time (the daily base, plus what they earned), and a note when they have a new character to make. */
 export function Kids() {
   const {bundle, refresh} = useFamily();
   const {t} = useI18n();
-  // Balances change on the TV (brain games, approvals there), so look again on every visit.
+  // Balances change on the TV (approvals there, TV time used), so look again on every visit.
   useEffect(() => void refresh(), [refresh]);
 
   return (
@@ -34,6 +34,12 @@ export function Kids() {
                 <span className="grow">
                   <span className="row-title">{child.name}</span>
                   <KidTime child={child} max={4} />
+                  {(child.characterTokens ?? 0) > 0 ? (
+                    <span className="badge badge-new">
+                      <Icon name="sparkle" size={14} />
+                      {t('newCharacter')}
+                    </span>
+                  ) : null}
                 </span>
                 <Icon name="chevron" />
               </Link>

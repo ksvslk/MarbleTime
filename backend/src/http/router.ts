@@ -1,6 +1,7 @@
 /** A small router: one Lambda serves every route (fewer cold starts), and the dev server runs the same code. */
 import type {Deps} from '../domain/deps';
 import {ApiError} from '../domain/errors';
+import {announce} from '../domain/realtime';
 import type {Parent} from '../domain/types';
 
 export interface HttpRequest {
@@ -9,7 +10,10 @@ export interface HttpRequest {
   /** Lower-case header names. */
   headers: Record<string, string | undefined>;
   query: Record<string, string | undefined>;
+  /** The body as text (JSON routes). */
   body?: string;
+  /** The body's bytes, for routes that take binary bodies (audio). */
+  rawBody?: Buffer;
   /** Set by the caller from verified credentials: API Gateway's JWT authorizer, or the dev server's dev tokens. */
   parent?: Parent;
 }
@@ -24,8 +28,10 @@ export interface Context {
   deps: Deps;
   req: HttpRequest;
   params: Record<string, string>;
-  /** The parsed JSON body; undefined when there is none. */
+  /** The parsed JSON body; undefined when there is none (and on raw routes). */
   body: unknown;
+  /** A raw route's body bytes (empty when there is none). */
+  raw: Buffer;
 }
 
 export interface Route {
@@ -34,29 +40,44 @@ export interface Route {
   path: string;
   /** "parent" routes sit behind API Gateway's JWT authorizer (infra/stack.ts); "device" ones check the TV's token. */
   auth: 'parent' | 'device' | 'none';
+  /** The body is binary (audio), handed over as bytes instead of parsed as JSON. */
+  raw?: boolean;
   handle: (ctx: Context) => Promise<HttpResponse>;
 }
 
 export const json = (status: number, body: unknown, headers?: Record<string, string>): HttpResponse => ({status, body, ...(headers && {headers})});
 export const noContent = (): HttpResponse => ({status: 204});
 
-export function createRouter(routes: Route[], deps: Deps): (req: HttpRequest) => Promise<HttpResponse> {
+/** The dependencies a router is made with; `changed` is added per request. */
+export type RouterDeps = Omit<Deps, 'changed'>;
+
+export function createRouter(routes: Route[], baseDeps: RouterDeps): (req: HttpRequest) => Promise<HttpResponse> {
   const compiled = routes.map(route => ({route, pattern: new RegExp(`^${route.path.replace(/\{(\w+)\}/g, '(?<$1>[^/]{1,100})')}$`)}));
   return async req => {
+    // Families this request changed: told once, after the request, even if a later step of it failed.
+    const changed = new Set<string>();
+    const deps: Deps = {...baseDeps, changed: familyId => changed.add(familyId)};
     try {
-      const path = req.path.replace(/(?<=.)\/+$/, '');
-      const matching = compiled.flatMap(({route, pattern}) => {
-        const match = pattern.exec(path);
-        return match ? [{route, params: match.groups ?? {}}] : [];
-      });
-      if (!matching.length) throw new ApiError(404, 'not_found', `No route ${path}`);
-      const hit = matching.find(({route}) => route.method === req.method);
-      if (!hit) throw new ApiError(405, 'method_not_allowed', `${req.method} is not allowed on ${path}`);
-      return finish(await hit.route.handle({deps, req, params: decodeParams(hit.params), body: parseBody(req.body)}));
+      return finish(await handle(deps, req));
     } catch (error) {
       return finish(errorResponse(error));
+    } finally {
+      if (changed.size) await announce(deps.repo, deps.sendRealtime, [...changed], deps.now());
     }
   };
+
+  async function handle(deps: Deps, req: HttpRequest): Promise<HttpResponse> {
+    const path = req.path.replace(/(?<=.)\/+$/, '');
+    const matching = compiled.flatMap(({route, pattern}) => {
+      const match = pattern.exec(path);
+      return match ? [{route, params: match.groups ?? {}}] : [];
+    });
+    if (!matching.length) throw new ApiError(404, 'not_found', `No route ${path}`);
+    const hit = matching.find(({route}) => route.method === req.method);
+    if (!hit) throw new ApiError(405, 'method_not_allowed', `${req.method} is not allowed on ${path}`);
+    const raw = hit.route.raw ? (req.rawBody ?? Buffer.from(req.body ?? '', 'utf8')) : Buffer.alloc(0);
+    return hit.route.handle({deps, req, params: decodeParams(hit.params), body: hit.route.raw ? undefined : parseBody(req.body), raw});
+  }
 }
 
 function decodeParams(params: Record<string, string>): Record<string, string> {

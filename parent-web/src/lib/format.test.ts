@@ -2,10 +2,10 @@ import {describe, expect, it} from 'vitest';
 import {dailyBaseText, earnedText, formatMinutes, marblesFor, minutesFromSec, repeatSummary, timeAgo, weekdayName} from './format';
 
 describe('marbles and minutes', () => {
-  it('counts whole marbles of 5 minutes, none for zero or less', () => {
-    expect(marblesFor(15)).toBe(3);
-    expect(marblesFor(7)).toBe(1);
-    expect(marblesFor(4)).toBe(0);
+  it('counts whole marbles of 10 minutes, none for zero or less', () => {
+    expect(marblesFor(30)).toBe(3);
+    expect(marblesFor(15)).toBe(1);
+    expect(marblesFor(9)).toBe(0);
     expect(marblesFor(0)).toBe(0);
     expect(marblesFor(-10)).toBe(0);
   });

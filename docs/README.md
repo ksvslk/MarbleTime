@@ -84,6 +84,8 @@ flowchart LR
 | [05-agent-playbook](05-agent-playbook.md) | Tooling (incl. Amazon Devices Builder Tools), Fire OS + Vega loops, parallel agents, CLAUDE.md, bonus paperwork |
 | [06-device-testing](06-device-testing.md) | Stick setup, Amazon Kids setup, strict-mode grants, Vega simulator, test checklists, video capture |
 | [07-earned-time-api](07-earned-time-api.md) | The feature request to Amazon: problem, proposed API, safety model |
+| [08-evidence-based-design](08-evidence-based-design.md) | Draft for decision: the reward/time model, brain games and question checking rebuilt from research; every value cites evidence or is marked as an assumption to test |
+| [research/](research/) | The five research reports behind 08: screen time, rewards and motivation, learning games, verifying AI questions, open question banks |
 
 ## Decisions for you
 

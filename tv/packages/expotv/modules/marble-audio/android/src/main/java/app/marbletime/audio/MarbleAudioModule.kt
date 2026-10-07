@@ -14,8 +14,9 @@ import java.net.URL
 /**
  * MarbleTime's audio on Fire OS. Sound effects go through SoundPool, which is made for game sounds:
  * low latency, overlapping streams (marbles clinking together). Read-aloud clips play one after another
- * through a plain MediaPlayer. Neither creates a media session, so the remote's play/pause keeps
- * belonging to the video apps.
+ * through a plain MediaPlayer, which also plays a character's line from an https URL; "onLine" tells JS when
+ * each line starts and ends, so the character's mouth moves with it. Neither creates a media session, so the
+ * remote's play/pause keeps belonging to the video apps.
  */
 class MarbleAudioModule : Module() {
   private var pool: SoundPool? = null
@@ -24,6 +25,7 @@ class MarbleAudioModule : Module() {
   private val pending = mutableMapOf<Int, Float>()
 
   private var voice: MediaPlayer? = null
+  private var saying: String? = null
   private val lines = ArrayDeque<String>()
   private val handler by lazy { Handler(Looper.myLooper() ?: Looper.getMainLooper()) }
 
@@ -90,16 +92,29 @@ class MarbleAudioModule : Module() {
     nextLine()
   }
 
+  /** Says the clips after whatever is being said now (a character's line after the read-aloud). */
+  private fun enqueue(uris: List<String>) {
+    lines.addAll(uris)
+    if (voice == null) nextLine()
+  }
+
   private fun stopSpeaking() {
     handler.removeCallbacksAndMessages(null)
     lines.clear()
     voice?.release()
     voice = null
+    ended()
+  }
+
+  private fun ended() {
+    saying?.let { sendEvent("onLine", mapOf("uri" to it, "state" to "end")) }
+    saying = null
   }
 
   private fun nextLine() {
     voice?.release()
     voice = null
+    ended()
     val uri = lines.removeFirstOrNull() ?: return
     val player = MediaPlayer()
     try {
@@ -119,13 +134,20 @@ class MarbleAudioModule : Module() {
         }
       }
       // A short breath between lines, like a person reading.
-      player.setOnCompletionListener { handler.postDelayed({ nextLine() }, 250) }
+      player.setOnCompletionListener {
+        ended()
+        handler.postDelayed({ nextLine() }, 250)
+      }
       player.setOnErrorListener { _, what, _ ->
         Log.w(TAG, "voice error $what for $uri")
         nextLine()
         true
       }
-      player.setOnPreparedListener { it.start() }
+      player.setOnPreparedListener {
+        it.start()
+        saying = uri
+        sendEvent("onLine", mapOf("uri" to uri, "state" to "start"))
+      }
       voice = player
       player.prepareAsync()
     } catch (e: Exception) {
@@ -145,6 +167,8 @@ class MarbleAudioModule : Module() {
   override fun definition() = ModuleDefinition {
     Name("MarbleAudio")
 
+    Events("onLine")
+
     Function("preload") { uris: List<String> ->
       uris.forEach { load(it) }
     }
@@ -155,6 +179,10 @@ class MarbleAudioModule : Module() {
 
     Function("speak") { uris: List<String> ->
       speak(uris)
+    }
+
+    Function("enqueue") { uris: List<String> ->
+      enqueue(uris)
     }
 
     Function("stopSpeaking") {

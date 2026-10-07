@@ -8,16 +8,17 @@ const adjust = (f: Fixture, deltaMin: number, id?: string) =>
   f.mom.post(`/children/${f.mia.id}/adjust`, {deltaMin, reason: deltaMin > 0 ? 'Helped grandma' : 'Hit her brother', ...(id && {id})});
 
 describe('bonus and taken-away minutes', () => {
-  it('adds a BONUS (handed off to Amazon Kids) and takes minutes away as a PENALTY (not handed off)', async () => {
+  it('adds a BONUS (handed off to Amazon Kids) and takes minutes away as a PENALTY (not handed off), in whole marbles', async () => {
     const f = await family();
-    const bonus = await adjust(f, 15);
+    const bonus = await adjust(f, 20);
     expect(bonus.status).toBe(200);
-    expect(bonus.body.balanceSec).toBe(900);
-    expect(bonus.body.entry).toMatchObject({type: 'BONUS', deltaSec: 900, reason: 'Helped grandma', createdBy: 'parent:mom', handoff: 'PENDING'});
-    const minus = await adjust(f, -5);
+    expect(bonus.body.balanceSec).toBe(1200);
+    expect(bonus.body.entry).toMatchObject({type: 'BONUS', deltaSec: 1200, reason: 'Helped grandma', createdBy: 'parent:mom', handoff: 'PENDING'});
+    const minus = await adjust(f, -10);
     expect(minus.body.balanceSec).toBe(600);
-    expect(minus.body.entry).toMatchObject({type: 'PENALTY', deltaSec: -300, reason: 'Hit her brother'});
+    expect(minus.body.entry).toMatchObject({type: 'PENALTY', deltaSec: -600, reason: 'Hit her brother'});
     expect(minus.body.entry.handoff).toBeUndefined();
+    for (const deltaMin of [5, -15, 0, 130]) expect((await adjust(f, deltaMin)).status).toBe(400);
   });
 
   it('never goes below an empty jar: it takes what is there, records that, and the debt grows by it', async () => {
@@ -33,7 +34,7 @@ describe('bonus and taken-away minutes', () => {
 
   it('answers 409 empty_jar when there is nothing to take, and writes nothing', async () => {
     const f = await family();
-    const res = await adjust(f, -5);
+    const res = await adjust(f, -10);
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('empty_jar');
     expect((await f.mom.get(`/children/${f.mia.id}/ledger`)).body.entries).toEqual([]);
@@ -54,9 +55,9 @@ describe('bonus and taken-away minutes', () => {
     expect(penalties).toHaveLength(1);
     // A repeat of a bonus is ignored as well.
     const bonusId = randomUUID();
-    await adjust(f, 5, bonusId);
-    await adjust(f, 5, bonusId);
-    expect(await f.balance(f.mia.id)).toBe(2700);
+    await adjust(f, 10, bonusId);
+    await adjust(f, 10, bonusId);
+    expect(await f.balance(f.mia.id)).toBe(3000);
   });
 
   it('never takes more than the jar holds when two minuses arrive at the same moment', async () => {
@@ -69,13 +70,13 @@ describe('bonus and taken-away minutes', () => {
 
   it('lists the ledger newest first, with a limit', async () => {
     const f = await family();
-    for (const delta of [5, 10, 15]) {
+    for (const delta of [10, 20, 30]) {
       await adjust(f, delta);
       f.clock.now += 1000;
     }
     const {body} = await f.mom.get(`/children/${f.mia.id}/ledger?limit=2`);
-    expect(body.entries.map((e: {deltaSec: number}) => e.deltaSec)).toEqual([900, 600]);
+    expect(body.entries.map((e: {deltaSec: number}) => e.deltaSec)).toEqual([1800, 1200]);
     expect((await f.mom.get('/children/nobody/ledger')).status).toBe(404);
-    expect((await f.mom.post('/children/nobody/adjust', {deltaMin: 5, reason: 'x'})).status).toBe(404);
+    expect((await f.mom.post('/children/nobody/adjust', {deltaMin: 10, reason: 'x'})).status).toBe(404);
   });
 });

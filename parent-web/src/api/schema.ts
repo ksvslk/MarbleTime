@@ -37,7 +37,33 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /** The parent's name as kids see it on the TV when this parent approves a job ("– Dad"). Works once signed in, before or after the family exists. */
+        patch: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        name: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Me"];
+                    };
+                };
+            };
+        };
         trace?: never;
     };
     "/family": {
@@ -201,7 +227,7 @@ export interface paths {
         };
         options?: never;
         head?: never;
-        /** Edit a child (name, avatar, age, brain-game settings) */
+        /** Edit a child (name, avatar, age, daily budget) */
         patch: {
             parameters: {
                 query?: never;
@@ -261,6 +287,7 @@ export interface paths {
                     "application/json": {
                         /** @description client UUID; repeats are ignored */
                         id?: string;
+                        /** @description whole marbles (10 min each) */
                         deltaMin: number;
                         reason: string;
                     };
@@ -329,6 +356,232 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/children/{childId}/characters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: components["parameters"]["childId"];
+            };
+            cookie?: never;
+        };
+        /** The kid's characters, newest first (drawing, ready, or needs_help) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    childId: components["parameters"]["childId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            characters: components["schemas"]["Character"][];
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        /**
+         * Make a new character from the kid's own words (uses one character token)
+         * @description The art director turns the words into a character card first (a few seconds, in this request): brands
+         *     and known characters are never copied, scary things become friendly, mild cartoon props are fine
+         *     (docs/08, Decisions 5). Drawing and checking then run in the background (median ~25 s); the family's
+         *     clients get `changed` when the character is ready. No ready-made character is ever swapped in.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    childId: components["parameters"]["childId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description the kid's words, typed or from /speech-to-text */
+                        description: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Accepted; status drawing */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Character"];
+                    };
+                };
+                /** @description no_tokens: the kid has no character token */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description idea_not_ok: nothing safe and original could be made from these words; message is a kind sentence (in the family's language) to read to the kid; the token is kept */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description too_many: too many tries for now; the token is kept */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description unavailable: the drawing models can't be reached right now; the token is kept, try later */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/children/{childId}/characters/{characterId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: components["parameters"]["childId"];
+                characterId: components["parameters"]["characterId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * A grown-up removes a character, in any state
+         * @description A drawing in progress is dropped. The token of a drawing or ready character goes back to the kid, who can make
+         *     another (a needs_help try already gave it back). Kids never lose an earned character to a removal.
+         */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    childId: components["parameters"]["childId"];
+                    characterId: components["parameters"]["characterId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Removed */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/speech-to-text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The kid's spoken idea from the parent's phone → text in the family's language (Gemini listens). The audio is not stored or logged.
+         * @description The parent app records, then converts in the browser to a 16 kHz mono 16-bit PCM WAV (at most 15 s). The backend
+         *     checks the header and asks Gemini for an exact transcript in the family's language (en, et, de or es; words in
+         *     another language are kept as said). The body arrives base64-encoded through API Gateway: decode it to bytes,
+         *     never to text.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "audio/wav": string;
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description empty when nothing was heard */
+                            text: string;
+                        };
+                    };
+                };
+                /** @description bad_audio: not a 16 kHz mono 16-bit PCM WAV */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                413: components["responses"]["Error"];
+                429: components["responses"]["Error"];
+                /** @description unavailable: the speech model can't be reached right now */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/children/{childId}/handoff": {
         parameters: {
             query?: never;
@@ -362,7 +615,13 @@ export interface paths {
             };
         };
         put?: never;
-        /** Mark hand-off entries done (added in Amazon Kids) or skipped */
+        /**
+         * Mark hand-off entries done (added in Amazon Kids) or skipped (settled another way)
+         * @description Either way the minutes are settled and leave the kid's jar at the family's next local midnight: until then they
+         *     are today's TV (the daily maximum holds and the TV's marbles stay). After that midnight, the kid's first read
+         *     or write takes them out of balanceSec with a HANDOFF ledger entry, so the jar has room for new marbles. Earned
+         *     minutes otherwise wait in the jar until used (strict mode) or handed off; nothing else empties it.
+         */
         post: {
             parameters: {
                 query?: never;
@@ -621,6 +880,119 @@ export interface paths {
             };
         };
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/push/key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Web Push (VAPID) public key the parent app subscribes with */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            /** @description base64url */
+                            publicKey: string;
+                        };
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/push/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * This browser wants notifications (a kid says "I did it!"). Repeats with the same endpoint update it.
+         * @description The server sends a Web Push to every subscribed browser of the family's parents when a claim is made:
+         *     title "<child>: <job> is done", body "+<minutes> min · tap to answer", data {url: "/", claimId}.
+         *     Subscriptions the push service reports gone (404/410) are deleted.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        endpoint: string;
+                        keys: {
+                            p256dh: string;
+                            auth: string;
+                        };
+                    };
+                };
+            };
+            responses: {
+                /** @description Saved */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                400: components["responses"]["Error"];
+            };
+        };
+        /** Stop notifications for this browser */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        endpoint: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Deleted (or already gone) */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
         options?: never;
         head?: never;
         patch?: never;
@@ -1076,7 +1448,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/device/games/results": {
+    "/device/characters/{characterId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                characterId: components["parameters"]["characterId"];
+            };
+            cookie?: never;
+        };
+        /** A ready character's art for the TV to draw and animate (never changes once ready; cache forever) */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    characterId: components["parameters"]["characterId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["CharacterArt"];
+                    };
+                };
+                404: components["responses"]["Error"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/device/speech": {
         parameters: {
             query?: never;
             header?: never;
@@ -1085,7 +1498,18 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** A finished brain game. The server applies the child's daily game cap. Idempotent on `id`. */
+        /**
+         * A short line spoken by a character, or by the narrator (read-aloud), in the family's language (Gemini voices), with the mouth's movement
+         * @description The TV fills its own templates ("You did it, Mia!", in en, et, de or es) and asks for the audio. Gemini-TTS
+         *     speaks it in character: the character's voice, with a speaking style the backend composes from fixed parts
+         *     (what the character is, its mood and its voiceStyle; never AI-written words). The audio is loudness-normalised
+         *     (about -16 LUFS, like the read-aloud) and the same text, character and language always give the same audio
+         *     (cached), so a line is made once. Only short lines; rate-limited per TV.
+         *
+         *     Without `characterId` the **narrator** says it: the TV's read-aloud voice (the same voice and style as its
+         *     recorded clips, scripts/make-voices.py), for the family's own words that can't be recorded ahead (kids'
+         *     names, job titles, "Feed the cat: done! – Dad", a bonus reason).
+         */
         post: {
             parameters: {
                 query?: never;
@@ -1096,13 +1520,10 @@ export interface paths {
             requestBody: {
                 content: {
                     "application/json": {
-                        /** @description client UUID */
-                        id: string;
-                        childId: string;
-                        topic: components["schemas"]["Topic"];
-                        correct: number;
-                        total: number;
-                        at: number;
+                        text: string;
+                        lang: components["schemas"]["Lang"];
+                        /** @description a ready character of this TV's family, whose voice, mood and voiceStyle shape the speech; left out = the narrator */
+                        characterId?: string;
                     };
                 };
             };
@@ -1113,13 +1534,87 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content: {
-                        "application/json": {
-                            /** @description marbles credited (0 when the daily cap is reached) */
-                            marbles: number;
-                            balanceSec: number;
-                        };
+                        "application/json": components["schemas"]["Speech"];
                     };
                 };
+                /** @description not_found: no such ready character in this family */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description too_many: more than 60 new lines this hour on this TV (cached lines don't count) */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description unavailable: speech can't be made right now; the TV stays silent. A new line not ready in the request's 24 s goes on in the background: asked again later, it comes from the cache */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/device/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A grown-up changes the family's TV settings on the TV, with the family PIN (same PIN limit as decisions)
+         * @description The phone app sees the change on its next load; the last change wins, wherever it was made.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        pin: string;
+                        lang?: components["schemas"]["Lang"];
+                        caps?: boolean;
+                        voice?: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Family"];
+                    };
+                };
+                400: components["responses"]["Error"];
+                403: components["responses"]["Error"];
+                429: components["responses"]["Error"];
             };
         };
         delete?: never;
@@ -1189,8 +1684,6 @@ export interface components {
         /** @enum {string} */
         Avatar: "bear" | "bunny";
         /** @enum {string} */
-        Topic: "numbers" | "words" | "puzzles";
-        /** @enum {string} */
         Platform: "fireos" | "vega" | "web";
         /**
          * @default amazon_kids
@@ -1208,6 +1701,8 @@ export interface components {
             parent: {
                 id: string;
                 email?: string;
+                /** @description as kids see it; unset until the parent picks one */
+                name?: string;
             };
             family: components["schemas"]["Family"] | null;
         };
@@ -1216,7 +1711,7 @@ export interface components {
             name: string;
             lang: components["schemas"]["Lang"];
             /**
-             * @description IANA zone; "today" (daily jobs, game cap) is this zone's day
+             * @description IANA zone; "today" (daily jobs, the daily budget) is this zone's day
              * @example Europe/Tallinn
              */
             timezone: string;
@@ -1248,36 +1743,41 @@ export interface components {
             chores: components["schemas"]["Chore"][];
             devices: components["schemas"]["Device"][];
         };
-        GameSettings: {
-            topics: components["schemas"]["Topic"][];
-            /** @default 4 */
-            dailyCapMarbles: number;
-        };
         Child: {
             id: string;
             name: string;
             avatar: components["schemas"]["Avatar"];
             color: components["schemas"]["Color"];
             age: number;
-            /** @description earned minutes × 60 (never below 0) */
+            /** @description earned minutes × 60 not yet used or handed off (never below 0) */
             balanceSec: number;
             dailyBaseMin: components["schemas"]["DailyBase"];
-            games: components["schemas"]["GameSettings"];
+            dailyMaxMin: components["schemas"]["DailyMax"];
+            /** @description new characters earned (jobs approved while the jar was full) and not yet made */
+            characterTokens: number;
         };
         /**
-         * @description Screen time every day, before anything is earned, so TV isn't only a prize. Not in the ledger and
-         *     not handed off: in Amazon Kids mode the parent sets the same daily limit there; in strict mode the
-         *     TV starts each day with it.
-         * @default 30
+         * @description Screen time every day, before anything is earned, so TV isn't only a prize: an allowance, the parenting
+         *     practice linked to less screen time (docs/08 §1.3). Default: half of dailyMaxMin rounded up to the next 10
+         *     (60 → 30, 90 → 50, 120 → 60), so a third to a half of the jar is earnable (docs/08 §1.5). Never above dailyMaxMin.
+         *     Not in the ledger and not handed off: in Amazon Kids mode the parent sets the same daily limit there; in
+         *     strict mode the TV starts each day with it.
          */
         DailyBase: number;
+        /**
+         * @description The most TV a day for this kid, everything included: the jar's size. From national guidance (docs/08 §1.1):
+         *     default 60 under age 7 (WHO 2019; Estonia TAI 2025 "kuni 60 minutit"), 90 from age 7 (TAI 2025 "kuni kahe
+         *     tunnini"; Norway 60–90); never above 60 under 7 or 120 from 7. Changing the age clamps it, and so does the
+         *     server for values above the limit (no error).
+         */
+        DailyMax: number;
         ChildInput: {
             name: string;
             avatar: components["schemas"]["Avatar"];
             color: components["schemas"]["Color"];
             age: number;
             dailyBaseMin?: components["schemas"]["DailyBase"];
-            games?: components["schemas"]["GameSettings"];
+            dailyMaxMin?: components["schemas"]["DailyMax"];
         };
         ChildPatch: {
             name?: string;
@@ -1285,7 +1785,7 @@ export interface components {
             color?: components["schemas"]["Color"];
             age?: number;
             dailyBaseMin?: components["schemas"]["DailyBase"];
-            games?: components["schemas"]["GameSettings"];
+            dailyMaxMin?: components["schemas"]["DailyMax"];
         };
         /** @description How often a job can be done. Every kind can be done at most once per day per child. */
         Repeat: {
@@ -1305,7 +1805,13 @@ export interface components {
             title: string;
             icon: components["schemas"]["JobIcon"];
             color: components["schemas"]["Color"];
+            /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes: number;
+            /**
+             * @description a job the kid already does regularly: praised, no marble (docs/08 §2.4)
+             * @default false
+             */
+            routine: boolean;
             repeat: components["schemas"]["Repeat"];
             childIds: string[];
             createdAt: number;
@@ -1314,7 +1820,13 @@ export interface components {
             title: string;
             icon?: components["schemas"]["JobIcon"];
             color?: components["schemas"]["Color"];
+            /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes: number;
+            /**
+             * @description a job the kid already does regularly: praised, no marble (docs/08 §2.4)
+             * @default false
+             */
+            routine: boolean;
             repeat?: components["schemas"]["Repeat"];
             childIds: string[];
         };
@@ -1322,7 +1834,10 @@ export interface components {
             title?: string;
             icon?: components["schemas"]["JobIcon"];
             color?: components["schemas"]["Color"];
+            /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes?: number;
+            /** @description a job the kid already does regularly: praised, no marble (docs/08 §2.4); left out = unchanged */
+            routine?: boolean;
             repeat?: components["schemas"]["Repeat"];
             childIds?: string[];
         };
@@ -1339,15 +1854,29 @@ export interface components {
             decidedAt?: number;
             /** @enum {string} */
             decidedBy?: "parent" | "tv";
+            /** @description the approving parent's name as kids see it ("– Dad"); absent when approved on the TV or unset */
+            approverName?: string;
+            /**
+             * @description Set on approval: marbles = minutesCredited went into the jar (as much as fitted under dailyMaxMin);
+             *     character = the jar was full, so the kid earned a new character (characterTokens + 1);
+             *     praise = a routine job, praised without a marble.
+             * @enum {string}
+             */
+            reward?: "marbles" | "character" | "praise";
+            /** @description minutes that went into the jar (≤ minutes; 0 for character and praise) */
+            minutesCredited?: number;
         };
         LedgerEntry: {
             id: string;
             childId: string;
             deltaSec: number;
-            /** @enum {string} */
-            type: "ALLOWANCE" | "CHORE" | "GAME" | "BONUS" | "PENALTY" | "USAGE" | "ADJUST";
+            /**
+             * @description HANDOFF: minutes settled by the hand-off, which leave the jar at the family's next local midnight (createdBy "system", dated at that midnight). GAME only in history from before Oct 7, 2026 (brain games were removed)
+             * @enum {string}
+             */
+            type: "ALLOWANCE" | "CHORE" | "GAME" | "BONUS" | "PENALTY" | "USAGE" | "ADJUST" | "HANDOFF";
             reason: string;
-            /** @description claim id or game result id */
+            /** @description claim id (old GAME entries: game result id) */
             refId?: string;
             /** @description "parent:<id>", "tv:<deviceId>" or "system" */
             createdBy?: string;
@@ -1361,6 +1890,88 @@ export interface components {
         Balance: {
             balanceSec: number;
             entry: components["schemas"]["LedgerEntry"];
+        };
+        /**
+         * @description Gemini-TTS voices (Google Cloud Text-to-Speech), picked by the art director to suit the character: Puck upbeat, Zephyr bright, Fenrir excitable, Leda youthful, Aoede breezy, Laomedeia upbeat, Achird friendly, Sadachbia lively, Autonoe bright, Algenib gravelly, Achernar soft, Vindemiatrix gentle
+         * @enum {string}
+         */
+        CharacterVoice: "Puck" | "Zephyr" | "Fenrir" | "Leda" | "Aoede" | "Laomedeia" | "Achird" | "Sadachbia" | "Autonoe" | "Algenib" | "Achernar" | "Vindemiatrix";
+        /** @enum {string} */
+        CharacterMood: "happy" | "silly" | "brave" | "sleepy" | "proud" | "curious" | "calm";
+        /** @description How the character sounds, picked by the art director to fit it (a tiny dragon squeaks and bounces, a sleepy bear rumbles slowly). Fixed words only, so the kid's idea never reaches the speech model as instructions. */
+        CharacterVoiceStyle: {
+            /** @enum {string} */
+            pitch: "high" | "medium" | "low";
+            /** @enum {string} */
+            pace: "quick" | "normal" | "slow";
+            /** @enum {string} */
+            energy: "bouncy" | "cheerful" | "calm" | "sleepy" | "bold";
+            /** @enum {string} */
+            texture: "squeaky" | "clear" | "soft" | "breathy" | "gravelly" | "booming";
+        };
+        /** @enum {string} */
+        CharacterPart: "body" | "head" | "eye-left" | "eye-right" | "mouth" | "arm-left" | "arm-right" | "legs" | "extra";
+        Character: {
+            id: string;
+            childId: string;
+            /**
+             * @description needs_help: drawing and checking did not succeed within their repair rounds; the token went back to the kid, a grown-up can try other words
+             * @enum {string}
+             */
+            status: "drawing" | "ready" | "needs_help";
+            /** @description the kid's words */
+            description: string;
+            /** @description from the art director, in the family's language, e.g. "Pancake Dragon" or "Pannkoogidraakon" */
+            name?: string;
+            card?: components["schemas"]["CharacterCard"];
+            voice?: components["schemas"]["CharacterVoice"];
+            voiceStyle?: components["schemas"]["CharacterVoiceStyle"];
+            /** @description the full, checked SVG (ready only), for the parent app to show */
+            svg?: string;
+            createdAt: number;
+            readyAt?: number;
+        };
+        /** @description The art director's reading of the kid's words; this, never the raw words, is what gets drawn. */
+        CharacterCard: {
+            /** @description e.g. "a dragon" */
+            what: string;
+            colours: string[];
+            outfit: string;
+            mood: components["schemas"]["CharacterMood"];
+            /** @description one fun detail, e.g. "loves pancakes, wears rollerskates" */
+            detail: string;
+        };
+        CharacterArt: {
+            id: string;
+            name?: string;
+            voice: components["schemas"]["CharacterVoice"];
+            /** @example 0 0 512 512 */
+            viewBox: string;
+            /** @description In drawing order. Each layer is a complete small SVG (same viewBox); a named part can be rotated or scaled around its pivot, a layer without a part never moves on its own. */
+            layers: {
+                part?: components["schemas"]["CharacterPart"];
+                /** @description the named part this layer was drawn inside and rides on (eyes and mouth on the head, a held thing on an arm): the TV moves it with that part first */
+                parent?: components["schemas"]["CharacterPart"];
+                /** @description [x, y] in viewBox units */
+                pivot?: number[];
+                svg: string;
+            }[];
+        };
+        Speech: {
+            /** @description https URL of the audio (WAV, 24 kHz mono 16-bit), valid for at least a day */
+            audioUrl: string;
+            durationMs: number;
+            /** @description How open the mouth is, every stepMs from the start (0 shut … 1 wide open), from the audio's loudness */
+            mouth: {
+                stepMs: number;
+                open: number[];
+            };
+            /** @description Viseme marks, when the voice gives them (none of the Gemini voices does) */
+            visemes?: {
+                /** @description ms from the start */
+                time: number;
+                value: string;
+            }[];
         };
         Handoff: {
             /** @description pending earned minutes minus outstanding penalty debt, never below 0 */
@@ -1410,12 +2021,21 @@ export interface components {
             }[];
             /** @description waiting, plus decided in the last 7 days */
             claims: components["schemas"]["Claim"][];
-            /** @description childId → game marbles earned today */
-            gameMarblesToday: {
-                [key: string]: number;
-            };
+            /** @description the kids' characters that are drawing or ready (art from GET /device/characters/{id}) */
+            characters?: {
+                id: string;
+                childId: string;
+                /** @enum {string} */
+                status: "drawing" | "ready";
+                name?: string;
+                voice?: components["schemas"]["CharacterVoice"];
+                mood?: components["schemas"]["CharacterMood"];
+                createdAt: number;
+            }[];
             /** @description the family's local date, YYYY-MM-DD */
             today: string;
+            /** @description wss:// address for live updates (x-realtime); absent where there is none */
+            realtimeUrl?: string;
             serverTime: number;
         };
     };
@@ -1435,6 +2055,7 @@ export interface components {
         choreId: string;
         claimId: string;
         deviceId: string;
+        characterId: string;
         code: string;
     };
     requestBodies: never;
@@ -1455,12 +2076,21 @@ export const pathsPairingsCodeGetResponses200ContentApplicationJsonStatusValues:
 export const langValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Lang"]> = ["en", "et", "de", "es"];
 export const colorValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Color"]> = ["peach", "mint", "sky", "lilac", "gold"];
 export const avatarValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Avatar"]> = ["bear", "bunny"];
-export const topicValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Topic"]> = ["numbers", "words", "puzzles"];
 export const platformValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Platform"]> = ["fireos", "vega", "web"];
 export const deviceModeValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["DeviceMode"]> = ["amazon_kids", "strict", "api_mock"];
 export const claimStatusValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["ClaimStatus"]> = ["waiting", "approved", "rejected"];
 export const jobIconValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["JobIcon"]> = ["toys", "cat", "tooth", "moon", "broom", "bed", "shirt", "laundry", "trash", "recycle", "table", "cook", "wash", "shower", "bath", "dog", "fish", "bird", "rabbit", "plant", "leaf", "snow", "book", "pencil", "backpack", "music", "paint", "puzzle", "bike", "shoes", "car", "shopping", "spray", "sofa", "lamp", "baby", "heart", "water", "fruit", "veggie", "sun", "mail", "star"];
 export const claimDecidedByValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Claim"]["decidedBy"]> = ["parent", "tv"];
-export const ledgerEntryTypeValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["LedgerEntry"]["type"]> = ["ALLOWANCE", "CHORE", "GAME", "BONUS", "PENALTY", "USAGE", "ADJUST"];
+export const claimRewardValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Claim"]["reward"]> = ["marbles", "character", "praise"];
+export const ledgerEntryTypeValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["LedgerEntry"]["type"]> = ["ALLOWANCE", "CHORE", "GAME", "BONUS", "PENALTY", "USAGE", "ADJUST", "HANDOFF"];
 export const ledgerEntryHandoffValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["LedgerEntry"]["handoff"]> = ["PENDING", "DONE", "SKIPPED"];
+export const characterVoiceValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoice"]> = ["Puck", "Zephyr", "Fenrir", "Leda", "Aoede", "Laomedeia", "Achird", "Sadachbia", "Autonoe", "Algenib", "Achernar", "Vindemiatrix"];
+export const characterMoodValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterMood"]> = ["happy", "silly", "brave", "sleepy", "proud", "curious", "calm"];
+export const characterVoiceStylePitchValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoiceStyle"]["pitch"]> = ["high", "medium", "low"];
+export const characterVoiceStylePaceValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoiceStyle"]["pace"]> = ["quick", "normal", "slow"];
+export const characterVoiceStyleEnergyValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoiceStyle"]["energy"]> = ["bouncy", "cheerful", "calm", "sleepy", "bold"];
+export const characterVoiceStyleTextureValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoiceStyle"]["texture"]> = ["squeaky", "clear", "soft", "breathy", "gravelly", "booming"];
+export const characterPartValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterPart"]> = ["body", "head", "eye-left", "eye-right", "mouth", "arm-left", "arm-right", "legs", "extra"];
+export const characterStatusValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Character"]["status"]> = ["drawing", "ready", "needs_help"];
+export const deviceStateCharactersStatusValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["DeviceState"]["characters"]["status"]> = ["drawing", "ready"];
 export type operations = Record<string, never>;

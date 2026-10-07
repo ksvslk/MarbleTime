@@ -130,3 +130,84 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Severity:** low.
 - **Workaround:** check the player state in `dumpsys`; verify by eye on the TV.
 - **Suggestion:** a developer option to include video layers in screen captures of non-DRM content.
+
+## 2026-10-05 · A new AWS account can't call any Bedrock model ("Error 002")
+
+- **Task:** generate children's quiz questions with Claude on Amazon Bedrock, from a hackathon project's new AWS account (us-east-1, signed in with `aws login`).
+- **Steps:** `bedrock list-foundation-models` and `list-inference-profiles` show the Claude models as ACTIVE → InvokeModel on `us.anthropic.claude-sonnet-5-5` through the official Anthropic Bedrock SDK.
+- **Expected:** the call works, or a clear "request access here" step.
+- **Actual:** `400 Error 002: Access to Bedrock models is not allowed for this account`, for every model, Amazon's own Nova Micro included. Adding a payment method didn't lift it. Nothing in the console says the account is restricted; per AWS re:Post it's an automatic limit on new accounts with little billing history, lifted only through a support case.
+- **Severity:** high for a time-boxed hackathon: the AI part of the project is blocked on a support ticket, and the error doesn't say what to do.
+- **Not IAM:** the deployed question writer, calling as its own Lambda IAM role (not root), gets the same `Error 002` on every call (Oct 7, 01:00 UTC nightly run), and so does a fresh test role with AWS's `AmazonBedrockFullAccess` policy (Nova Micro and Claude); a missing permission would be `AccessDeniedException … not authorized to perform bedrock:InvokeModel`.
+- **Workaround:** a free Support case (Account and billing) asking to enable Bedrock model access; meanwhile the app runs on its built-in question bank.
+- **Suggestion:** say in the error (and on the Bedrock console) that the account is restricted and link the request form; let hackathon participants skip the wait.
+
+## 2026-10-06 · No command-line screenshot of the Vega Virtual Device
+
+- **Task:** check a new TV screen on the Vega Virtual Device from a script, as we do on Fire OS with `adb exec-out screencap`.
+- **Steps:** looked for a screenshot command in `vega`, `vega virtual-device` and `vega device` (none); ran the on-device `screenshooter /tmp/x.png` through `vega exec vda shell`; fell back to capturing the VVD's macOS window.
+- **Expected:** one command that saves a PNG of the device screen.
+- **Actual:** `screenshooter` fails as the shell user (`creating a buffer file for 8294400 B failed: Permission denied`), and the window capture only works while the VVD window is on the current desktop (`could not create image from window` otherwise).
+- **Severity:** medium (every automated UI check on Vega needs the window on screen).
+- **Workaround:** keep the VVD window visible and capture it by window id (`scripts/vega.sh shot`).
+- **Suggestion:** `vega device screenshot -o file.png`, working for the virtual device and for devices in developer mode.
+
+
+## 2026-10-07 · Vega: react-native-svg needs a hand-made alias, and its npm tags are unclear
+
+- **Task:** draw kids' characters with react-native-svg in shared code that both the Fire OS and the Vega build bundle.
+- **Steps:** add `@amazon-devices/react-native-svg` to the Vega app; import `react-native-svg` in the shared package.
+- **Expected:** the Vega module resolver preset maps the community name to Amazon's port, as it does for some libraries.
+- **Actual:** it doesn't for SVG (nor for Lottie), so shared code only resolves with a `metro.config.js` alias per library. On npm, `latest` (3.0.9000000001) sits next to `rn83-alpha` (3.0.9000000000-rn-83) and `rn83-alpha-old`, with no note on which matches React Native 0.83.
+- **Severity:** low.
+- **Workaround:** a metro `extraNodeModules` alias (like the template's Lottie one) and `latest`, whose version string says `+15.11.1`.
+- **Suggestion:** list the community package names the preset maps, and a "which version for which RN" table in the Vega library docs.
+
+## 2026-10-07 · Amazon Transcribe streaming takes raw PCM, not WAV
+
+- **Task:** turn a kid's spoken idea (recorded on the parent's phone) into text with Transcribe streaming, en-US.
+- **Steps:** the contract said the browser sends a 16 kHz mono 16-bit WAV, "which Transcribe streaming takes as it is".
+- **Expected:** a WAV is fine, as it is for batch jobs.
+- **Actual:** the streaming docs say the PCM media encoding is "PCM signed 16-bit little-endian audio (note that this does not include WAV)"; the header has to be stripped. Easy to miss, because batch transcription accepts WAV files.
+- **Severity:** low (caught in review, before any code ran against AWS).
+- **Workaround:** the backend checks the WAV header and sends only the samples.
+- **Suggestion:** accept a WAV header in streaming, or flag the difference from batch more prominently.
+
+## 2026-10-07 · Polly CLI: a list option swallows the output file
+
+- **Task:** make test lines with viseme speech marks for the TV characters: `aws polly synthesize-speech ... --output-format json --speech-mark-types viseme marks.json`.
+- **Expected:** marks written to `marks.json`.
+- **Actual:** `the following arguments are required: outfile`: `--speech-mark-types` takes a list, so it also took `marks.json` as a second mark type.
+- **Severity:** low.
+- **Workaround:** put `--speech-mark-types viseme` before another option, with the output file last.
+- **Suggestion:** the CLI help example for speech marks could show this order.
+
+## 2026-10-07 · An S3 presigned URL can't outlive the Lambda credentials that signed it
+
+- **Task:** give the TV a link to a cached Polly MP3 that works for at least a day (our API contract), from the API Lambda.
+- **Steps:** `getSignedUrl(s3, new GetObjectCommand(…), {expiresIn: 2 * 86400})` with the Lambda's role credentials.
+- **Expected:** a link valid for 48 hours (the presigner accepts up to 7 days).
+- **Actual:** a presigned URL stops working when the session that signed it expires; a Lambda role's session lasts hours, so `expiresIn` beyond that is silently meaningless. The S3 user guide says so; the SDK presigner, where the expiry is set, accepts the value without a word.
+- **Severity:** medium (links break hours later, with nothing at signing time to say why).
+- **Workaround:** CloudFront signed URLs: the bucket stays private behind a distribution with origin access control; a custom resource makes the key pair once (private key in SSM Parameter Store, public key in a CloudFront key group).
+- **Suggestion:** have the presigner warn (or cap `expiresIn`) when the credentials expire before the URL would, and say so in its docs.
+
+## 2026-10-07 · Polly: no length for an MP3, and lip-sync marks need a second request
+
+- **Task:** a cartoon character says a short line on the TV with its mouth in sync: the MP3, its length and the viseme marks.
+- **Steps:** `SynthesizeSpeech` with `OutputFormat: mp3`, then the same text again with `OutputFormat: json`, `SpeechMarkTypes: ['viseme']`.
+- **Expected:** the audio's length with the audio, and a way to get audio and marks in one request.
+- **Actual:** audio and speech marks are separate requests (two round trips for each line), and the MP3 answer carries no duration, so we read it from the MP3's frame headers (Polly's neural MP3 is MPEG-2 layer III, 24 kHz, 48 kbit/s; our count matches ffprobe to the millisecond).
+- **Severity:** low.
+- **Workaround:** both requests in parallel, and a short MP3 frame-header parser.
+- **Suggestion:** return the duration (a response header would do) and let one request return the audio with its speech marks.
+
+## 2026-10-07 · CDK `NodejsFunction`: a native module for Lambda from a Mac, without Docker
+
+- **Task:** bundle `@napi-rs/canvas` (Skia, a prebuilt native binary) into an arm64 Lambda with `NodejsFunction`, synthesised on an Apple Silicon Mac without Docker.
+- **Steps:** `bundling.nodeModules: ['@napi-rs/canvas']`.
+- **Expected:** a documented way to install the binary for the function's platform (Linux arm64, glibc).
+- **Actual:** the local install brings the macOS binary, which Lambda can't load; the docs only point to Docker bundling. Setting `bundling.environment` to `npm_config_os=linux`, `npm_config_cpu=arm64`, `npm_config_libc=glibc` installs the right one, but npm still adds the musl build too (26 MB more in the bundle).
+- **Severity:** low (silent until the function runs).
+- **Workaround:** those `npm_config_*` settings, plus an `afterBundling` hook that deletes the musl package.
+- **Suggestion:** a target-platform option for `nodeModules` (from `architecture` and the runtime), or a documented recipe for prebuilt native modules.

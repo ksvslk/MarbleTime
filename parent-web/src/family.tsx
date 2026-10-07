@@ -9,6 +9,8 @@ export interface FamilyState {
   refresh: () => Promise<void>;
   /** Apply a change the API just confirmed, without waiting for a refresh. */
   update: (change: (bundle: FamilyBundle) => FamilyBundle) => void;
+  /** Who is signed in, as PATCH /me just returned it (the name kids see). */
+  setMe: (me: Me) => void;
 }
 
 export const FamilyContext = createContext<FamilyState | null>(null);

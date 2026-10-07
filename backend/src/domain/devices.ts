@@ -1,7 +1,9 @@
 /** TVs: pairing by QR code (docs/03 §4.3), device tokens, the state the TV polls, heartbeats. */
+import {deviceCharacters} from './characters';
 import {recentClaims} from './claims';
 import type {Deps} from './deps';
 import {ApiError, busy, conflict, notFound} from './errors';
+import {currentChildren} from './ledger';
 import {newDeviceToken, newId, newPairingCode, sha256Hex} from './secrets';
 import {localDay, MINUTE, WEEK} from './time';
 import type {Device, Family, Pairing} from './types';
@@ -53,7 +55,10 @@ export async function confirmPairing(deps: Deps, family: Family, code: string, i
     const device: Device = {
       id: newId(), familyId: family.id, name: input.name, platform: pairing.platform, mode: input.mode ?? 'amazon_kids', createdAt: now,
     };
-    if (await deps.repo.confirmPairing(code, device, now)) return {created: true, device: deviceView(device)};
+    if (await deps.repo.confirmPairing(code, device, now)) {
+      deps.changed(family.id);
+      return {created: true, device: deviceView(device)};
+    }
   }
   // Paired already (maybe a moment ago, by a second tap), or it just expired.
   const now = await deps.repo.getPairing(code);
@@ -70,12 +75,14 @@ export async function listDevices(deps: Deps, family: Family) {
 export async function patchDevice(deps: Deps, family: Family, deviceId: string, input: DevicePatch) {
   const device = await deps.repo.updateDevice(family.id, deviceId, input);
   if (!device) throw notFound('TV');
+  deps.changed(family.id);
   return deviceView(device);
 }
 
 /** Unpairs a TV: its token stops working. */
 export async function removeDevice(deps: Deps, family: Family, deviceId: string) {
   await deps.repo.deleteDevice(family.id, deviceId);
+  deps.changed(family.id);
 }
 
 /** `Authorization: Device <token>` → the TV and its family, or 401. Notes when the TV was last seen. */
@@ -103,8 +110,9 @@ export async function heartbeat(deps: Deps, family: Family, device: Device, appV
 export async function deviceState(deps: Deps, family: Family, device: Device) {
   const now = deps.now();
   const today = localDay(now, family.timezone);
-  const [children, chores, claims, adjustments] = await Promise.all([
-    deps.repo.listChildren(family.id), deps.repo.listChores(family.id), recentClaims(deps, family.id, now), deps.repo.adjustments(family.id, now - WEEK),
+  const [children, chores, claims, adjustments, characters] = await Promise.all([
+    currentChildren(deps, family), deps.repo.listChores(family.id), recentClaims(deps, family.id, now), deps.repo.adjustments(family.id, now - WEEK),
+    deviceCharacters(deps, family),
   ]);
   children.sort(byCreated);
   const state = {
@@ -118,8 +126,10 @@ export async function deviceState(deps: Deps, family: Family, device: Device) {
     // Bonuses and taken-away minutes of the last 7 days, so the TV can say why a jar changed.
     adjustments: adjustments.sort(newestFirst).map(adjustmentView),
     claims: claims.map(claimView),
-    gameMarblesToday: Object.fromEntries(children.map(c => [c.id, c.gameDay === today ? (c.gameMarbles ?? 0) : 0])),
+    // Drawing and ready characters; the TV fetches a ready one's layers once (GET /device/characters/{id}).
+    characters,
     today,
+    ...(deps.realtimeUrl !== undefined && {realtimeUrl: deps.realtimeUrl}),
   };
   return {etag: `"${sha256Hex(JSON.stringify(state)).slice(0, 32)}"`, body: {...state, serverTime: now}};
 }

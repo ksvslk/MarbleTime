@@ -1,4 +1,4 @@
-import {Key, Lang, Localized, t} from './i18n';
+import {Lang, Localized} from './i18n';
 import {colors} from './tokens';
 
 /** Kids, names and jobs are user content (parents type them), so ids are plain strings. */
@@ -65,8 +65,12 @@ export interface Kid {
   avatar: 'bear' | 'bunny';
   avatarBg: string;
   age: number;
-  /** TV time every day before anything is earned, so TV isn't only a prize (a parent setting). */
+  /** TV time every day before anything is earned: an allowance, so TV isn't only a prize (a parent setting). */
   dailyBaseMin: number;
+  /** The most TV a day, everything included: the jar's size (docs/08 §1: 60 under 7, 90 from 7 by default). */
+  dailyMaxMin: number;
+  /** New characters earned (jobs approved while the jar was full) and not yet made. */
+  characterTokens?: number;
 }
 
 /** A real-life job, written by a parent (any length, any language; screens must fit it). */
@@ -75,53 +79,25 @@ export interface Job {
   title: string | Localized;
   icon: JobIconName;
   color: string;
+  /** 10, 20 or 30: one to three marbles. */
   minutes: number;
   /** A one-off job: gone once approved (others come back the next day). */
   once?: boolean;
+  /** A job the kid already does regularly: praised, no marble (docs/08 §2.4). */
+  routine?: boolean;
 }
 
-export type Topic = 'numbers' | 'words' | 'puzzles';
-export type Shape = 'circle' | 'triangle' | 'square';
-
-/** A brain game: a topic the parent allowed; its questions come from AI (M4) or the built-in bank. */
-export interface Game {
-  id: string;
-  topic: Topic;
-  title: Key;
-  label: string;
-  color: string;
-  marbles: number;
-}
-
-export type Picture =
-  | {kind: 'count'; item: 'apple'; n: number}
-  | {kind: 'sequence'; shapes: Shape[]}
-  | {kind: 'sentence'; before: string; after: string};
-
-export type Choice = {kind: 'text'; text: string} | {kind: 'shape'; shape: Shape};
-
-/** One question in the fixed template (docs/03 §11). */
-export interface Question {
-  prompt: string;
-  say: string;
-  picture: Picture;
-  choices: Choice[];
-  answer: number;
-  praise: string;
-}
-
-/** The family: kids, their jobs and allowed games. Comes from the parent app (M2); a sample until then. */
+/** The family: kids and their jobs. Comes from the parent app; empty until a phone pairs the TV. */
 export interface Family {
   kids: Kid[];
   jobs: Record<KidId, Job[]>;
-  games: Record<KidId, Game[]>;
 }
 
 export const textOf = (value: string | Localized, lang: Lang) => (typeof value === 'string' ? value : value[lang]);
 
 const KIDS: Kid[] = [
-  {id: 'mia', name: 'Mia', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30},
-  {id: 'leo', name: 'Leo', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 30},
+  {id: 'mia', name: 'Mia', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30, dailyMaxMin: 60},
+  {id: 'leo', name: 'Leo', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 40, dailyMaxMin: 90},
 ];
 
 // Sample jobs. Real ones are written by parents in the parent app, in their own language.
@@ -134,171 +110,45 @@ const TABLE: Localized = {en: 'Set the table', et: 'Kata laud', de: 'Tisch decke
 const JOBS: Record<KidId, Job[]> = {
   mia: [
     {id: 'toys', title: TOYS, icon: 'toys', color: colors.peach, minutes: 10},
-    {id: 'cat', title: CAT, icon: 'cat', color: colors.mint, minutes: 10},
-    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 5},
+    {id: 'cat', title: CAT, icon: 'cat', color: colors.mint, minutes: 20},
+    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10, routine: true},
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
   leo: [
-    {id: 'table', title: TABLE, icon: 'table', color: colors.peach, minutes: 15},
-    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 5},
+    {id: 'table', title: TABLE, icon: 'table', color: colors.peach, minutes: 20},
+    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10, routine: true},
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
 };
 
-const GAMES: Record<KidId, Game[]> = {
-  mia: [
-    {id: 'numbers', topic: 'numbers', title: 'gameNumbers', label: '123', color: colors.sky, marbles: 2},
-    {id: 'puzzles', topic: 'puzzles', title: 'gamePuzzles', label: '', color: colors.peach, marbles: 2},
-  ],
-  leo: [
-    {id: 'words', topic: 'words', title: 'gameWords', label: 'Abc', color: colors.lilac, marbles: 2},
-    {id: 'numbers', topic: 'numbers', title: 'gameNumbers', label: '123', color: colors.sky, marbles: 2},
-  ],
-};
+/** A TV that isn't paired yet has no family at all (it shows the welcome screen). */
+export const EMPTY_FAMILY: Family = {kids: [], jobs: {}};
 
-export const SAMPLE_FAMILY: Family = {kids: KIDS, jobs: JOBS, games: GAMES};
+/** Test and demo material only: unit tests, the layout-check test links and the demo voice clips. A real TV never shows it. */
+export const SAMPLE_FAMILY: Family = {kids: KIDS, jobs: JOBS};
 
 /** Worst-case user content for layout checks (marbletime://open?stress=1): long names, long jobs, 3 kids, 4 languages. */
 export const STRESS_FAMILY: Family = {
   kids: [
-    {id: 'max', name: 'Maximilian-Alexander', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30},
-    {id: 'onnela', name: 'Õnnela-Mai Kristiina', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 30},
-    {id: 'jo', name: 'Jo', avatar: 'bear', avatarBg: colors.mint, age: 6, dailyBaseMin: 0},
+    {id: 'max', name: 'Maximilian-Alexander', avatar: 'bear', avatarBg: colors.gold, age: 5, dailyBaseMin: 30, dailyMaxMin: 60},
+    {id: 'onnela', name: 'Õnnela-Mai Kristiina', avatar: 'bunny', avatarBg: colors.sky, age: 8, dailyBaseMin: 60, dailyMaxMin: 120},
+    {id: 'jo', name: 'Jo', avatar: 'bear', avatarBg: colors.mint, age: 6, dailyBaseMin: 0, dailyMaxMin: 60},
   ],
   jobs: {
     max: [
-      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 15},
-      {id: 'lego', title: 'Put all the LEGO back in the big blue box under the bed', icon: 'toys', color: colors.mint, minutes: 10},
-      {id: 'et', title: 'Tühjenda nõudepesumasin ja pühi köögilaud puhtaks', icon: 'table', color: colors.sky, minutes: 10},
-      {id: 'es', title: 'Recoger los juguetes del salón antes de cenar', icon: 'toys', color: colors.lilac, minutes: 5},
-      {id: 'x', title: 'X', icon: 'star', color: colors.peach, minutes: 5},
+      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 30},
+      {id: 'lego', title: 'Put all the LEGO back in the big blue box under the bed', icon: 'toys', color: colors.mint, minutes: 20},
+      {id: 'et', title: 'Tühjenda nõudepesumasin ja pühi köögilaud puhtaks', icon: 'table', color: colors.sky, minutes: 20},
+      {id: 'es', title: 'Recoger los juguetes del salón antes de cenar', icon: 'toys', color: colors.lilac, minutes: 10},
+      {id: 'x', title: 'X', icon: 'star', color: colors.peach, minutes: 10, routine: true},
     ],
     onnela: [
-      {id: 'long', title: 'Supercalifragilisticexpialidocious', icon: 'star', color: colors.lilac, minutes: 20},
-      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 15},
+      {id: 'long', title: 'Supercalifragilisticexpialidocious', icon: 'star', color: colors.lilac, minutes: 30},
+      {id: 'dish', title: 'Geschirrspülmaschine ausräumen und Küche wischen', icon: 'table', color: colors.peach, minutes: 20},
     ],
-    jo: [{id: 'bed', title: 'Bed', icon: 'bed', color: colors.sky, minutes: 5}],
+    jo: [{id: 'bed', title: 'Bed', icon: 'bed', color: colors.sky, minutes: 10}],
   },
-  games: {max: GAMES.mia, onnela: GAMES.leo, jo: GAMES.mia},
 };
 
-/** Most marbles a kid can earn from games per day, so real-life jobs stay the main way to earn. */
-export const DAILY_GAME_MARBLES = 4;
-
+/** The grown-ups PIN while a test link's sample family is loaded (a real TV uses the family's own PIN). */
 export const DEMO_PIN = '1234';
-
-const text = (word: string): Choice => ({kind: 'text', text: word});
-const shape = (sh: Shape): Choice => ({kind: 'shape', shape: sh});
-
-const apples = (lang: Lang, n: number, choices: number[]): Question => ({
-  prompt: t(lang, 'howManyApples'),
-  say: t(lang, 'howManyApplesSay'),
-  picture: {kind: 'count', item: 'apple', n},
-  choices: choices.map(c => text(String(c))),
-  answer: choices.indexOf(n),
-  praise: t(lang, 'applesPraise', {n}),
-});
-
-const next = (lang: Lang, shapes: Shape[], answer: Shape, choices: Shape[]): Question => ({
-  prompt: t(lang, 'whatNext'),
-  say: t(lang, 'whatNext'),
-  picture: {kind: 'sequence', shapes},
-  choices: choices.map(shape),
-  answer: choices.indexOf(answer),
-  praise: t(lang, 'foundIt'),
-});
-
-const fill = (lang: Lang, before: string, after: string, choices: string[], answer: string): Question => ({
-  prompt: t(lang, 'whichWord'),
-  say: `${t(lang, 'whichWord')} ${before} … ${after}`,
-  picture: {kind: 'sentence', before, after},
-  choices: choices.map(text),
-  answer: choices.indexOf(answer),
-  praise: `${before} ${answer} ${after}`.trim(),
-});
-
-const sum = (lang: Lang, a: number, b: number, choices: number[]): Question => ({
-  prompt: t(lang, 'howMuch'),
-  say: t(lang, 'sumSay', {a, b}),
-  picture: {kind: 'sentence', before: `${a} + ${b} =`, after: ''},
-  choices: choices.map(c => text(String(c))),
-  answer: choices.indexOf(a + b),
-  praise: `${a} + ${b} = ${a + b}`,
-});
-
-/** Grammar is different in every language, so the word puzzles are written per language (AI makes more in M4). */
-const GRAMMAR: Record<Lang, [string, string, string[], string][]> = {
-  en: [
-    ['Every day, the dog', 'to the park.', ['run', 'runs', 'running'], 'runs'],
-    ['Yesterday we', 'a big cake.', ['bake', 'baked', 'baking'], 'baked'],
-    ['The birds are', 'in the tree.', ['sing', 'sings', 'singing'], 'singing'],
-  ],
-  et: [
-    ['Koer', 'iga päev parki.', ['jooksma', 'jookseb', 'jooksis'], 'jookseb'],
-    ['Eile me', 'suure koogi.', ['küpsetame', 'küpsetasime', 'küpsetama'], 'küpsetasime'],
-    ['Linnud', 'puu otsas.', ['laulab', 'laulma', 'laulavad'], 'laulavad'],
-  ],
-  de: [
-    ['Jeden Tag', 'der Hund in den Park.', ['laufen', 'läuft', 'laufend'], 'läuft'],
-    ['Gestern', 'wir einen großen Kuchen.', ['backen', 'backten', 'gebacken'], 'backten'],
-    ['Die Vögel', 'im Baum.', ['singt', 'singen', 'gesungen'], 'singen'],
-  ],
-  es: [
-    ['Todos los días, el perro', 'al parque.', ['correr', 'corre', 'corriendo'], 'corre'],
-    ['Ayer', 'un pastel grande.', ['hacemos', 'hicimos', 'hacer'], 'hicimos'],
-    ['Los pájaros', 'en el árbol.', ['canta', 'cantan', 'cantar'], 'cantan'],
-  ],
-};
-
-/** Built-in question bank: works offline and before the AI generator exists (M4). */
-export function bank(lang: Lang): Record<Topic, Record<'young' | 'old', Question[]>> {
-  return {
-    numbers: {
-      young: [apples(lang, 4, [3, 4, 5]), apples(lang, 3, [2, 3, 4]), apples(lang, 5, [5, 6, 4]), apples(lang, 2, [1, 3, 2])],
-      old: [sum(lang, 7, 5, [11, 12, 13]), sum(lang, 9, 6, [15, 14, 16]), sum(lang, 8, 8, [18, 16, 17])],
-    },
-    puzzles: {
-      young: [
-        next(lang, ['circle', 'triangle', 'circle', 'triangle', 'circle'], 'triangle', ['square', 'triangle', 'circle']),
-        next(lang, ['square', 'square', 'circle', 'square', 'square'], 'circle', ['circle', 'triangle', 'square']),
-        next(lang, ['triangle', 'circle', 'square', 'triangle', 'circle'], 'square', ['triangle', 'square', 'circle']),
-      ],
-      old: [next(lang, ['circle', 'circle', 'triangle', 'circle', 'circle'], 'triangle', ['circle', 'square', 'triangle'])],
-    },
-    words: {
-      young: [],
-      old: GRAMMAR[lang].map(([before, after, choices, answer]) => fill(lang, before, after, choices, answer)),
-    },
-  };
-}
-
-/** The app checks every question itself (docs/03 §11); AI-made sets go through the same check in M4. */
-export function isQuestionValid(q: Question): boolean {
-  if (q.choices.length !== 3 || q.answer < 0 || q.answer > 2) return false;
-  const keys = q.choices.map(c => (c.kind === 'text' ? c.text : c.shape));
-  if (new Set(keys).size !== 3) return false;
-  const right = q.choices[q.answer];
-  if (q.picture.kind === 'count') return right.kind === 'text' && Number(right.text) === q.picture.n;
-  if (q.picture.kind === 'sequence') {
-    const seq = q.picture.shapes;
-    // Repeating pattern: find the shortest period that explains the sequence, then predict the next shape.
-    for (let period = 1; period < seq.length; period++) {
-      if (seq.every((sh, i) => sh === seq[i % period])) {
-        return right.kind === 'shape' && right.shape === seq[seq.length % period];
-      }
-    }
-    return false;
-  }
-  if (q.picture.kind === 'sentence' && /^\d+ \+ \d+ =$/.test(q.picture.before)) {
-    const [a, b] = q.picture.before.match(/\d+/g)!.map(Number);
-    return right.kind === 'text' && Number(right.text) === a + b;
-  }
-  return true; // grammar: checked against the word list in M4
-}
-
-export function questionsFor(topic: Topic, age: number, lang: Lang = 'en', count = 3): Question[] {
-  const band = age <= 6 ? 'young' : 'old';
-  const all = bank(lang)[topic];
-  const pool = all[band].length ? all[band] : all[band === 'young' ? 'old' : 'young'];
-  return pool.filter(isQuestionValid).slice(0, count);
-}

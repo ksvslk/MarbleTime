@@ -31,6 +31,7 @@ body {
 h1,
 h2,
 h3,
+h4,
 p {
   margin: 0;
 }
@@ -463,6 +464,10 @@ input::placeholder {
   align-items: center;
   gap: 12px;
 }
+.switch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
 .swatches {
   display: flex;
@@ -782,6 +787,325 @@ input::placeholder {
   color: var(--grey-ink);
 }
 
+/* ---------- Notifications ---------- */
+
+.notify-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.notify-card .setting-row {
+  flex: 1;
+  min-width: 0;
+}
+.notify-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--tile-off);
+}
+
+/* ---------- The daily budget (the jar) ---------- */
+
+/* The budget inside a form (onboarding, the kid form): a section of its own under a thin line. */
+.sub-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--tile-off);
+}
+.stepper-minutes {
+  font-size: 24px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.jar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* A place for every marble the day can hold: the free ones are in (gold = time), the ones jobs add are empty. */
+.jar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: var(--tile-off);
+}
+.jar-slot {
+  width: 20px;
+  height: 20px;
+  border: 2px dashed var(--grey-ink);
+  border-radius: 50%;
+  opacity: 0.45;
+}
+.jar-slot-small {
+  width: 12px;
+  height: 12px;
+  border-width: 1.5px;
+}
+/* base + earnable = ceiling, each number over its caption. */
+.jar-sum {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: start;
+  gap: 6px;
+  text-align: center;
+}
+.jar-part {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.jar-part strong {
+  font-size: 18px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.jar-part span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey-ink);
+}
+.jar-part .marble,
+.jar-slot-small {
+  display: inline-block;
+  vertical-align: -1px;
+}
+.jar-op {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--grey-ink);
+}
+.jar-rule {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.jar-rule .icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ---------- Characters ---------- */
+
+.character-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.prompt-art {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+}
+.prompt-spark {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--lilac);
+  color: var(--ink);
+  box-shadow: 0 0 0 3px var(--white);
+}
+.prompt-title {
+  font-size: 20px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+/* The art sits on the kid's colour, as their animal does. */
+.character-art {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 28%;
+  color: var(--ink);
+}
+.character-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.character-drawing {
+  display: flex;
+  animation: drawing 1.4s ease-in-out infinite;
+}
+@keyframes drawing {
+  50% {
+    opacity: 0.55;
+    transform: scale(1.15) rotate(18deg);
+  }
+}
+.character-missing {
+  display: flex;
+  opacity: 0.35;
+}
+
+.character-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: 16px 12px;
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.character-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.character-name {
+  display: -webkit-box;
+  overflow: hidden;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.character-remove {
+  position: absolute;
+  top: -6px;
+  right: 0;
+  width: 40px;
+  height: 40px;
+  box-shadow: 0 0 0 3px var(--white);
+}
+
+/* Drawing, ready or needs help: the character large, with what's happening under it. */
+.character-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+.character-title {
+  font-size: 24px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+.stage-status {
+  font-size: 18px;
+  font-weight: 650;
+}
+
+/* The art director's kind sentence after 422, for the grown-up to read to the kid. */
+.callout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-left: 6px solid var(--lilac);
+  border-radius: 18px;
+  background: var(--tile-off);
+}
+.callout-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--grey-ink);
+}
+.callout-text {
+  font-size: 20px;
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+/* The big mic button: ink when ready, coral while it records. */
+.mic-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.mic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 96px;
+  height: 96px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.mic:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.mic:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.mic-on {
+  background: var(--coral);
+  color: var(--ink);
+  animation: recording 1.2s ease-in-out infinite;
+}
+@keyframes recording {
+  50% {
+    transform: scale(1.06);
+  }
+}
+.mic-note {
+  min-height: 1.35em;
+  font-weight: 600;
+  text-align: center;
+}
+
+textarea {
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  border: 2px solid var(--soft);
+  border-radius: 16px;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 18px; /* 16px or more, so iOS doesn't zoom in */
+  resize: vertical;
+}
+textarea::placeholder {
+  color: var(--placeholder);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--tile-off);
+  color: var(--grey-ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.badge-new {
+  align-self: flex-start;
+  background: var(--lilac);
+  color: var(--ink);
+}
+
 /* ---------- Jobs and TVs ---------- */
 
 .job-meta {
@@ -789,6 +1113,31 @@ input::placeholder {
   flex-wrap: wrap;
   align-items: center;
   gap: 4px 12px;
+}
+/* A routine job: praised, no marble. */
+.routine-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--grey-ink);
+}
+/* 1, 2 or 3 marbles: three equal choices in one row, marbles first and the minutes small (docs/03 §12). */
+.marble-chips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+.marble-chips .chip {
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  min-height: 72px;
+  padding: 10px 6px;
+  border-radius: 22px;
+}
+.chip-minutes {
+  font-size: 14px;
 }
 
 .device-head {

@@ -8,15 +8,15 @@ import {Field, Group} from '../ui/controls';
 import {Art} from '../ui/Icon';
 import {useShowError} from '../ui/Toast';
 import {browserTimeZone, LangChips, PinFields, TimeZoneSelect} from './FamilyFields';
-import {DEFAULT_GAMES, KidFields, newKidDraft, type KidDraft} from './KidFields';
+import {KidFields, newKidDraft, type KidDraft} from './KidFields';
 
-/** First visit (GET /me says family: null): the family, then the first kid. */
+/** First visit (GET /me says family: null): the family (and, if they like, the grown-up's name for the kids), then the first kid. */
 export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
   const api = useApi();
   const {t, lang, setLang} = useI18n();
   const showError = useShowError();
   const [step, setStep] = useState<'family' | 'kid'>('family');
-  const [family, setFamily] = useState({name: '', timezone: browserTimeZone(), pin: '', pinAgain: ''});
+  const [family, setFamily] = useState({name: '', parentName: '', timezone: browserTimeZone(), pin: '', pinAgain: ''});
   const [kid, setKid] = useState<KidDraft>(() => newKidDraft([]));
   const [tried, setTried] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -30,14 +30,19 @@ export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
     setBusy(true);
     try {
       await api.createFamily({name: family.name.trim(), lang, timezone: family.timezone, pin: family.pin});
-      setStep('kid');
     } catch (error) {
       // 409: this grown-up already has a family (a double tap, or a second try): carry on with the kid.
-      if (error instanceof ApiError && error.status === 409) setStep('kid');
-      else showError(error);
-    } finally {
-      setBusy(false);
+      if (!(error instanceof ApiError && error.status === 409)) {
+        showError(error);
+        setBusy(false);
+        return;
+      }
     }
+    // The name is optional, so a failure here doesn't stop anyone: it can be set in Settings later.
+    const parentName = family.parentName.trim();
+    if (parentName) await api.patchMe({name: parentName}).catch(showError);
+    setStep('kid');
+    setBusy(false);
   };
 
   const saveKid = async (event: FormEvent) => {
@@ -46,7 +51,7 @@ export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
     setBusy(true);
     try {
       if (!kidSaved) {
-        await api.addChild({...kid, name: kid.name.trim(), games: DEFAULT_GAMES});
+        await api.addChild({...kid, name: kid.name.trim()});
         setKidSaved(true);
       }
       await onDone();
@@ -84,6 +89,18 @@ export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
               autoComplete="family-name"
             />
           </Field>
+          <Field label={t('parentNameOptional')} hint={t('parentNameHint')} counter={`${family.parentName.length}/24`}>
+            <input
+              value={family.parentName}
+              onChange={e => {
+                const parentName = e.target.value;
+                setFamily(current => ({...current, parentName}));
+              }}
+              placeholder={t('parentNamePlaceholder')}
+              maxLength={24}
+              autoComplete="nickname"
+            />
+          </Field>
           <Group label={t('language')}>
             <LangChips value={lang} onChange={setLang} />
           </Group>
@@ -106,7 +123,7 @@ export function Onboarding({onDone}: {onDone: () => Promise<void>}) {
           <h1>{t('firstKid')}</h1>
           <p className="hint">{t('firstKidHint')}</p>
           {/* No TV is paired yet, so Amazon Kids, the default mode, applies. */}
-          <KidFields value={kid} amazonKids={usesAmazonKids([])} onChange={setKid} />
+          <KidFields value={kid} amazonKids={usesAmazonKids([])} isNew onChange={setKid} />
           <button className="btn btn-gold btn-block" disabled={busy || !kid.name.trim()}>
             {t('start')}
           </button>

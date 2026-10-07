@@ -2,6 +2,8 @@ import type {
   AdjustInput,
   ApiErrorBody,
   Balance,
+  Character,
+  CharacterInput,
   Child,
   ChildInput,
   ChildPatch,
@@ -20,7 +22,10 @@ import type {
   HandoffMark,
   LedgerEntry,
   Me,
+  MePatch,
   PairingConfirm,
+  PushSubscriptionInput,
+  PushUnsubscribe,
 } from './types';
 
 /** A failed call: the contract's `{"error": {code, message}}`, or a stand-in when there was no such body. */
@@ -50,6 +55,16 @@ export interface ApiOptions {
 
 type Method = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
+/** A request body sent as it is (audio), not as JSON. */
+class RawBody {
+  readonly data: Blob;
+  readonly type: string;
+  constructor(data: Blob, type: string) {
+    this.data = data;
+    this.type = type;
+  }
+}
+
 async function errorFrom(res: Response): Promise<ApiError> {
   try {
     const body = (await res.json()) as Partial<ApiErrorBody>;
@@ -71,11 +86,18 @@ export function createApi(options: ApiOptions) {
     const token = await options.getToken();
     const headers: Record<string, string> = {Accept: 'application/json'};
     if (token) headers.Authorization = `Bearer ${token}`;
-    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    let payload: BodyInit | undefined;
+    if (body instanceof RawBody) {
+      headers['Content-Type'] = body.type;
+      payload = body.data;
+    } else if (body !== undefined) {
+      headers['Content-Type'] = 'application/json';
+      payload = JSON.stringify(body);
+    }
 
     let res: Response;
     try {
-      res = await send(base + path, {method, headers, body: body === undefined ? undefined : JSON.stringify(body)});
+      res = await send(base + path, {method, headers, body: payload});
     } catch (e) {
       throw new ApiError(0, 'network', e instanceof Error ? e.message : String(e));
     }
@@ -96,6 +118,8 @@ export function createApi(options: ApiOptions) {
   const id = encodeURIComponent;
   return {
     me: () => call<Me>('GET', '/me'),
+    /** The grown-up's name as kids see it on the TV ("– Dad"). */
+    patchMe: (body: MePatch) => call<Me>('PATCH', '/me', body),
     createFamily: (body: FamilyCreate) => call<Family>('POST', '/family', body),
     family: () => call<FamilyBundle>('GET', '/family'),
     patchFamily: (body: FamilyPatch) => call<Family>('PATCH', '/family', body),
@@ -106,6 +130,13 @@ export function createApi(options: ApiOptions) {
     adjust: (childId: string, body: AdjustInput) => call<Balance>('POST', `/children/${id(childId)}/adjust`, body),
     ledger: async (childId: string, limit = 50) =>
       (await call<{entries: LedgerEntry[]}>('GET', `/children/${id(childId)}/ledger?limit=${limit}`)).entries,
+    /** The kid's characters, newest first (drawing, ready or needs_help). */
+    characters: async (childId: string) => (await call<{characters: Character[]}>('GET', `/children/${id(childId)}/characters`)).characters,
+    /** 202 with the character drawing; 422 `idea_not_ok` (a kind sentence to read to the kid), 409 `no_tokens`. */
+    addCharacter: (childId: string, body: CharacterInput) => call<Character>('POST', `/children/${id(childId)}/characters`, body),
+    removeCharacter: (childId: string, characterId: string) => call<void>('DELETE', `/children/${id(childId)}/characters/${id(characterId)}`),
+    /** The kid's words from a recording: 16 kHz mono 16-bit PCM WAV, at most 15 s (lib/wav.ts). "" when nothing was heard. */
+    speechToText: async (wav: Blob) => (await call<{text: string}>('POST', '/speech-to-text', new RawBody(wav, 'audio/wav'))).text,
     handoff: (childId: string) => call<Handoff>('GET', `/children/${id(childId)}/handoff`),
     markHandoff: (childId: string, body: HandoffMark) => call<Handoff>('POST', `/children/${id(childId)}/handoff`, body),
 
@@ -122,6 +153,11 @@ export function createApi(options: ApiOptions) {
     devices: async () => (await call<{devices: Device[]}>('GET', '/devices')).devices,
     patchDevice: (deviceId: string, body: DevicePatch) => call<Device>('PATCH', `/devices/${id(deviceId)}`, body),
     removeDevice: (deviceId: string) => call<void>('DELETE', `/devices/${id(deviceId)}`),
+
+    /** Web Push: the server's public (VAPID) key, and this browser's subscription in or out. */
+    pushKey: async () => (await call<{publicKey: string}>('GET', '/push/key')).publicKey,
+    addPushSubscription: (body: PushSubscriptionInput) => call<void>('POST', '/push/subscriptions', body),
+    removePushSubscription: (body: PushUnsubscribe) => call<void>('DELETE', '/push/subscriptions', body),
   };
 }
 

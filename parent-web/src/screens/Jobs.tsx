@@ -4,11 +4,11 @@ import {useI18n} from '../i18n/I18n';
 import {repeatSummary} from '../lib/format';
 import {Avatar} from '../ui/Avatar';
 import {Icon} from '../ui/Icon';
-import {JobTile} from '../ui/JobTile';
+import {JobTile, RoutineLabel} from '../ui/JobTile';
 import {TimeLabel} from '../ui/Marbles';
 import {Empty, Page} from '../ui/Page';
 
-/** Every job, with its marbles, how often it repeats and whose it is. */
+/** Every job, with its marbles (or "Routine"), how often it repeats and whose it is. */
 export function Jobs() {
   const {bundle} = useFamily();
   const {t, lang} = useI18n();
@@ -38,7 +38,7 @@ export function Jobs() {
                 <span className="grow">
                   <span className="row-title">{chore.title}</span>
                   <span className="job-meta">
-                    <TimeLabel minutes={chore.minutes} max={6} />
+                    {chore.routine ? <RoutineLabel label={t('routine')} /> : <TimeLabel minutes={chore.minutes} max={6} />}
                     <span className="meta">{repeatSummary(lang, chore.repeat)}</span>
                   </span>
                 </span>

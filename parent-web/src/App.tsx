@@ -6,9 +6,12 @@ import type {FamilyBundle, Me} from './api/types';
 import {AuthProvider, useAuth} from './auth/AuthContext';
 import {CALLBACK_PATH} from './auth/auth';
 import type {ConfigResult} from './config';
-import {FamilyContext, type FamilyState} from './family';
+import {FamilyContext, useFamily, type FamilyState} from './family';
 import {FamilyLang, useI18n} from './i18n/I18n';
+import {LiveProvider, useOnChanged} from './live/LiveContext';
+import {PushProvider} from './push/PushContext';
 import {Approvals} from './screens/Approvals';
+import {CharacterNew} from './screens/CharacterNew';
 import {JobEdit} from './screens/JobEdit';
 import {Jobs} from './screens/Jobs';
 import {KidDetail} from './screens/KidDetail';
@@ -36,7 +39,7 @@ export function App({config}: {config: ConfigResult}) {
         <BrowserRouter>
           <Routes>
             <Route path={CALLBACK_PATH} element={<AuthCallback />} />
-            <Route path="*" element={<SignedInGate />} />
+            <Route path="*" element={<SignedInGate realtimeUrl={config.config.realtimeUrl} />} />
           </Routes>
         </BrowserRouter>
       </ApiProvider>
@@ -44,15 +47,15 @@ export function App({config}: {config: ConfigResult}) {
   );
 }
 
-function SignedInGate() {
+function SignedInGate({realtimeUrl}: {realtimeUrl?: string}) {
   const {status} = useAuth();
   if (status === 'loading') return <Splash />;
   if (status === 'signedOut') return <SignIn />;
-  return <FamilyGate />;
+  return <FamilyGate realtimeUrl={realtimeUrl} />;
 }
 
-/** Loads GET /me, then GET /family; no family yet means onboarding. */
-function FamilyGate() {
+/** Loads GET /me, then GET /family; no family yet means onboarding. Then live updates and notifications start. */
+function FamilyGate({realtimeUrl}: {realtimeUrl?: string}) {
   const api = useApi();
   const {setLang} = useI18n();
   const [data, setData] = useState<{me: Me; bundle: FamilyBundle | null} | null>(null);
@@ -77,10 +80,11 @@ function FamilyGate() {
     (change: (bundle: FamilyBundle) => FamilyBundle) => setData(current => (current?.bundle ? {...current, bundle: change(current.bundle)} : current)),
     [],
   );
+  const setMe = useCallback((me: Me) => setData(current => (current ? {...current, me} : current)), []);
   const refresh = useCallback(() => load().catch(() => undefined), [load]);
   const family = useMemo<FamilyState | null>(
-    () => (data?.bundle ? {me: data.me, bundle: data.bundle, refresh, update} : null),
-    [data, refresh, update],
+    () => (data?.bundle ? {me: data.me, bundle: data.bundle, refresh, update, setMe} : null),
+    [data, refresh, update, setMe],
   );
 
   if (!data) return error ? <LoadFailed error={error} onRetry={() => void loadOrShow()} /> : <Splash />;
@@ -88,7 +92,11 @@ function FamilyGate() {
   return (
     <FamilyContext.Provider value={family}>
       <FamilyLang lang={family.bundle.family.lang}>
-        <Screens />
+        <LiveProvider url={realtimeUrl}>
+          <PushProvider>
+            <Screens />
+          </PushProvider>
+        </LiveProvider>
       </FamilyLang>
     </FamilyContext.Provider>
   );
@@ -96,6 +104,9 @@ function FamilyGate() {
 
 function Screens() {
   const pairing = useMatch('/pair/:code');
+  const {refresh} = useFamily();
+  // Kids, jobs, TVs and settings all come from the family data: fetch it again whenever something changed.
+  useOnChanged(() => void refresh());
   return (
     <div className={pairing ? 'app' : 'app app-with-tabs'}>
       <Routes>
@@ -104,6 +115,7 @@ function Screens() {
         <Route path="kids/new" element={<KidEdit />} />
         <Route path="kids/:id" element={<KidDetail />} />
         <Route path="kids/:id/edit" element={<KidEdit />} />
+        <Route path="kids/:id/character" element={<CharacterNew />} />
         <Route path="jobs" element={<Jobs />} />
         <Route path="jobs/new" element={<JobEdit />} />
         <Route path="jobs/:id" element={<JobEdit />} />

@@ -1,18 +1,20 @@
-/** Claims: a kid's "I did it!" on the TV, and a grown-up's yes or not yet (docs/03 §4.1). */
+/** Claims: a kid's "I did it!" on the TV, and a grown-up's yes or not yet (docs/03 §4.1; rewards: budget.ts). */
+import {jobMinutes, rewardFor} from './budget';
 import type {Deps} from './deps';
-import {ApiError, busy, conflict, notFound} from './errors';
+import {busy, conflict, notFound} from './errors';
 import {bumped, withoutChild} from './family';
+import {currentChild} from './ledger';
+import {pushNewClaim} from './push';
 import type {Decision} from './repo';
-import {newId, pinMatches} from './secrets';
-import {isoWeekday, localDay, MINUTE, WEEK} from './time';
+import {checkTvPin} from './pin';
+import {newId} from './secrets';
+import {isoWeekday, localDay, WEEK} from './time';
 import type {Claim, ClaimStatus, Device, Family, LedgerEntry} from './types';
 import type {ClaimInput, DecideInput} from './validate';
 import {claimView, newestFirst} from './views';
 
 /** GET /claims shows every waiting claim and at most this many decided ones, the latest first. */
 const HISTORY = 200;
-/** Wrong grown-ups PINs allowed per TV per minute; the next try gets 429. */
-const PIN_TRIES = 5;
 
 export type Who = {by: 'parent'; sub: string} | {by: 'tv'; deviceId: string};
 const createdBy = (who: Who) => (who.by === 'parent' ? `parent:${who.sub}` : `tv:${who.deviceId}`);
@@ -39,11 +41,13 @@ export async function claimChore(deps: Deps, family: Family, input: ClaimInput) 
     throw conflict('not_today', "This job isn't on today");
   }
   const claim: Claim = {
-    id: input.id, childId: child.id, choreId: chore.id, choreTitle: chore.title, minutes: chore.minutes,
+    id: input.id, childId: child.id, choreId: chore.id, choreTitle: chore.title, minutes: jobMinutes(chore.minutes), routine: chore.routine ?? false,
     status: 'waiting', createdAt, slot: chore.repeat.kind === 'once' ? 'once' : day,
   };
   switch (await deps.repo.createClaim(family.id, claim)) {
     case 'created':
+      deps.changed(family.id);
+      await pushNewClaim(deps, family, claim, child.name);
       return {created: true, claim: claimView(claim)};
     case 'exists': {
       const again = await deps.repo.getClaim(family.id, claim.id);
@@ -61,7 +65,10 @@ export async function takeBack(deps: Deps, family: Family, claimId: string): Pro
     const claim = await deps.repo.getClaim(family.id, claimId);
     if (!claim) return;
     if (claim.status !== 'waiting') throw conflict('already_decided', `A grown-up already decided (${claim.status})`);
-    if (await deps.repo.deleteClaim(family.id, claim)) return;
+    if (await deps.repo.deleteClaim(family.id, claim)) {
+      deps.changed(family.id);
+      return;
+    }
   }
   throw busy();
 }
@@ -79,40 +86,48 @@ export async function decide(deps: Deps, family: Family, claimId: string, yes: b
     if (claim.status !== 'waiting') throw conflict('already_decided', `This claim was already ${claim.status}`);
     const now = deps.now();
     const decided: Claim = {...claim, status, decidedAt: now, decidedBy: who.by};
-    const decision: Decision = yes ? await approval(deps, family.id, decided, who, now) : {claim: decided, releaseSlot: true};
-    if ((await deps.repo.decideClaim(family.id, decision)) === 'ok') return claimView(decided);
-    // Someone decided it, or changed the one-off job, at the same moment: look again.
+    const decision: Decision = yes ? await approval(deps, family, decided, who, now) : {claim: decided, releaseSlot: true};
+    if ((await deps.repo.decideClaim(family.id, decision)) === 'ok') {
+      deps.changed(family.id);
+      return claimView(decision.claim);
+    }
+    // Someone decided it, changed the one-off job or the kid's jar at the same moment: look again.
   }
   throw busy();
 }
 
-/** The claimed minutes go to the kid, waiting for the Amazon Kids hand-off. A one-off job is then done for this kid. */
-async function approval(deps: Deps, familyId: string, claim: Claim, who: Who, now: number): Promise<Decision> {
-  const entry: LedgerEntry = {
-    id: newId(), childId: claim.childId, deltaSec: claim.minutes * 60, type: 'CHORE', reason: claim.choreTitle,
+/**
+ * What a yes gives (budget.ts rewardFor, the same rule on the phone and on the TV): marbles into the jar while it has
+ * room (waiting for the Amazon Kids hand-off), a character token once it's full, praise for a routine job. A parent
+ * who set a name signs it ("– Dad"). A one-off job is then done for this kid.
+ */
+async function approval(deps: Deps, family: Family, claim: Claim, who: Who, now: number): Promise<Decision> {
+  const familyId = family.id;
+  // The jar as of now: yesterday's hand-off has left it.
+  const [child, chore, approverName] = await Promise.all([
+    currentChild(deps, family, claim.childId, true),
+    deps.repo.getChore(familyId, claim.choreId),
+    who.by === 'parent' ? deps.repo.getParentName(who.sub) : undefined,
+  ]);
+  if (!child) throw notFound('child');
+  // Claims from before routine jobs existed follow the job as it is now.
+  const {reward, minutesCredited} = rewardFor(child, {minutes: claim.minutes, routine: claim.routine ?? chore?.routine ?? false});
+  const approved: Claim = {...claim, reward, minutesCredited, ...(approverName !== undefined && {approverName})};
+  const entry: LedgerEntry | undefined = reward === 'marbles' ? {
+    id: newId(), childId: claim.childId, deltaSec: minutesCredited * 60, type: 'CHORE', reason: claim.choreTitle,
     refId: claim.id, createdBy: createdBy(who), createdAt: now, handoff: 'PENDING',
-  };
-  const chore = await deps.repo.getChore(familyId, claim.choreId);
-  if (chore?.repeat.kind !== 'once' || !chore.childIds.includes(claim.childId)) return {claim, releaseSlot: false, entry};
+  } : undefined;
+  const credit = {...(entry && {entry}), ...(reward === 'character' && {token: true}), balanceSec: child.balanceSec};
+  if (chore?.repeat.kind !== 'once' || !chore.childIds.includes(claim.childId)) return {claim: approved, releaseSlot: false, ...credit};
   // "Gone once approved": the kid comes off the job, and with nobody left the job goes. The slot is freed,
   // so a parent who puts the kid back on the job makes it doable again.
   const after = withoutChild(chore, claim.childId);
-  return {claim, releaseSlot: true, entry, chore: {before: chore, after: after && {...after, updatedAt: bumped(deps, chore)}}};
+  return {claim: approved, releaseSlot: true, ...credit, chore: {before: chore, after: after && {...after, updatedAt: bumped(deps, chore)}}};
 }
 
-/** A grown-up decides on the TV with the family PIN. More than 5 wrong PINs a minute on one TV → 429. */
+/** A grown-up decides on the TV with the family PIN (pin.ts: more than 5 wrong PINs a minute on one TV → 429). */
 export async function decideOnTv(deps: Deps, family: Family, device: Device, claimId: string, input: DecideInput) {
-  const now = deps.now();
-  const fails = (device.pinFails ?? []).filter(time => now - time < MINUTE);
-  if (fails.length >= PIN_TRIES) {
-    const wait = Math.ceil((fails[0] + MINUTE - now) / 1000);
-    throw new ApiError(429, 'too_many_tries', 'Too many wrong PINs on this TV; wait a minute', {'retry-after': String(wait)});
-  }
-  if (!family.pin) throw new ApiError(403, 'no_pin', 'Set a grown-ups PIN in the parent app first');
-  if (!pinMatches(input.pin, family.pin)) {
-    await deps.repo.updateDevice(family.id, device.id, {pinFails: [...fails, now]});
-    throw new ApiError(403, 'wrong_pin', 'Wrong PIN');
-  }
+  await checkTvPin(deps, family, device, input.pin);
   return decide(deps, family, claimId, input.yes, {by: 'tv', deviceId: device.id});
 }
 

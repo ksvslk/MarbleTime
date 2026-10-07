@@ -18,7 +18,17 @@
         }
       ],
       "expo-router",
-      "expo-font",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "./assets/fonts/Fredoka-Regular.ttf",
+            "./assets/fonts/Fredoka-Medium.ttf",
+            "./assets/fonts/Fredoka-SemiBold.ttf",
+            "./assets/fonts/Fredoka-Bold.ttf"
+          ]
+        }
+      ],
       [
         "expo-build-properties",
         {

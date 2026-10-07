@@ -16,10 +16,13 @@ export const colors = {
   mint: '#86E3B8',
   glass: 'rgba(255,255,255,0.10)',
   glassEdge: 'rgba(255,255,255,0.75)',
+  /** An empty place in today's jar: a faint fill, never a ring (white rings mean focus). */
+  jarSlot: 'rgba(255,255,255,0.16)',
   chip: 'rgba(255,255,255,0.14)',
   tile: '#FFFFFF',
   tileOff: '#EEF0F8',
   greyInk: '#5A6080',
 };
 
-export const MIN_PER_MARBLE = 5;
+/** One marble is one short TV session: Estonia's TAI (2026) advises sessions of at most 10–15 minutes for ages 3–5 (docs/08 §1.6). */
+export const MIN_PER_MARBLE = 10;

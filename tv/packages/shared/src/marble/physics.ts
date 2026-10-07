@@ -13,10 +13,19 @@ export const JAR = {
   /** The neck opening the marbles fall through. */
   neckLeft: 60,
   neckRight: 324,
+  /** The marbles' radius in a jar of unknown size (it holds JAR_CAPACITY). */
   radius: 36,
 };
 /** Most marbles drawn in the jar (more minutes are still counted, just not drawn). */
 export const JAR_CAPACITY = 24;
+
+/**
+ * Marble radius for a jar that holds n marbles, so a full jar looks full: the largest radius at which n settled
+ * marbles leave only the top 8% of the glass free. Searched offline with this file's simulation (deterministic);
+ * a test checks the table still fits it.
+ */
+const RADIUS_FOR = [110, 110, 98, 84, 75.5, 74, 66.5, 65.5, 61.5, 57, 57, 50.5, 50.5, 48.5, 47, 46.5, 44, 44, 42, 42, 38.5, 38.5, 38.5, 38.5];
+export const radiusFor = (capacity: number) => RADIUS_FOR[Math.max(1, Math.min(JAR_CAPACITY, Math.round(capacity))) - 1];
 
 const G = 2600; // px/s², tuned so a drop takes ~0.6 s
 const RESTITUTION = 0.32;
@@ -55,9 +64,8 @@ function rng(seed: number) {
   };
 }
 
-/** Drop one marble from `startX` onto the settled `pile` (which doesn't move). */
-export function simulateDrop(pile: Point[], startX: number): Drop {
-  const r = JAR.radius;
+/** Drop one marble of radius `r` from `startX` onto the settled `pile` (which doesn't move). */
+export function simulateDrop(pile: Point[], startX: number, r = JAR.radius): Drop {
   const {width: W, height: H, cornerBottom: C} = JAR;
   let x = startX;
   let y = -r - 20;
@@ -148,17 +156,25 @@ export function simulateDrop(pile: Point[], startX: number): Drop {
   return {path, final: {x, y}, impacts, duration: path.length * FRAME};
 }
 
-const cache: Drop[] = [];
+const caches = new Map<number, Drop[]>();
 
-/** The settled jar with `n` marbles: marble i fell after marbles 0…i−1 had settled. Memoized. */
-export function jarDrops(n: number): Drop[] {
+/**
+ * The settled jar with `n` marbles of radius `r`: marble i fell after marbles 0…i−1 had settled, so a jar with
+ * more marbles only adds to the pile. Memoized per radius.
+ */
+export function jarDrops(n: number, r = JAR.radius): Drop[] {
+  const cache = caches.get(r) ?? [];
+  caches.set(r, cache);
   const count = Math.min(n, JAR_CAPACITY);
   while (cache.length < count) {
     const i = cache.length;
     const random = rng(i + 1);
-    const span = JAR.neckRight - JAR.neckLeft - 2 * JAR.radius;
-    const startX = JAR.neckLeft + JAR.radius + span * (0.2 + 0.6 * random());
-    cache.push(simulateDrop(cache.map(d => d.final), startX));
+    const span = JAR.neckRight - JAR.neckLeft - 2 * r;
+    const startX = JAR.neckLeft + r + span * (0.2 + 0.6 * random());
+    cache.push(simulateDrop(cache.map(d => d.final), startX, r));
   }
   return cache.slice(0, count);
 }
+
+/** The top of the pile (px from the top of the glass) when `n` marbles of radius `r` have settled. */
+export const pileTop = (n: number, r: number) => Math.min(...jarDrops(n, r).map(d => d.final.y - r));

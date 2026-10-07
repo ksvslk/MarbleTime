@@ -6,7 +6,6 @@ import type {JobIconName} from './data';
 import type {Lang} from './i18n';
 
 export type ColorName = 'peach' | 'mint' | 'sky' | 'lilac' | 'gold';
-export type Topic = 'numbers' | 'words' | 'puzzles';
 
 export interface ServerChild {
   id: string;
@@ -16,7 +15,45 @@ export interface ServerChild {
   age: number;
   balanceSec: number;
   dailyBaseMin?: number;
-  games: {topics: Topic[]; dailyCapMarbles: number};
+  /** The daily ceiling: the jar's size (missing on a backend from before it existed). */
+  dailyMaxMin?: number;
+  characterTokens?: number;
+}
+
+/** Gemini-TTS voices, picked by the backend's art director. */
+export type CharacterVoice = 'Puck' | 'Zephyr' | 'Fenrir' | 'Leda' | 'Aoede' | 'Laomedeia' | 'Achird' | 'Sadachbia' | 'Autonoe' | 'Algenib' | 'Achernar' | 'Vindemiatrix';
+export type CharacterMood = 'happy' | 'silly' | 'brave' | 'sleepy' | 'proud' | 'curious' | 'calm';
+
+/** A kid's character as GET /device/state lists it; its art comes from GET /device/characters/{id} once ready. */
+export interface ServerCharacter {
+  id: string;
+  childId: string;
+  status: 'drawing' | 'ready';
+  name?: string;
+  voice?: CharacterVoice;
+  mood?: CharacterMood;
+  createdAt: number;
+}
+
+export type CharacterPart = 'body' | 'head' | 'eye-left' | 'eye-right' | 'mouth' | 'arm-left' | 'arm-right' | 'legs' | 'extra';
+
+/** A ready character's art: layers in drawing order, each a complete small SVG with the same viewBox. Never changes. */
+export interface CharacterArt {
+  id: string;
+  name?: string;
+  voice: CharacterVoice;
+  viewBox: string;
+  /** parent: the named part this layer was drawn inside and moves with (eyes on the head, a held thing on an arm). */
+  layers: {part?: CharacterPart; parent?: CharacterPart; pivot?: [number, number]; svg: string}[];
+}
+
+/** A line a character says (Gemini voice, WAV), with how open the mouth is every stepMs (0–1). */
+export interface Speech {
+  audioUrl: string;
+  durationMs: number;
+  mouth?: {stepMs: number; open: number[]};
+  /** Older speech (and voices that give them): viseme marks, ms from the start. */
+  visemes?: {time: number; value: string}[];
 }
 
 /** A bonus (+) or taken-away (−) minutes, with the parent's reason. */
@@ -38,6 +75,7 @@ export interface ServerChore {
   minutes: number;
   repeat: Repeat;
   childIds: string[];
+  routine?: boolean;
 }
 
 export interface ServerClaim {
@@ -49,6 +87,9 @@ export interface ServerClaim {
   createdAt: number;
   decidedAt?: number;
   decidedBy?: 'parent' | 'tv';
+  approverName?: string;
+  reward?: 'marbles' | 'character' | 'praise';
+  minutesCredited?: number;
 }
 
 /** GET /device/state */
@@ -59,8 +100,10 @@ export interface ServerState {
   claims: ServerClaim[];
   adjustments?: ServerAdjustment[];
   device?: {id: string; name: string; mode: 'amazon_kids' | 'strict' | 'api_mock'};
-  gameMarblesToday: Record<string, number>;
+  characters?: ServerCharacter[];
   today: string;
+  /** wss:// address for live updates. */
+  realtimeUrl?: string;
   serverTime: number;
 }
 
@@ -118,8 +161,18 @@ export const api = {
   decide: (base: string, token: string, claimId: string, yes: boolean, pin: string) =>
     call<ServerClaim>(base, `/device/claims/${claimId}/decide`, {method: 'POST', token, body: {yes, pin}}),
 
-  gameResult: (base: string, token: string, result: {id: string; childId: string; topic: string; correct: number; total: number; at: number}) =>
-    call<{marbles: number; balanceSec: number}>(base, '/device/games/results', {method: 'POST', token, body: result}),
+  /** Grown-ups changed settings on the TV (checked with the family PIN). */
+  settings: (base: string, token: string, settings: {lang?: Lang; caps?: boolean; voice?: boolean}, pin: string) =>
+    call(base, '/device/settings', {method: 'POST', token, body: {pin, ...settings}}),
 
   heartbeat: (base: string, token: string, appVersion: string) => call(base, '/device/heartbeat', {method: 'POST', token, body: {appVersion}}),
+
+  /** A ready character's art (cache it: it never changes). */
+  characterArt: async (base: string, token: string, id: string) =>
+    (await call<CharacterArt>(base, `/device/characters/${encodeURIComponent(id)}`, {token})).data!,
+
+  /** Audio and mouth timings for a short pre-written line (the backend caches each text + voice). */
+  /** A character says it in its own voice and style (the backend knows them); without characterId, the narrator. */
+  speech: async (base: string, token: string, line: {text: string; lang: Lang; characterId?: string}) =>
+    (await call<Speech>(base, '/device/speech', {method: 'POST', token, body: line})).data!,
 };

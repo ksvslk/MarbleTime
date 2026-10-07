@@ -52,10 +52,17 @@ export function Stepper({value, min, max, step = 1, onChange, children}: {value:
 }
 
 /** On/off. Selected states are shown by fill; the white ring only ever means focus (docs/03 §12). */
-export function Switch({checked, label, onChange}: {checked: boolean; label: string; onChange: (checked: boolean) => void}) {
+export function Switch({checked, label, disabled, onChange}: {checked: boolean; label: string; disabled?: boolean; onChange: (checked: boolean) => void}) {
   const {t} = useI18n();
   return (
-    <button type="button" role="switch" aria-checked={checked} aria-label={label} className={`switch${checked ? ' switch-on' : ''}`} onClick={() => onChange(!checked)}>
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={label}
+      disabled={disabled}
+      className={`switch${checked ? ' switch-on' : ''}`}
+      onClick={() => onChange(!checked)}>
       <span>{checked ? t('on') : t('off')}</span>
       <span className="switch-knob" />
     </button>

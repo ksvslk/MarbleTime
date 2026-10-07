@@ -1,21 +1,15 @@
 /** The one Lambda behind API Gateway (HTTP API, payload format 2.0). */
+import {InvokeCommand, LambdaClient} from '@aws-sdk/client-lambda';
+import {aiModel, DIRECTOR_TIMEOUT_MS} from './ai/models';
 import {createApi} from './api';
+import type {DrawingJob} from './domain/drawing';
+import type {SpeechWork} from './domain/speech';
+import {type HttpApiEvent, toRequest, toResult} from './http/api-gateway';
 import {pickIcon} from './icons';
+import {vapidFromSsm, webPushSender} from './push/web-push';
+import {apiGatewaySender} from './realtime/api-gateway';
 import {DynamoRepo} from './repo/dynamo';
-
-/** The parts of the HTTP API v2 event we use. */
-interface HttpApiEvent {
-  rawPath: string;
-  body?: string;
-  isBase64Encoded?: boolean;
-  headers?: Record<string, string | undefined>;
-  queryStringParameters?: Record<string, string | undefined>;
-  requestContext: {
-    http: {method: string};
-    /** Present on parent routes: API Gateway's JWT authorizer has already checked the Cognito token. */
-    authorizer?: {jwt?: {claims?: Record<string, unknown>}};
-  };
-}
+import {awsSpeech} from './speech/aws';
 
 const env = (name: string) => {
   const value = process.env[name];
@@ -23,26 +17,38 @@ const env = (name: string) => {
   return value;
 };
 
-const api = createApi({repo: new DynamoRepo(env('TABLE_NAME')), now: Date.now, pwaUrl: env('PWA_URL'), pickIcon});
+const lambda = new LambdaClient({});
+
+/** Hands a new character to the drawing worker and returns at once (an async "Event" invoke). */
+async function startDrawing(job: DrawingJob) {
+  await lambda.send(new InvokeCommand({FunctionName: env('DRAWING_FUNCTION'), InvocationType: 'Event', Payload: Buffer.from(JSON.stringify(job))}));
+}
+
+/**
+ * Hands a new line its request couldn't finish in 24 s to the worker (an async invoke), which goes on with its tries:
+ * nothing in a Lambda outlives its response.
+ */
+async function handOffLine(job: SpeechWork['job']) {
+  const work: SpeechWork = {kind: 'speech', job};
+  await lambda.send(new InvokeCommand({FunctionName: env('DRAWING_FUNCTION'), InvocationType: 'Event', Payload: Buffer.from(JSON.stringify(work))}));
+}
+
+const api = createApi({
+  repo: new DynamoRepo(env('TABLE_NAME')),
+  now: Date.now,
+  pwaUrl: env('PWA_URL'),
+  pickIcon,
+  director: aiModel(env('MODEL_ID'), DIRECTOR_TIMEOUT_MS),
+  startDrawing,
+  // Gemini voices and listening: Google from AWS isn't built yet (Workload Identity Federation, README), so these answer
+  // 503 saying so; deploys refuse to start without the Google setup (infra/app.ts).
+  speech: {...awsSpeech(env), handOff: handOffLine},
+  sendRealtime: apiGatewaySender(env('REALTIME_ENDPOINT')),
+  realtimeUrl: env('REALTIME_URL'),
+  // Push services want to know who sends: the parent app's address.
+  push: webPushSender(vapidFromSsm(env('VAPID_PUBLIC_PARAM'), env('VAPID_PRIVATE_PARAM')), env('PWA_URL')),
+});
 
 export async function handler(event: HttpApiEvent) {
-  const claims = event.requestContext.authorizer?.jwt?.claims;
-  // Access tokens carry `sub` but no `email`; ID tokens carry both. Either passes the authorizer.
-  const parent = typeof claims?.sub === 'string'
-    ? {sub: claims.sub, ...(typeof claims.email === 'string' && {email: claims.email})}
-    : undefined;
-  const body = event.body !== undefined && event.isBase64Encoded ? Buffer.from(event.body, 'base64').toString('utf8') : event.body;
-  const response = await api({
-    method: event.requestContext.http.method,
-    path: event.rawPath,
-    headers: event.headers ?? {},
-    query: event.queryStringParameters ?? {},
-    body,
-    parent,
-  });
-  return {
-    statusCode: response.status,
-    headers: response.headers,
-    body: response.body === undefined ? '' : JSON.stringify(response.body),
-  };
+  return toResult(await api(toRequest(event)));
 }
