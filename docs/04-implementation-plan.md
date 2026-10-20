@@ -166,7 +166,7 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 - [x] FEEDBACK.md (per tool: Fire OS/ADB, Expo TV, Vega SDK/VVD, Amazon Kids, AWS incl. Bedrock, Polly, Transcribe), drafted Oct 20
 - [ ] FEATURE_REQUESTS.md (**Earned Time API: Critical**)
 - [ ] FRICTION_LOG.md entries
-- [x] Repo access: public at <https://github.com/ksvslk/MarbleTime>, MIT (Oct 20). Commits use GitHub's private email.
+- [x] Repo access: public at <https://github.com/ksvslk/MarbleTime>, MIT (Oct 20). New commits use GitHub's private email.
 - [ ] Submit **Oct 22**. Keep the backend running through **Nov 20**.
 
 ### Demo video storyboard (< 3:00)
