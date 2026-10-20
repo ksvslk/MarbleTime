@@ -146,19 +146,24 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
 | 9 | ✅ **Built (Oct 19):** a kid's bedtime (set on the kid's page) dims them on "Who's watching?" with a moon; when it begins during a show the video locks within a second ("It's bedtime, Leo"), and only the time before it counts. "30 more minutes" with the PIN lets everyone watch again (the remote starts there when nobody can watch). |
 | 10 | ✅ Screen off ends the session: 23 s counted of 82 s watched, none of the 40 s dark. |
 
-**On the stick, Oct 19** (the family's own TV switched to strict mode for ten minutes, nobody picked, so no time was counted; then back to Amazon Kids mode): YouTube, Prime Video and Netflix were each behind "Kes vaatab?" 0.6–0.8 s after they opened (row 1). Fire TV's settings (`com.amazon.tv.settings.v2`) and the uninstall dialog (`com.android.packageinstaller`) brought up the PIN pad, "Teleri seadete avamiseks", in 1.4 and 1.1 s (row 6). "Alexa, open YouTube" said into the hardware remote (row 5): YouTube opened about 2 s after the button was let go and was behind "Kes vaatab?" a second later. **Oct 20, filming the demo video** (the made-up family, fast clock): Demo Cartoons opened behind "Who's watching?"; with Mia picked it played, "5 minutes left" and then "1 minute left" showed over the cartoon (row 2), and "Mia's jar is empty" locked it at zero (row 3).
+**On the stick, Oct 19** (the family's own TV switched to strict mode for ten minutes, nobody picked, so no time was counted; then back to Amazon Kids mode): YouTube, Prime Video and Netflix were each behind "Kes vaatab?" 0.6–0.8 s after they opened (row 1). Fire TV's settings (`com.amazon.tv.settings.v2`) and the uninstall dialog (`com.android.packageinstaller`) brought up the PIN pad, "Teleri seadete avamiseks", in 1.4 and 1.1 s (row 6). "Alexa, open YouTube" said into the hardware remote (row 5): YouTube opened about 2 s after the button was let go and was behind "Kes vaatab?" a second later. **Oct 20, filming the demo video** (the made-up family, fast clock): Demo Cartoons opened behind "Who's watching?"; with Mia picked it played, "5 minutes left" and then "1 minute left" showed over the cartoon (row 2), and "Mia's jar is empty" locked it at zero (row 3). Two bugs found while filming, both fixed and unit-tested: Amazon's own parental-controls PIN (`com.amazon.tv.parentalcontrols`), which Fire OS puts in front of Settings when the parent turned it on, was metered like a video app (now free, row 6); and a TV that found a different family behind it replayed that family's past bonuses and characters as new (now nothing of a new family's past is celebrated, `logic.ts`). Re-filmed the same day with Lisa: "Who's watching?" with Lisa 53 min and Leo 70 min as soon as Demo Cartoons opened.
 
 **Emulator setup that worked:** `avdmanager create avd -n marbletime-tv -k "system-images;android-34;google-tv;arm64-v8a" -d tv_1080p`; build with `-PreactNativeArchitectures=armeabi-v7a,arm64-v8a` (the stick's build is 32-bit only); turn off Play Protect's check before `adb install` (`settings put global verifier_verify_adb_installs 0`), or the install waits for a tap; start apps with `am start -n` (`monkey` fails there); the Mac is `10.0.2.2`.
 
 ## 7. Recording the demo video
 
-- **Stick:** `adb shell screenrecord --time-limit 180 /sdcard/demo.mp4`, then `adb pull /sdcard/demo.mp4`. This gives a clean 1080p capture of our screens and Demo Cartoons. DRM apps record as black.
-- **Simulator:** macOS screen recording (⌘⇧5) of the VVD window.
-- **Phone:** the built-in screen recorder.
-- **One "real living room" shot:** film the TV and the phone together with a third camera.
+- **Stick:** `scrcpy --no-window --no-audio --no-control --video-codec=h264 --max-size=960 --max-fps=30 --record=take.mkv`.
+  The stick has only software video encoders, so `screenrecord` gets about 12 fps at 1920×1080 (5–7 with a video
+  playing) while the TV shows 60; 960×540 holds a steady 30 (FRICTION_LOG, Oct 20). DRM apps record as black, and so
+  does any video on the hardware decoder: Demo Cartoons decodes in software, from a 30 fps copy in its APK while filming.
+  No sound is recorded (scrcpy's audio capture gives silence on the stick); the app's sounds are added in the edit.
+- **Simulator:** ffmpeg's screen capture (`-f avfoundation`) cropped to the VVD window's screen area.
+- **Phone:** headless Chrome at phone size, filmed with the DevTools screencast; its taps are logged with the clock to
+  line up with the TV takes.
+- **A "real living room" shot**, if wanted: film the TV and the phone together with a camera.
 - **Rules:**
   - Under 3 minutes, English, public on YouTube.
-  - No third-party content or logos. Credit the CC film (e.g. *Big Buck Bunny*).
+  - No third-party content or logos. Credit the CC film (*Big Buck Bunny*).
   - Label strict mode as a Fire OS prototype.
 - The storyboard is in [04](04-implementation-plan.md).
 

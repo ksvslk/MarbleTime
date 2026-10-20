@@ -61,7 +61,10 @@ class MainActivity : Activity() {
         val sources = DefaultMediaSourceFactory(this).setDataSourceFactory(DefaultDataSource.Factory(this, http))
         player = ExoPlayer.Builder(this, renderers).setMediaSourceFactory(sources).build().apply {
             setVideoTextureView(video)
-            setMediaItem(MediaItem.fromUri(VIDEO_URL))
+            // A 30 fps copy built into the APK plays instead when there is one (see the README): it leaves the stick enough
+            // CPU to record its screen smoothly, which the 60 fps stream doesn't (decoder and encoder are both software).
+            val local = "cartoon.mp4" in (assets.list("") ?: emptyArray())
+            setMediaItem(MediaItem.fromUri(if (local) "asset:///cartoon.mp4" else VIDEO_URL))
             repeatMode = Player.REPEAT_MODE_ONE
             prepare()
         }

@@ -8,6 +8,9 @@ mode meters and locks in tests and in the demo video, so no real streaming servi
 - Remote: OK or play/pause pauses and resumes.
 - Plays through ExoPlayer with software decoders first, into a `TextureView`, so the stick's screen recordings show
   the cartoon (the hardware decoder's frames come out black: FRICTION_LOG, Oct 5).
+- For recording, a 30 fps copy at `app/src/main/assets/cartoon.mp4` (git-ignored) plays instead of the stream. The
+  stick's video encoder is software too, and with the 60 fps stream decoding it can't keep up. Make one with
+  `ffmpeg -ss 60 -t 90 -i <the stream URL> -vf fps=30 -c:v libx264 -crf 22 -c:a aac app/src/main/assets/cartoon.mp4`.
 
 Build and install (same toolchain as the TV app):
 

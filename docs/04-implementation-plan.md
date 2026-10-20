@@ -169,42 +169,54 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 - [x] Repo access: public at <https://github.com/ksvslk/MarbleTime>, MIT (Oct 20). New commits use GitHub's private email.
 - [ ] Submit **Oct 22**. Keep the backend running through **Nov 20**.
 
-### Demo video storyboard (< 3:00), updated Oct 20
+### Demo video storyboard (< 3:00), updated Oct 20 (third cut)
 
-It has to sell: the fight every parent knows, the joy of the marbles dropping early, proof on a real Fire TV, and the
-ask. A made-up family only (Mia and Leo, "Dad", PIN 1234), so no real name is on screen. No third-party apps or logos:
-the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end card).
+What it has to show: Lisa earning a marble, the dragon she invents, strict mode stopping a cartoon on a real Fire TV,
+and the ask. A made-up family only (Lisa and Leo, "Dad", PIN 1234), so no real name is on screen. No third-party apps
+or logos: the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end card).
 
-**The presenter's script**, read to the camera (about 50 s; the face goes in a circle at the bottom right):
+**The presenter's script** (about 70 s), read to the camera with the face in a circle at the bottom right. Plain
+words, no slogans (the first script was rejected for "really" and "No nagging, no arguing"):
 
-1. "Every parent knows this fight: just five more minutes! MarbleTime turns it into a game."
-2. "Kids earn TV time with real jobs. This jar is Mia's TV time for today. Every marble is ten minutes."
-3. "Mia tidies her toys and tells the TV. Dad taps yes on his phone, and the marbles drop in."
-4. "A full jar? Extra jobs earn something even better: a character Mia invents. She types a dragon who loves
-   pancakes, and AI brings it to life."
-5. "And it really works. On Fire TV, strict mode counts the minutes in any app. When the jar is empty, the TV stops.
-   No nagging, no arguing."
-6. "One app for Fire OS and Vega, with the backend on AWS."
-7. "Amazon Kids already counts the time. Give us one Earned Time API, and every family on Fire TV can earn it.
-   MarbleTime: TV time, earned."
+1. "Kids always want five more minutes of TV. With MarbleTime, they earn them."
+2. "This jar is Lisa's TV time for today. One marble is ten minutes."
+3. "Lisa tidied her toys, so she tells the TV. Her dad gets a message on his phone. He taps yes, and a marble drops
+   into her jar."
+4. "Once the jar is full, the next job earns her a new character. Lisa typed 'a dragon who loves pancakes'. The AI
+   drew it, and now it talks to her."
+5. "Her dad can turn on strict mode. Then the Fire TV counts her minutes in every app. She sees a note at five minutes
+   and at one minute. When the jar is empty, the cartoon stops."
+6. "At bedtime the TV locks until morning, even with time left in the jar."
+7. "The app also works with Amazon Kids. Then the phone tells her dad how many minutes to add there. The same app runs
+   on Vega, with the backend on AWS."
+8. "Amazon Kids already counts screen time. If Amazon added an Earned Time API, apps like this could add the minutes
+   kids earn. Then it would work on every Fire TV."
+
+A second version is narrated by Pancake Dragon in its own app voice (same shots, its face in the circle).
 
 | Line | On screen | Recorded with |
 |---|---|---|
-| 1 | Cold open: marbles drop into the jar, with their clink; then the title card | stick (`screenrecord`), card |
-| 2 | "Who's here?" → Mia → her board: the jar and job cards that show what they give | stick |
-| 3 | "Toys away" → "I did it!"; side by side, the phone app's "Yes"; the marbles drop | stick, phone app |
-| 4 | Full jar → one more job → "A new character!" → the typed idea → (cut over the drawing) → it waves and talks | stick |
-| 5 | Strict mode (label: "Fire OS prototype, sideloaded"): who's watching → Demo Cartoons → "1 minute left" → locked: "Mia's jar is empty"; Settings → the PIN pad | stick with the fast clock (`fast=1`) |
-| 6 | The same app on the Vega Virtual Device; then the "How it's built" card | VVD window, card |
-| 7 | The ask: the Earned Time API, the repo address, credits | card |
+| 1 | "Who's here?" → Lisa → her board; then the title card | stick |
+| 2 | The jar: 50 min, one marble = 10 min | stick |
+| 3 | "Toys away" → "Great job, Lisa!"; the claim on Dad's phone, his tap, the marble dropping | stick, phone app |
+| 4 | Full jar → "Feed the cat" → Dad's yes → "Wow! … a new character" → the TV keyboard → "Drawing your character…" → (dissolve) the dragon → "Hi Lisa! I'm Pancake Dragon!" | stick, phone app |
+| 5 | Dad's phone: TVs → Strict; "Who's watching?" → Lisa → the cartoon → the 5- and 1-minute notes → "Lisa's jar is empty" | stick with the fast clock (`fast=1`), phone app |
+| 6 | Bedtime set on the phone; the kid greyed out with a moon | stick, phone app |
+| 7 | The phone's "Add 10 min in Amazon Kids"; the same app and dragon on the Vega Virtual Device; "How it's built" | VVD window, card |
+| 8 | The ask: the Earned Time API, the repo address, credits | card |
 
-Labels on screen say where each shot comes from: "Fire TV Stick 4K Plus", "Vega Virtual Device". The stick's
-recordings have no sound, so the app's own sounds are added in the edit from its assets.
+How it is recorded:
 
-Filmed by the agent on the real stick and the Vega Virtual Device. The stick shows the demo family from a filming
-data file in which it is the demo family's TV under its own token hash, so its pairing with the real family is kept.
-Demo Cartoons decodes in software, so the cartoon shows in the stick's recordings. The phone app is filmed in a
-phone-sized browser window.
+- **The stick:** `scrcpy --max-size=960 --max-fps=30 --no-audio`. The stick has only software video encoders, so
+  `screenrecord` at full HD gets about 12 fps (FRICTION_LOG, Oct 20); 960×540 holds 30. Demo Cartoons plays a 30 fps
+  copy built into its APK while filming (its README).
+- **The phone app:** headless Chrome at 390×844 (2×), filmed with the DevTools screencast and tapped through the same
+  protocol; every tap is logged with the clock, so it lines up with the TV.
+- **The VVD:** its window, with ffmpeg's screen capture.
+- **No speed-ups:** each scene plays in real time; where waiting is left out, a short dissolve shows it.
+- The stick's recordings have no sound, so the app's own sounds and the character's voice clip are added in the edit.
+- The stick shows the made-up family from a filming data file in which it is that family's TV under its own token
+  hash, so its pairing with the real family is kept. It sleeps before every server switch.
 
 ## What to cut if we're behind
 

@@ -38,6 +38,9 @@ we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
     describe their character by voice, so we dropped voice input.
   - The default text-to-speech engine (IVONA) has no voices for apps; Pico works only with a `<queries>` entry (Oct 5).
   - `am start -W` hangs while the screensaver runs, and screenshots of a playing video are black (Oct 5).
+  - Recording the screen for a demo video is hard. The stick offers apps only software video encoders, so
+    `screenrecord` gets about 12 fps at full HD while the TV shows 60. Our first cut looked jumpy because of it. It
+    took scrcpy at 960×540 and a 30 fps cartoon to get a steady 30 fps, and nothing records the sound (Oct 20).
 - **Getting started:** about 10 minutes: Developer options, ADB debugging, `adb connect`.
 - **Again?** Yes. Sideloading on Fire OS is what made strict mode possible at all. We'd still rather call an Earned
   Time API than run our own lock screen ([docs/07](docs/07-earned-time-api.md)).

@@ -350,3 +350,35 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Suggestion:** drop the navigation before applying the length limit; show a page once with the SDK versions it
   covers; flush `exec` output before exiting; fix the `KEY_ENTER` row or name a key that sends `select`.
 
+
+## 2026-10-20 · Fire TV: the stick records its own screen at 12 frames a second
+
+- **Task:** record the demo video on the Fire TV Stick 4K Plus (Fire OS 8, Android 11) with `adb shell screenrecord`.
+- **Expected:** the 60 fps the TV shows. `dumpsys gfxinfo` says MarbleTime draws 300 frames in 5 s, none late.
+- **Actual:** about 12 fps at 1920×1080, and 5–7 fps while a cartoon plays. The video looked jumpy to the user,
+  who asked why it wasn't recorded "from the real TV". `scrcpy --list-encoders` shows why: the stick offers apps only
+  software encoders (`c2.android.avc.encoder`, `hevc`, `vp8`, `vp9`), so the CPU encodes every frame. The cartoon's
+  decoder is software too (Oct 5 entry: the hardware decoder's frames record as black).
+- **Measured (scrcpy 4.1, H.264, 6 s of the board):** 1920 wide 13 fps, 1280 21 fps, 1024 35 fps, 960 43 fps, 854 58 fps.
+  With the 60 fps Big Buck Bunny stream playing, 1024 gets 20 fps (gaps up to 180 ms). With a 30 fps H.264 copy built
+  into Demo Cartoons, 960×540 gets 29 fps.
+- **Also:** `scrcpy --audio-source=output` records silence on the stick (−87 dB), and costs a few frames a second.
+- **Severity:** medium: a demo recorded the obvious way looks broken, and nothing says the encoder is software.
+- **Workaround:** `scrcpy --max-size=960 --max-fps=30 --no-audio`, a 30 fps source for the video app, sounds added
+  afterwards.
+- **Suggestion:** say in the Fire TV developer docs what screen recording can do on each stick, and give apps the
+  hardware encoder (or a full-rate capture over `adb`) on devices in developer mode.
+
+## 2026-10-20 · Gemini-TTS reads the quoted character description aloud on longer lines
+
+- **Task:** narrate the demo video in Pancake Dragon's own voice: `gemini-2.5-flash-tts`, voice Puck, with the style
+  the backend gives the character (`voicePrompt`: `A native English speaker, as "a friendly dragon", a cartoon character
+  for young children: …`).
+- **Expected:** the sentence, in that voice.
+- **Actual:** checked with the backend's own listener, 3 of 9 narration sentences came out wrong. "Lisa tidies her toys
+  and tells the TV." began with "A friendly dragon." in 6 takes out of 6. Another sentence lost its first words to it,
+  and "That's me." came out twice. The app's own short lines ("Hi Lisa! I'm Pancake Dragon!") were right on the first
+  take, and the app checks every line anyway (line-check.ts, up to 6 takes), so kids never heard it.
+- **Severity:** low for the app (the check catches it, at the cost of more takes), high for anything that skips the check.
+- **Workaround:** for the video, the same style without the quoted `what`; every sentence listened back before use.
+- **Suggestion:** a style field the model never speaks. For us: if takes keep failing, try the style without `what`.

@@ -81,8 +81,8 @@ is worth.
 - On a real Fire TV Stick, strict mode puts YouTube, Prime Video and Netflix behind "Who's watching?" within a second
   of opening, "Alexa, open YouTube" included.
 - The same app runs on Fire OS and on the Vega simulator.
-- 612 automated tests across the backend, the phone app, the TV's rules and the strict-mode engine.
-- 30 friction log entries, each with steps, a workaround and a suggestion.
+- 614 automated tests across the backend, the phone app, the TV's rules and the strict-mode engine.
+- 32 friction log entries, each with steps, a workaround and a suggestion.
 
 ### What we learned
 
