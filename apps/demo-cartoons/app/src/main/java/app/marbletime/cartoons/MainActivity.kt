@@ -71,8 +71,11 @@ class MainActivity : Activity() {
     }
 
     // It plays only while in front: a TextureView keeps its surface behind MarbleTime's lock screen.
+    // Strict mode's "Who's watching?" can cover this app just as it starts, and losing the surface mid-decode stops the
+    // player with a decoder error; it starts again here, where it was, when the app is back in front.
     override fun onStart() {
         super.onStart()
+        if (player.playerError != null) player.prepare()
         player.play()
     }
 

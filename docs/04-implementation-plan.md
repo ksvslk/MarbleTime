@@ -184,9 +184,9 @@ words, no slogans (the first script was rejected for "really" and "No nagging, n
    into her jar."
 4. "Once the jar is full, the next job earns her a new character. Lisa typed 'a dragon who loves pancakes'. The AI
    drew it, and now it talks to her."
-5. "Her dad can turn on strict mode. Then the Fire TV counts her minutes in every app. She sees a note at five minutes
-   and at one minute. When the jar is empty, the cartoon stops."
-6. "At bedtime the TV locks until morning, even with time left in the jar."
+5. "Her dad can turn on strict mode. Then the Fire TV counts her minutes in every app. Five minutes before the end,
+   she sees a note. When the jar is empty, the cartoon stops."
+6. "Her dad sets a bedtime on his phone. At bedtime the TV locks until morning, even with time left in the jar."
 7. "The app also works with Amazon Kids. Then the phone tells her dad how many minutes to add there. The same app runs
    on Vega, with the backend on AWS."
 8. "Amazon Kids already counts screen time. If Amazon added an Earned Time API, apps like this could add the minutes
@@ -200,8 +200,8 @@ A second version is narrated by Pancake Dragon in its own app voice (same shots,
 | 2 | The jar: 50 min, one marble = 10 min | stick |
 | 3 | "Toys away" → "Great job, Lisa!"; the claim on Dad's phone, his tap, the marble dropping | stick, phone app |
 | 4 | Full jar → "Feed the cat" → Dad's yes → "Wow! … a new character" → the TV keyboard → "Drawing your character…" → (dissolve) the dragon → "Hi Lisa! I'm Pancake Dragon!" | stick, phone app |
-| 5 | Dad's phone: TVs → Strict; "Who's watching?" → Lisa → the cartoon → the 5- and 1-minute notes → "Lisa's jar is empty" | stick with the fast clock (`fast=1`), phone app |
-| 6 | Bedtime set on the phone; the kid greyed out with a moon | stick, phone app |
+| 5 | Dad's phone: TVs → Strict; "Who's watching?" → Lisa → the cartoon, Dad's phone counting down → "5 minutes left" → "Lisa's jar is empty" | stick with the fast clock (`fast=1`), phone app |
+| 6 | Dad's phone: "TV off at bedtime" from 20:23; Lisa starts a cartoon; at 20:23 "It's bedtime, Lisa", both kids greyed out with a moon | stick, phone app |
 | 7 | The phone's "Add 10 min in Amazon Kids"; the same app and dragon on the Vega Virtual Device; "How it's built" | VVD window, card |
 | 8 | The ask: the Earned Time API, the repo address, credits | card |
 

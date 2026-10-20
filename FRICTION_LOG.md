@@ -363,6 +363,8 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
   With the 60 fps Big Buck Bunny stream playing, 1024 gets 20 fps (gaps up to 180 ms). With a 30 fps H.264 copy built
   into Demo Cartoons, 960×540 gets 29 fps.
 - **Also:** `scrcpy --audio-source=output` records silence on the stick (−87 dB), and costs a few frames a second.
+  In the evening the same 960×540 recording got 22 fps with the cartoon: the stick had 14 MB of its 800 MB swap left
+  (the Silk browser and other apps cached in the background). `adb shell am kill-all` brought it back to 28 fps.
 - **Severity:** medium: a demo recorded the obvious way looks broken, and nothing says the encoder is software.
 - **Workaround:** `scrcpy --max-size=960 --max-fps=30 --no-audio`, a 30 fps source for the video app, sounds added
   afterwards.

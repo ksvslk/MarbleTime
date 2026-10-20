@@ -157,6 +157,11 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
   playing) while the TV shows 60; 960×540 holds a steady 30 (FRICTION_LOG, Oct 20). DRM apps record as black, and so
   does any video on the hardware decoder: Demo Cartoons decodes in software, from a 30 fps copy in its APK while filming.
   No sound is recorded (scrcpy's audio capture gives silence on the stick); the app's sounds are added in the edit.
+  With the stick short on memory (swap full after an evening of apps), the cartoon recorded at 22 fps;
+  `adb shell am kill-all` (cached apps only) freed 300 MB and brought it back to 28.
+- **Strict-mode shots:** `fast=1` (a second counts as a minute) empties a jar in seconds. Its "1 minute left" note waits
+  behind "5 minutes left" and only shows after the lock, so a take shows the five-minute note. A bedtime is read when a
+  kid starts watching: set it a few minutes ahead first, then press Watch.
 - **Simulator:** ffmpeg's screen capture (`-f avfoundation`) cropped to the VVD window's screen area.
 - **Phone:** headless Chrome at phone size, filmed with the DevTools screencast; its taps are logged with the clock to
   line up with the TV takes.
