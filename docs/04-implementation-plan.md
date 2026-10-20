@@ -162,25 +162,35 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 
 - [ ] Demo video (storyboard below), uploaded public on YouTube
 - [ ] README: what it is, modes, architecture diagram, **setup and run instructions** (Fire OS + Vega), license
-- [ ] Devpost text
+- [x] Devpost text: drafted Oct 20 in [09](09-devpost.md); the video link and judges' testing notes still to add
 - [x] FEEDBACK.md (per tool: Fire OS/ADB, Expo TV, Vega SDK/VVD, Amazon Kids, AWS incl. Bedrock, Polly, Transcribe), drafted Oct 20
 - [ ] FEATURE_REQUESTS.md (**Earned Time API: Critical**)
 - [ ] FRICTION_LOG.md entries
 - [x] Repo access: public at <https://github.com/ksvslk/MarbleTime>, MIT (Oct 20). New commits use GitHub's private email.
 - [ ] Submit **Oct 22**. Keep the backend running through **Nov 20**.
 
-### Demo video storyboard (< 3:00)
+### Demo video storyboard (< 3:00), updated Oct 20
 
-| Time | Shot |
-|---|---|
-| 0:00–0:15 | The problem: screen time is a daily negotiation. Amazon Kids gives limits, not motivation. |
-| 0:15–0:35 | On the stick: "Who's here?" → Mia's board. She picks "Toys away" with the remote: "I did it!" |
-| 0:35–0:55 | Parent's phone: one tap on "Yes" → the marbles drop into the jar on the TV 🎉 |
-| 0:55–1:20 | Mia's jar is full (the daily maximum for a 5-year-old). One more job → "WOW! A new character!" She tells Dad "a dragon who loves pancakes"; his phone hears it. Half a minute later the TV shows her character: it waves and says "Hi Mia!", lip-synced. |
-| 1:20–1:50 | **Strict mode** (labelled "Fire OS prototype"): Demo Cartoons counts down → 1-min banner → "Jar is empty" lock → "Do a job" → approve → unlocks by itself |
-| 1:50–2:10 | **Appstore mode:** the same app on the Vega simulator. The parent taps "Add 15 min in Amazon Kids". |
-| 2:10–2:30 | How it works: one React Native codebase (Fire OS + Vega), Kotlin strict module, AWS (Lambda, DynamoDB, Polly, Transcribe) + AI that draws from the kid's words, checked by code and a second model |
-| 2:30–2:55 | The ask: the **Earned Time API**. One call, and every Fire TV family gets this safely, on Fire OS and Vega. |
+A made-up family only (Mia and Leo, "Dad", PIN 1234: the seeded demo family on its own ports), so no real name is on
+screen. No third-party apps or logos: the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end
+card). English narration by an Amazon Polly voice.
+
+| Time | On screen | Recorded with | Narration |
+|---|---|---|---|
+| 0:00–0:12 | Title over the TV's "Who's here?" | stick (`screenrecord`), title by ffmpeg | "Screen time is a daily negotiation. Amazon Kids can set a limit, but it can't let kids earn time." |
+| 0:12–0:30 | Mia's board: the jar (today's time) and job cards that show what they give | stick | "MarbleTime puts the deal on the TV. Mia's jar is her TV time for today. Each marble is ten minutes, and every day starts half full." |
+| 0:30–0:45 | She picks "Toys away" with the remote → "I did it!" | stick | "She picks a job with the remote and says she did it." |
+| 0:45–1:05 | Side by side: the notification on Dad's phone with "Yes" and "Not yet" → Yes → the marbles drop, with sound | phone's own screen recording + stick | "Dad gets a notification and says yes. The marbles drop into the jar." |
+| 1:05–1:35 | Full jar → one more job → "A new character!" → she types "a dragon who loves pancakes" → (cut over the drawing) → it waves and talks | stick | "When the jar is full, extra jobs earn something else: a character she invents. An AI draws it from her words, code and a second model check it, and it talks to her." |
+| 1:35–2:05 | **Strict mode** (label: "Fire OS prototype, sideloaded"): pick who's watching → Demo Cartoons → "1 minute left" → locked: "Mia's jar is empty" → a yes on the phone → watching again; then Settings → the PIN pad | a phone camera on the TV (the stick records video as black), the stick for MarbleTime's own screens, fast clock (`fast=1`) | "On Fire OS, strict mode counts the time in any video app. At zero it locks, until a grown-up says yes to a job. The TV's settings need the parents' PIN." |
+| 2:05–2:15 | Bedtime: the moon on "Who's watching?" | stick | "At bedtime the TV stays off, whatever is in the jar." |
+| 2:15–2:30 | The same app on the Vega Virtual Device | macOS screen recording of the VVD | "The same React Native app runs on Vega. There, Amazon Kids keeps the limit." |
+| 2:30–2:45 | How it's built: Fire OS + Vega · Kotlin strict module · AWS (API Gateway, Lambda, DynamoDB, Cognito, CloudFront) · AI checked by code | card | "One codebase for both platforms, a Kotlin module for strict mode, and the backend on AWS." |
+| 2:45–2:58 | The ask: the Earned Time API; the repo address; credits | card | "Our ask to Amazon: an Earned Time API, so a family app can add time to Amazon Kids. Then this works on every Fire TV." |
+
+Needed on filming day: the stick paired to the demo family (and back to the real family afterwards), a second phone
+or a camera for the strict-mode shot (the stick's recordings show any video as black, even in a `TextureView`:
+FRICTION_LOG Oct 5), Do Not Disturb on the phone, the Vega Virtual Device running the same build.
 
 ## What to cut if we're behind
 

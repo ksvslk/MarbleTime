@@ -137,10 +137,10 @@ async function main() {
       console.log(`character ${report.characterId}: ${report.status} after ${report.rounds.length} round(s)\n  ${rounds.join('\n  ')}`);
     }, error => console.error('drawing failed:', error));
   };
-  // A kid's next puzzle session is written in this process, in the background (puzzles/daily.ts): the writer and
-  // the solvers are Gemini models through the same gcloud sign-in. With MODEL_ID=fake there is no writer, and
-  // sessions come from the bank alone.
-  const puzzleWriter = modelId === 'fake' ? undefined : aiModel(process.env.PUZZLE_WRITER ?? 'gemini-3.8-flash', 120_000);
+  // Sessions come from the bank alone (puzzles/bank/, written ahead of time and checked), as on AWS, so no model runs
+  // while a kid plays. PUZZLE_WRITER=<model> also writes new puzzles for a kid's next session, in the background
+  // (puzzles/daily.ts), checked by the solvers; all through this machine's gcloud sign-in.
+  const puzzleWriter = process.env.PUZZLE_WRITER ? aiModel(process.env.PUZZLE_WRITER, 120_000) : undefined;
   const puzzleSolvers = (process.env.PUZZLE_SOLVERS ?? 'gemini-3.5-flash,gemini-2.5-flash,gemini-3.8-flash').split(',').map(id => aiModel(id.trim(), 60_000));
   const startPuzzles = puzzleWriter && (async (job: PuzzleJob) => {
     void makePuzzleSet({repo, now: Date.now, writer: puzzleWriter, solvers: puzzleSolvers, bank: bankFor}, job).then(report => {
@@ -244,6 +244,7 @@ async function main() {
     console.log(`Pairing links: ${pwaUrl}/pair/<code> (set PWA_URL to change)`);
     console.log('Parents sign in with: Authorization: Bearer dev-<name>');
     console.log(`Characters: ${modelId}${modelId === 'fake' ? ' (free stand-in)' : ''} (set MODEL_ID to change; "fake" needs no sign-in)`);
+    console.log(`Puzzles: ${puzzleWriter ? `the bank, and new ones from ${process.env.PUZZLE_WRITER}` : 'the bank (set PUZZLE_WRITER to also write new ones)'}`);
     console.log(`Speech: characters ${ttsModel}, narrator ${ttsModel === 'fake' ? 'fake' : NARRATOR_MODEL}, listening ${sttModel}${ttsModel === 'fake' || sttModel === 'fake' ? ' (new lines not heard back)' : ''} (Google, with this machine's gcloud sign-in); lines cached in ${speechDir}`);
     if (seed) console.log(`Seeded: parent "Bearer ${DEMO_PARENT}" (Mia, Leo, PIN 1234) and a paired TV, "Authorization: Device ${DEMO_DEVICE_TOKEN}"`);
   });

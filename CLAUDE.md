@@ -24,7 +24,7 @@ amazon_kids (Appstore, Fire OS + Vega) · strict (Fire OS sideload, Kotlin modul
 
 ## Rules
 - Verify every TV change on the stick or the VVD (screenshot or log check) before saying it's done.
-- Follow the TV design rules in docs/03 §12: marbles = 5 min, gold only for time and the main button, white ring only for focus, one row, few words.
+- Follow the TV design rules in docs/03 §12: a marble = 10 min, gold only for time and the main button, white ring only for focus, one row, few words.
 - Shared code stays platform-neutral; platform bits go in *.android.tsx / *.kepler.tsx.
 - Ledger/hand-off/strict-engine/brain-game-checker changes need unit tests. Contract changes: openapi.yaml first.
 - Log every tool/doc snag in FRICTION_LOG.md as it happens. No secrets or real kids' photos in git.

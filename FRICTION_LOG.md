@@ -132,6 +132,9 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Severity:** low.
 - **Workaround:** check the player state in `dumpsys`; verify by eye on the TV.
 - **Suggestion:** a developer option to include video layers in screen captures of non-DRM content.
+- **Oct 20:** drawing the video into a `TextureView` (a `MediaPlayer` on a `SurfaceTexture`) doesn't help: the
+  hardware VP9 decoder's frames (`OMX.MTK.VIDEO.DECODER.VP9`) stay black in `screencap` and `screenrecord` while the
+  app's own text shows. So any demo video of a video app on the stick has to be filmed with a camera.
 
 ## 2026-10-05 · A new AWS account can't call any Bedrock model ("Error 002")
 
@@ -141,7 +144,7 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Actual:** `400 Error 002: Access to Bedrock models is not allowed for this account`, for every model, Amazon's own Nova Micro included. Adding a payment method didn't lift it. Nothing in the console says the account is restricted; per AWS re:Post it's an automatic limit on new accounts with little billing history, lifted only through a support case.
 - **Severity:** high for a time-boxed hackathon: the AI part of the project is blocked on a support ticket, and the error doesn't say what to do.
 - **Not IAM:** the deployed question writer, calling as its own Lambda IAM role (not root), gets the same `Error 002` on every call (Oct 7, 01:00 UTC nightly run), and so does a fresh test role with AWS's `AmazonBedrockFullAccess` policy (Nova Micro and Claude); a missing permission would be `AccessDeniedException … not authorized to perform bedrock:InvokeModel`.
-- **Still blocked on Oct 19**, 14 days after the first try: the Converse API gives the same `Error 002` for Nova Micro and Claude Haiku 4.5. With the free (Basic) support plan the CLI can't read support cases either (`SubscriptionRequiredException`), so a case's progress is visible only in the console.
+- **Still blocked on Oct 19**, 14 days after the first try, and on Oct 20: the Converse API gives the same `Error 002` for Nova Micro and Claude Haiku 4.5. With the free (Basic) support plan the CLI can't read support cases either (`SubscriptionRequiredException`), so a case's progress is visible only in the console.
 - **Workaround:** a free Support case (Account and billing) asking to enable Bedrock model access; meanwhile the app runs on its built-in question bank.
 - **Why the workaround falls short (Oct 14):** the only other model this project can reach, Gemini (Vertex AI or API key), is barred by Google's terms from any app "directed towards or … likely to be accessed by individuals under the age of 18". For a kids' app the block leaves no allowed model for what children trigger at runtime (character making, on-demand puzzles); AWS's terms and Anthropic's Usage Policy do allow products for minors, with conditions (docs/01).
 - **Suggestion:** say in the error (and on the Bedrock console) that the account is restricted and link the request form; let hackathon participants skip the wait.
@@ -311,7 +314,9 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
   session since Oct 11, so the agent never had the server's tools. Of the skills, it used `signing-in-to-aws` once.
 - **Severity:** medium: the error blames the request, not the sign-in, and with short-term credentials it happens
   whenever a session starts after they expire.
-- **Workaround:** `aws login` before starting the agent session [A: not yet tried; it is what the stderr says].
+- **Workaround:** `aws login` before starting the agent session. Confirmed the same day: right after `aws login`
+  the same `initialize` answers normally ("MCP Proxy for AWS" 1.7.0); a session that is already running reconnects it
+  with `/mcp`.
 - **Suggestion:** pass the sign-in error through in the `initialize` error (message and `data`), or start without
   credentials and give each tool call that message, so the tools appear as soon as the user signs in again.
 
