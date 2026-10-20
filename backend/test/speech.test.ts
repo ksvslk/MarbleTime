@@ -17,6 +17,7 @@ import {toRequest} from '../src/http/api-gateway';
 import {integratedLoudness, parseWav, peakDbfs, samplesOf, speechLength, wavFile} from '../src/speech/audio';
 import {geminiListenBack, geminiListener, LISTEN_SYSTEM, listenBackPrompt, listenPrompt, padForListening, TRANSCRIPT_SCHEMA} from '../src/speech/gemini-listen';
 import {fakeVoices, finishLine, geminiVoices, NARRATOR_MODEL, narratorVoices, retryAfterMs, TTS_HEDGING, TTS_MODEL, TTS_URL} from '../src/speech/gemini-tts';
+import {NoVoiceError} from '../src/speech/polly';
 import {cachedAudio, folderSpeechCache} from '../src/speech/local-cache';
 import {s3SpeechCache, URL_LIFETIME} from '../src/speech/s3-cache';
 import {type Caller, family, HOUR, jsonReply, MONDAY_NOON, pairTv, setup, textReply} from './helpers';
@@ -223,6 +224,21 @@ describe('a character speaks on the TV (POST /device/speech with characterId)', 
     expect([narratorDown.status, narratorDown.body.error.code]).toEqual([503, 'unavailable']);
     expect(logs).toContain(`speech (test-narrator): try ${LINE_TRIES} of ${LINE_TRIES}: the voice failed (HedgeError)`);
     expect(logs.join('\n')).not.toMatch(/Mia|cat/);
+  });
+
+  it('answers 503 at once for a language this server has no voice for (Polly has no Estonian): one try, not six', async () => {
+    const f = await family();
+    await f.giveTokens(f.mia.id, 1);
+    const dragon = await readyCharacter(f);
+    let calls = 0;
+    f.speech.services.synth.synthesize = async line => {
+      calls++;
+      throw new NoVoiceError(line.lang);
+    };
+    const silent = await f.tv.post('/device/speech', {text: 'Tubli, Mia!', lang: 'et', characterId: dragon.id});
+    expect([silent.status, silent.body.error.code]).toEqual([503, 'unavailable']);
+    expect(silent.body.error.message).toContain('no voice for et');
+    expect(calls).toBe(1);
   });
 
   it('is for paired TVs', async () => {

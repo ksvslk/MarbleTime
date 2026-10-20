@@ -1,9 +1,10 @@
 /**
  * The CDK app. `npx cdk synth` works without an AWS account. Deploying is a separate, approved step (README).
  * Context: `stage` (default dev), `budgetEmail` (adds a $10/month budget alert), `modelId` (the characters' model:
- * a Bedrock inference profile; default Claude Haiku 4.5), `signUp=closed` (only invited parents; see README), and the
- * Google setup the voices and listening need: `googleProject`, `googleWifProvider`, `googleServiceAccount` (README,
- * "What the cloud needs for Google"). Without it, synth and deploy stop: there's no Amazon fallback for speech.
+ * a Bedrock inference profile; default Claude Haiku 4.5), `signUp=closed` (only invited parents; see README), and
+ * `speech`: `polly` (the default: Amazon Polly's voices, no listening) or `google` (Gemini voices and listening), which
+ * needs the Google setup: `googleProject`, `googleWifProvider`, `googleServiceAccount` (README, "What the cloud needs
+ * for Google"); without it, synth and deploy stop.
  */
 import {App} from 'aws-cdk-lib';
 import {bedrockModel, DEFAULT_MODEL_ID} from '../src/ai/models';
@@ -24,14 +25,19 @@ function googleSetup() {
   const missing = Object.entries({googleProject: setup.project, googleWifProvider: setup.wifProvider, googleServiceAccount: setup.serviceAccount})
     .filter(([, value]) => !value).map(([name]) => name);
   if (missing.length) {
-    throw new Error(`Speech now runs on Google (Gemini voices, Gemini listening), with no Amazon fallback: give ${missing.map(m => `--context ${m}=…`).join(' ')} (backend/README.md, "What the cloud needs for Google")`);
+    throw new Error(`speech=google (Gemini voices and listening) needs ${missing.map(m => `--context ${m}=…`).join(' ')} (backend/README.md, "What the cloud needs for Google")`);
   }
   return setup as {project: string; wifProvider: string; serviceAccount: string};
 }
 
+/** Who makes the TV's lines: Amazon Polly, or Google with its setup. */
+const speech: string = app.node.tryGetContext('speech') ?? 'polly';
+if (speech !== 'polly' && speech !== 'google') throw new Error(`speech "${speech}": use polly or google`);
+
 new MarbleTimeStack(app, `MarbleTime-${stage}`, {
   stage,
-  google: googleSetup(),
+  speech,
+  ...(speech === 'google' && {google: googleSetup()}),
   budgetEmail: app.node.tryGetContext('budgetEmail'),
   modelId: bedrockModel(app.node.tryGetContext('modelId') ?? DEFAULT_MODEL_ID),
   openSignUp: app.node.tryGetContext('signUp') !== 'closed',

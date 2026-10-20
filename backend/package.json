@@ -11,7 +11,7 @@
     "test": "tsc && vitest run",
     "test:dynamo": "DYNAMODB_ENDPOINT=${DYNAMODB_ENDPOINT:-http://localhost:8000} vitest run",
     "cdk": "cdk",
-    "deploy:dev": "cdk deploy --context stage=dev --context signUp=closed --require-approval never"
+    "deploy:dev": "cdk deploy --context stage=dev --require-approval never"
   },
   "dependencies": {
     "@anthropic-ai/bedrock-sdk": "^0.34.2",
@@ -20,6 +20,7 @@
     "@aws-sdk/client-bedrock-runtime": "^3.1146.0",
     "@aws-sdk/client-dynamodb": "^3.1146.0",
     "@aws-sdk/client-lambda": "^3.1146.0",
+    "@aws-sdk/client-polly": "^3.1154.0",
     "@aws-sdk/client-s3": "^3.1147.0",
     "@aws-sdk/client-ssm": "^3.1146.0",
     "@aws-sdk/cloudfront-signer": "^3.1138.0",

@@ -172,7 +172,8 @@ async function makeLine(deps: LineDeps, job: LineJob, signal?: AbortSignal): Pro
   /** A failed step: stops the line for a hand-off or a sign-in problem; otherwise counts the try. */
   const failed = (tried: string, step: string, error: unknown) => {
     if (signal?.aborted) throw error;
-    if (error instanceof Error && error.name === 'GoogleAuthError') throw unavailable('speech', error);
+    // A sign-in problem, or a language with no voice here: no use trying again.
+    if (error instanceof Error && (error.name === 'GoogleAuthError' || error.name === 'NoVoiceError')) throw unavailable('speech', error);
     console.warn(`${tried}: ${step} failed (${error instanceof Error ? error.name : 'Error'})`);
     job.tries++;
   };
@@ -346,7 +347,7 @@ function unavailable(what: 'speech' | 'listening', error: unknown): ApiError {
   if (error instanceof ApiError) return error;
   const name = error instanceof Error ? error.name : 'Error';
   console.error(`${what} failed: ${name}`);
-  if (name === 'GoogleAuthError') return new ApiError(503, 'unavailable', (error as Error).message);
+  if (name === 'GoogleAuthError' || name === 'NoVoiceError') return new ApiError(503, 'unavailable', (error as Error).message);
   return new ApiError(503, 'unavailable', what === 'speech' ? "Speech can't be made right now; try again in a minute" : "Listening isn't available right now; type the words instead");
 }
 

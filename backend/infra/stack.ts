@@ -35,11 +35,14 @@ export interface MarbleTimeStackProps extends StackProps {
   readonly budgetEmail?: string;
   /** The characters' model: a Bedrock inference profile id, e.g. us.anthropic.claude-haiku-4-5-20251001-v1:0. */
   readonly modelId: string;
+  /** Who makes the TV's lines: Amazon Polly (English, German, Spanish; no listening) or Google (Gemini). */
+  readonly speech: 'polly' | 'google';
   /**
    * Google for the voices (Gemini-TTS) and listening (Gemini): the project, and the keyless Workload Identity
-   * Federation from the Lambda's role (the pool provider and the service account it may act as). Required (app.ts).
+   * Federation from the Lambda's role (the pool provider and the service account it may act as). Needed with
+   * speech=google (app.ts).
    */
-  readonly google: {project: string; wifProvider: string; serviceAccount: string};
+  readonly google?: {project: string; wifProvider: string; serviceAccount: string};
   /** Anyone with the link can create a parent account; closed, parents are added by an admin (Cognito console). */
   readonly openSignUp: boolean;
 }
@@ -175,7 +178,7 @@ export class MarbleTimeStack extends Stack {
     fn.addToRolePolicy(invokeModel);
     worker.addToRolePolicy(invokeModel);
 
-    // ---------- Speech: the TV's lines (Gemini voices) cached in a private bucket, handed out as CloudFront signed URLs ----------
+    // ---------- Speech: the TV's lines (Polly or Gemini voices) cached in a private bucket, handed out as CloudFront signed URLs ----------
     // An S3 presigned URL dies with the Lambda credentials that signed it (hours); a CloudFront signed URL lasts the
     // day the contract promises. The key pair is made once by a custom resource; its private key stays in SSM.
     const speechBucket = new Bucket(this, 'SpeechCache', {
@@ -213,11 +216,18 @@ export class MarbleTimeStack extends Stack {
     for (const maker of [fn, worker]) {
       speechBucket.grantPut(maker);
       maker.addToRolePolicy(new PolicyStatement({actions: ['ssm:GetParameter'], resources: [speechKeyArn]}));
-      // The voices and listening are Google's (Gemini-TTS, Gemini): no AWS speech service. Google's side is reached with
-      // Workload Identity Federation from the function's role (not built yet: README).
-      maker.addEnvironment('GOOGLE_CLOUD_PROJECT', props.google.project);
-      maker.addEnvironment('GOOGLE_WIF_PROVIDER', props.google.wifProvider);
-      maker.addEnvironment('GOOGLE_SERVICE_ACCOUNT', props.google.serviceAccount);
+      maker.addEnvironment('SPEECH_PROVIDER', props.speech);
+      if (props.speech === 'polly') {
+        // Polly's SynthesizeSpeech has no resource to scope it to.
+        maker.addToRolePolicy(new PolicyStatement({actions: ['polly:SynthesizeSpeech'], resources: ['*']}));
+      } else {
+        // Gemini-TTS and Gemini listening, reached with Workload Identity Federation from the function's role (not built
+        // yet: README).
+        if (!props.google) throw new Error('speech=google needs the Google setup');
+        maker.addEnvironment('GOOGLE_CLOUD_PROJECT', props.google.project);
+        maker.addEnvironment('GOOGLE_WIF_PROVIDER', props.google.wifProvider);
+        maker.addEnvironment('GOOGLE_SERVICE_ACCOUNT', props.google.serviceAccount);
+      }
       maker.addEnvironment('SPEECH_BUCKET', speechBucket.bucketName);
       maker.addEnvironment('SPEECH_CDN_URL', `https://${speechCdn.distributionDomainName}`);
       maker.addEnvironment('SPEECH_KEY_ID', speechPublicKey.publicKeyId);
