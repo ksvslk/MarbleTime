@@ -171,11 +171,11 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 
 ### Demo video storyboard (< 3:00), updated Oct 20 (third cut)
 
-What it has to show: Lisa earning a marble, the dragon she invents, strict mode stopping a cartoon on a real Fire TV,
-and the ask. A made-up family only (Lisa and Leo, "Dad", PIN 1234), so no real name is on screen. No third-party apps
-or logos: the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end card).
+What it has to show: Lisa earning a marble, the dragon she invents, a round of puzzles, strict mode stopping a cartoon
+on a real Fire TV, and the ask. A made-up family only (Lisa and Leo, "Dad", PIN 1234), so no real name is on screen.
+No third-party apps or logos: the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end card).
 
-**The presenter's script** (about 70 s), read to the camera with the face in a circle at the bottom right. Plain
+**The presenter's script** (about 80 s), read to the camera with the face in a circle at the bottom right. Plain
 words, no slogans (the first script was rejected for "really" and "No nagging, no arguing"):
 
 1. "Kids always want five more minutes of TV. With MarbleTime, they earn them."
@@ -184,12 +184,14 @@ words, no slogans (the first script was rejected for "really" and "No nagging, n
    into her jar."
 4. "Once the jar is full, the next job earns her a new character. Lisa typed 'a dragon who loves pancakes'. The AI
    drew it, and now it talks to her."
-5. "Her dad can turn on strict mode. Then the Fire TV counts her minutes in every app. Five minutes before the end,
+5. "She can also play puzzles on the TV. An AI wrote the questions, and code checked every one. Each round earns a
+   star, and five stars earn a new character."
+6. "Her dad can turn on strict mode. Then the Fire TV counts her minutes in every app. Five minutes before the end,
    she sees a note. When the jar is empty, the cartoon stops."
-6. "Her dad sets a bedtime on his phone. At bedtime the TV locks until morning, even with time left in the jar."
-7. "The app also works with Amazon Kids. Then the phone tells her dad how many minutes to add there. The same app runs
+7. "Her dad sets a bedtime on his phone. At bedtime the TV locks until morning, even with time left in the jar."
+8. "The app also works with Amazon Kids. Then the phone tells her dad how many minutes to add there. The same app runs
    on Vega, with the backend on AWS."
-8. "Amazon Kids already counts screen time. If Amazon added an Earned Time API, apps like this could add the minutes
+9. "Amazon Kids already counts screen time. If Amazon added an Earned Time API, apps like this could add the minutes
    kids earn. Then it would work on every Fire TV."
 
 A second version is narrated by Pancake Dragon in its own app voice (same shots, its face in the circle).
@@ -200,10 +202,11 @@ A second version is narrated by Pancake Dragon in its own app voice (same shots,
 | 2 | The jar: 50 min, one marble = 10 min | stick |
 | 3 | "Toys away" → "Great job, Lisa!"; the claim on Dad's phone, his tap, the marble dropping | stick, phone app |
 | 4 | Full jar → "Feed the cat" → Dad's yes → "Wow! … a new character" → the TV keyboard → "Drawing your character…" → (dissolve) the dragon → "Hi Lisa! I'm Pancake Dragon!" | stick, phone app |
-| 5 | Dad's phone: TVs → Strict; "Who's watching?" → Lisa → the cartoon, Dad's phone counting down → "5 minutes left" → "Lisa's jar is empty" | stick with the fast clock (`fast=1`), phone app |
-| 6 | Dad's phone: "TV off at bedtime" from 20:23; Lisa starts a cartoon; at 20:23 "It's bedtime, Lisa", both kids greyed out with a moon | stick, phone app |
-| 7 | The phone's "Add 10 min in Amazon Kids"; the same app and dragon on the Vega Virtual Device; "How it's built" | VVD window, card |
-| 8 | The ask: the Earned Time API, the repo address, credits | card |
+| 5 | Lisa's board → Puzzles → "What starts with the sss sound…" → three ducks, "three" → "Yay! 5/5", a star; the star on her board and on Dad's phone | stick, phone app |
+| 6 | Dad's phone: TVs → Strict; "Who's watching?" → Lisa → the cartoon, Dad's phone counting down → "5 minutes left" → "Lisa's jar is empty" | stick with the fast clock (`fast=1`), phone app |
+| 7 | Dad's phone: "TV off at bedtime" from 20:23; Lisa starts a cartoon; at 20:23 "It's bedtime, Lisa", both kids greyed out with a moon | stick, phone app |
+| 8 | The phone's "Add 10 min in Amazon Kids"; the same app and dragon on the Vega Virtual Device; "How it's built" | VVD window, card |
+| 9 | The ask: the Earned Time API, the repo address, credits | card |
 
 How it is recorded:
 

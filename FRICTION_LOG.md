@@ -384,3 +384,16 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Severity:** low for the app (the check catches it, at the cost of more takes), high for anything that skips the check.
 - **Workaround:** for the video, the same style without the quoted `what`; every sentence listened back before use.
 - **Suggestion:** a style field the model never speaks. For us: if takes keep failing, try the style without `what`.
+
+## 2026-10-20 · Vertex AI: 429 "Resource exhausted" while listening back to narration
+
+- **Task:** three new narration sentences for the demo video in the dragon's voice (`gemini-2.5-flash-tts`), each take
+  listened back with `gemini-3.8-flash` before use, around 21:00 EEST.
+- **Expected:** a checked take in a few seconds, as for the 20 sentences before.
+- **Actual:** the listening model answered `429 RESOURCE_EXHAUSTED` ("Please try again later"). That sentence went
+  through 40 s later. The next one kept failing for about 7 minutes (8 tries, 45 s apart; their errors weren't kept),
+  then worked on the first try by hand. The 429 doesn't say which quota ran out or when it frees up.
+- **Severity:** low: a batch job that waits and tries again gets through, slowly.
+- **Workaround:** the video script waits 45 s between tries. (The backend's own speech client already waits as long as
+  Google's Retry-After or RetryInfo asks, when one comes.)
+- **Suggestion:** name the quota and give a retry time in every 429.
