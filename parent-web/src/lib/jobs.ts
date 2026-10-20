@@ -10,8 +10,6 @@ export const JOB_MINUTES = {min: JOB_MARBLES[0] * MIN_PER_MARBLE, max: JOB_MARBL
 export interface JobDraft {
   title: string;
   minutes: number;
-  /** Something the kid already does regularly: praised on the TV, no marble (docs/08 §2.4). */
-  routine: boolean;
   childIds: string[];
   repeat: Repeat['kind'];
   /** Kept while "Every day" or "Once" is picked, so switching back restores them. */
@@ -33,7 +31,6 @@ export function newJobDraft(kids: Child[], jobCount: number): JobDraft {
   return {
     title: '',
     minutes: JOB_MINUTES.min,
-    routine: false,
     childIds: kids.map(kid => kid.id),
     repeat: 'daily',
     days: SCHOOL_DAYS,
@@ -45,8 +42,6 @@ export function draftFrom(chore: Chore): JobDraft {
   return {
     title: chore.title,
     minutes: jobMinutes(chore.minutes),
-    // The contract defaults it to false, so a server may leave it out.
-    routine: chore.routine === true,
     childIds: chore.childIds,
     repeat: chore.repeat.kind,
     days: chore.repeat.kind === 'weekdays' ? chore.repeat.days : SCHOOL_DAYS,
@@ -55,13 +50,12 @@ export function draftFrom(chore: Chore): JobDraft {
   };
 }
 
-/** The body for POST /chores and PATCH /chores/{id}. A routine job keeps its marbles for when it stops being one. */
+/** The body for POST /chores and PATCH /chores/{id}. */
 export function toInput(job: JobDraft): ChoreInput {
   const repeat: Repeat = job.repeat === 'weekdays' ? {kind: 'weekdays', days: [...job.days].sort((a, b) => a - b)} : {kind: job.repeat};
   return {
     title: job.title.trim(),
     minutes: jobMinutes(job.minutes),
-    routine: job.routine,
     childIds: job.childIds,
     repeat,
     color: job.color,

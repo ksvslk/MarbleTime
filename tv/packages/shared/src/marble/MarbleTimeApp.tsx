@@ -6,9 +6,14 @@ import {celebrationToShow, firstSyncPending, needsPairing, StoreProvider, useSto
 import {Sound} from './sound';
 import {Speech} from './speech';
 import {colors} from './theme';
-import {BoardScreen, ClaimedScreen, GalleryScreen, MeetScreen, WhoScreen, YayScreen} from './screens/KidScreens';
+import {BoardScreen, ClaimedScreen, GalleryScreen, MeetScreen, WatchScreen, WhoScreen, YayScreen} from './screens/KidScreens';
 import {GrownupsScreen, PairScreen, PinScreen} from './screens/GrownupScreens';
+import {PuzzleDoneScreen, PuzzleScreen} from './screens/PuzzleScreen';
+import {CharacterNewScreen} from './screens/CharacterNewScreen';
 import {SyncLoop} from './sync';
+import {Strict} from './strict';
+import {StrictLink} from './strictLink';
+import {ScreenTime} from './screenTime';
 import {Appear} from './motion';
 import {ArtPrefetch} from './characters';
 
@@ -17,7 +22,7 @@ function Router() {
   const screen = state.screen;
 
   // Test link: marbletime://open?screen=board&kid=mia&lang=et (screen: who|board|pin|yay, with reward=marbles|character|praise and n;
-  // meet, with character=<id> of one of the paired family's ready characters; gallery;
+  // meet, with character=<id> of one of the paired family's ready characters; gallery; puzzle; puzzleDone, with marks;
   // api=<backend URL> points the TV at another backend, e.g. the dev server on the Mac; stress=1 / stress=0 load
   // test families for layout checks, which work without pairing).
   // It never opens the grown-ups area directly: the PIN screen still guards it.
@@ -37,7 +42,7 @@ function Router() {
       const kidId: KidId = params.kid ?? 'mia';
       if (params.screen === 'who') dispatch({type: 'go', screen: {name: 'who'}});
       if (params.screen === 'board') dispatch({type: 'go', screen: {name: 'board', kidId}});
-      if (params.screen === 'pin') dispatch({type: 'go', screen: {name: 'pin'}});
+      if (params.screen === 'pin') dispatch({type: 'go', screen: {name: 'pin', ...((params.for === 'settings' || params.for === 'bedtime') && {for: params.for})}});
       if (params.screen === 'yay') {
         const reward = params.reward === 'character' || params.reward === 'praise' ? params.reward : 'marbles';
         const marbles = reward === 'marbles' ? Math.max(1, Math.min(3, Number(params.n ?? 2))) : 0;
@@ -45,6 +50,13 @@ function Router() {
       }
       if (params.screen === 'meet' && params.character) dispatch({type: 'go', screen: {name: 'meet', kidId, characterId: params.character}});
       if (params.screen === 'gallery') dispatch({type: 'go', screen: {name: 'gallery', kidId}});
+      if (params.screen === 'puzzle') dispatch({type: 'go', screen: {name: 'puzzle', kidId}});
+      if (params.screen === 'characterNew') dispatch({type: 'go', screen: {name: 'characterNew', kidId}});
+      // The end of a puzzle round, only shown (nothing is counted or sent): marks=11011 is how each question went.
+      if (params.screen === 'puzzleDone') dispatch({type: 'go', screen: {name: 'puzzleDone', kidId, star: true, character: false, marks: [...(params.marks ?? '')].map(mark => mark === '1')}});
+      // Strict mode's service opens this when a video app may not be in front (nobody picked, or a jar is empty).
+      if (params.screen === 'watch') dispatch({type: 'go', screen: {name: 'watch', why: params.why === 'empty' || params.why === 'bedtime' ? params.why : 'who'}});
+      if (params.fast === '1' || params.fast === '0') Strict.setFastClock(params.fast === '1');
     };
     try {
       Linking.getInitialURL().then(handle).catch(() => {});
@@ -64,6 +76,7 @@ function Router() {
         case 'board':
         case 'pin':
         case 'grownups':
+        case 'watch':
           dispatch({type: 'go', screen: {name: 'who'}});
           return true;
         default:
@@ -103,6 +116,14 @@ function Screen() {
   switch (screen.name) {
     case 'who':
       return <WhoScreen />;
+    case 'watch':
+      return <WatchScreen why={screen.why} />;
+    case 'characterNew':
+      return <CharacterNewScreen kidId={screen.kidId} />;
+    case 'puzzle':
+      return <PuzzleScreen key={`puzzle-${screen.kidId}`} kidId={screen.kidId} />;
+    case 'puzzleDone':
+      return <PuzzleDoneScreen kidId={screen.kidId} star={screen.star} character={screen.character} marks={screen.marks} />;
     case 'board':
       return <BoardScreen key={`board-${screen.kidId}`} kidId={screen.kidId} focusId={screen.focusId} />;
     case 'claimed':
@@ -114,7 +135,7 @@ function Screen() {
     case 'gallery':
       return <GalleryScreen kidId={screen.kidId} />;
     case 'pin':
-      return <PinScreen />;
+      return <PinScreen purpose={screen.for} />;
     case 'grownups':
       return <GrownupsScreen />;
   }
@@ -127,6 +148,8 @@ export function MarbleTimeApp() {
     <StoreProvider>
       <View style={{flex: 1, backgroundColor: colors.bg}}>
         <SyncLoop />
+        <StrictLink />
+        <ScreenTime />
         <ArtPrefetch />
         <Router />
       </View>

@@ -12,12 +12,16 @@
 import {randomUUID} from 'node:crypto';
 import {createServer, type IncomingMessage} from 'node:http';
 import {networkInterfaces, tmpdir} from 'node:os';
-import {join} from 'node:path';
+import {mkdirSync, renameSync, writeFileSync} from 'node:fs';
+import {readFile} from 'node:fs/promises';
+import {dirname, join} from 'node:path';
 import webpush from 'web-push';
 import {type WebSocket, WebSocketServer} from 'ws';
 import {aiModel, DIRECTOR_TIMEOUT_MS, LOCAL_MODEL_ID, WORKER_PATIENCE} from './ai/models';
 import {patient} from './ai/resilience';
 import {createApi} from './api';
+import {bankFor} from './puzzles/bank';
+import {makePuzzleSet, type PuzzleJob} from './puzzles/daily';
 import {drawCharacter, type DrawingJob} from './domain/drawing';
 import type {PushSender} from './domain/push';
 import {announce, connect, disconnect, isPing, PONG, type SendRealtime} from './domain/realtime';
@@ -34,6 +38,8 @@ import {rasterize} from './svg/rasterize';
 const port = Number(process.env.PORT ?? 8787);
 const pwaUrl = process.env.PWA_URL ?? 'http://192.168.0.100:5173';
 const seed = process.argv.includes('--seed');
+/** Where the data is kept between runs (DATA_FILE); without it the data is gone when the server stops. */
+const dataFile = process.env.DATA_FILE;
 const modelId = process.env.MODEL_ID ?? LOCAL_MODEL_ID;
 const lan = Object.values(networkInterfaces()).flat().filter(net => net?.family === 'IPv4' && !net.internal).map(net => net!.address);
 /** This machine as the TV sees it on the LAN. */
@@ -94,6 +100,22 @@ function devPush(): PushSender {
 async function main() {
   const repo = new MemoryRepo();
   if (seed) await seedDemo(repo, Date.now());
+  if (dataFile) {
+    const saved = await readFile(dataFile).catch(() => undefined);
+    if (saved) repo.restore(saved);
+    // Writes also happen outside requests (a drawing finishing), so the file follows the data, not the requests.
+    let last: Buffer = saved ?? Buffer.alloc(0);
+    const save = () => {
+      const now = repo.snapshot();
+      if (now.equals(last)) return;
+      mkdirSync(dirname(dataFile), {recursive: true});
+      writeFileSync(`${dataFile}.tmp`, now);
+      renameSync(`${dataFile}.tmp`, dataFile);
+      last = now;
+    };
+    setInterval(save, 2000).unref();
+    for (const signal of ['SIGINT', 'SIGTERM'] as const) process.once(signal, () => { save(); process.exit(0); });
+  }
   const model = aiModel(modelId);
 
   // Realtime connections of this process; the domain stores them in the repo like the Lambda does.
@@ -115,6 +137,17 @@ async function main() {
       console.log(`character ${report.characterId}: ${report.status} after ${report.rounds.length} round(s)\n  ${rounds.join('\n  ')}`);
     }, error => console.error('drawing failed:', error));
   };
+  // A kid's next puzzle session is written in this process, in the background (puzzles/daily.ts): the writer and
+  // the solvers are Gemini models through the same gcloud sign-in. With MODEL_ID=fake there is no writer, and
+  // sessions come from the bank alone.
+  const puzzleWriter = modelId === 'fake' ? undefined : aiModel(process.env.PUZZLE_WRITER ?? 'gemini-3.8-flash', 120_000);
+  const puzzleSolvers = (process.env.PUZZLE_SOLVERS ?? 'gemini-3.5-flash,gemini-2.5-flash,gemini-3.8-flash').split(',').map(id => aiModel(id.trim(), 60_000));
+  const startPuzzles = puzzleWriter && (async (job: PuzzleJob) => {
+    void makePuzzleSet({repo, now: Date.now, writer: puzzleWriter, solvers: puzzleSolvers, bank: bankFor}, job).then(report => {
+      const dropped = report.dropped.length ? `; dropped ${report.dropped.length} (${[...new Set(report.dropped.map(d => d.why.split(':')[0]))].join(', ')})` : '';
+      console.log(`puzzles for a kid: ${report.status}, ${report.written} written, ${report.fromBank} from the bank${dropped}${report.error ? ` (${report.error})` : ''}`);
+    });
+  });
   const ears = aiModel(sttModel, DIRECTOR_TIMEOUT_MS);
   const api = createApi({
     repo, now: Date.now, pwaUrl, pickIcon, director: aiModel(modelId, DIRECTOR_TIMEOUT_MS), startDrawing,
@@ -126,7 +159,7 @@ async function main() {
       // A hum has no words to hear back, and fake ears hear none.
       ...(ttsModel !== 'fake' && sttModel !== 'fake' && {listenBack: geminiListenBack(ears)}),
     },
-    sendRealtime, realtimeUrl, push: devPush(),
+    sendRealtime, realtimeUrl, push: devPush(), ...(startPuzzles && {startPuzzles}),
   });
 
   const server = createServer(async (req, res) => {
@@ -141,6 +174,20 @@ async function main() {
     if (audioKey) {
       const audio = await cachedAudio(speechDir, audioKey);
       res.writeHead(audio ? 200 : 404, {...CORS, 'content-type': 'audio/wav', 'cache-control': 'public, max-age=86400'}).end(audio);
+      return;
+    }
+    // The local certificate authority (mkcert's), for a phone to install once: until it does, its browser shows the
+    // parent app but refuses the notification worker. Public by nature (it is a certificate, not a key).
+    if (req.method === 'GET' && url.pathname === '/dev/ca.crt') {
+      const ca = process.env.DEV_CA_FILE ? await readFile(process.env.DEV_CA_FILE).catch(() => undefined) : undefined;
+      res.writeHead(ca ? 200 : 404, {...CORS, 'content-type': 'application/x-x509-ca-cert', 'content-disposition': 'attachment; filename="marbletime-dev-ca.crt"'}).end(ca);
+      return;
+    }
+    // What went wrong on a phone, said by the parent app's dev build: the phone's own console is out of reach.
+    if (req.method === 'POST' && url.pathname === '/dev/log') {
+      const text = ((await readBody(req).catch(() => undefined)) ?? Buffer.alloc(0)).toString('utf8').slice(0, 2000);
+      console.log(`phone: ${text.replace(/\s+/g, ' ')}`);
+      res.writeHead(204, CORS).end();
       return;
     }
     let rawBody: Buffer | undefined;
@@ -191,7 +238,7 @@ async function main() {
   });
 
   server.listen(port, '0.0.0.0', () => {
-    console.log('MarbleTime dev API (data in memory):');
+    console.log(`MarbleTime dev API (data ${dataFile ? `kept in ${dataFile}` : 'in memory'}):`);
     for (const address of ['localhost', ...lan]) console.log(`  http://${address}:${port}`);
     console.log(`Realtime: ${realtimeUrl}?device=<token> or ?token=dev-<name> (set REALTIME_URL to change what the TV is told)`);
     console.log(`Pairing links: ${pwaUrl}/pair/<code> (set PWA_URL to change)`);

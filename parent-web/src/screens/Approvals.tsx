@@ -2,7 +2,7 @@ import {useRef, useState} from 'react';
 import {Link} from 'react-router';
 import {useApi} from '../api/ApiContext';
 import {ApiError} from '../api/client';
-import type {Child, Chore, Claim} from '../api/types';
+import {type Child, type Chore, type Claim, NOT_YET_REASONS, type NotYetReason} from '../api/types';
 import {useFamily} from '../family';
 import {useI18n} from '../i18n/I18n';
 import {timeAgo} from '../lib/format';
@@ -75,11 +75,11 @@ export function Approvals() {
   });
 
   /** Called once the card has lifted away: drop it, tell the server, and put it back if that fails. */
-  const decide = async (claim: Claim, yes: boolean) => {
+  const decide = async (claim: Claim, yes: boolean, reason?: NotYetReason) => {
     decided.current.add(claim.id);
     setClaims(list => list?.filter(c => c.id !== claim.id) ?? list);
     try {
-      const decided = await (yes ? api.approve(claim.id) : api.reject(claim.id));
+      const decided = await (yes ? api.approve(claim.id) : api.reject(claim.id, reason));
       if (yes) {
         const kid = bundle.children.find(child => child.id === claim.childId);
         toast(rewardText(lang, decided ?? claim, kid?.name ?? '').trim());
@@ -128,7 +128,7 @@ export function Approvals() {
               claim={claim}
               kid={bundle.children.find(child => child.id === claim.childId)}
               job={bundle.chores.find(chore => chore.id === claim.choreId)}
-              onDecide={yes => void decide(claim, yes)}
+              onDecide={(yes, reason) => void decide(claim, yes, reason)}
             />
           ))}
         </ul>
@@ -152,16 +152,22 @@ export function Approvals() {
   );
 }
 
-/** One job a kid says is done: the job's picture with the kid on it, the title, the marbles, Yes / Not yet. */
-function ClaimCard({claim, kid, job, onDecide}: {claim: Claim; kid?: Child; job?: Chore; onDecide: (yes: boolean) => void}) {
+/**
+ * One job a kid says is done: the job's picture with the kid on it, the title, what a yes gives (what the kid's card
+ * showed on the TV), Yes / Not yet. "Not yet" asks what the kid should hear, so they know what to do next.
+ */
+function ClaimCard({claim, kid, job, onDecide}: {claim: Claim; kid?: Child; job?: Chore; onDecide: (yes: boolean, reason?: NotYetReason) => void}) {
   const {t, lang} = useI18n();
   const [leaving, setLeaving] = useState(false);
+  const [asking, setAsking] = useState(false);
   // A decision lifts the card away first, as on the TV; one tap only.
-  const decide = (yes: boolean) => {
+  const decide = (yes: boolean, reason?: NotYetReason) => {
     if (leaving) return;
     setLeaving(true);
-    setTimeout(() => onDecide(yes), LEAVE_MS);
+    setTimeout(() => onDecide(yes, reason), LEAVE_MS);
   };
+  // Claims from before promises say what the job is worth.
+  const gives = claim.promised ?? {reward: 'marbles' as const, minutes: claim.minutes};
   return (
     <li className={`card claim${leaving ? ' leaving' : ''}`}>
       <div className="claim-top">
@@ -175,18 +181,35 @@ function ClaimCard({claim, kid, job, onDecide}: {claim: Claim; kid?: Child; job?
         <div className="grow">
           <h2 className="claim-title">{claim.choreTitle ?? job?.title ?? ''}</h2>
           <p className="meta">{t('saysDone', {kid: kid?.name ?? '', ago: timeAgo(lang, claim.createdAt, Date.now())})}</p>
-          {job?.routine ? <RoutineLabel label={t('routine')} /> : <TimeLabel minutes={claim.minutes} signed />}
+          {gives.reward === 'praise' ? <RoutineLabel label={t('routine')} /> : gives.minutes > 0 ? <TimeLabel minutes={gives.minutes} signed /> : null}
+          {gives.reward === 'character' ? <p className="meta">{t(gives.minutes > 0 ? 'givesBoth' : 'givesCharacter')}</p> : null}
         </div>
       </div>
-      <div className="button-row">
-        <button type="button" className="btn btn-gold" disabled={leaving} onClick={() => decide(true)}>
-          <Icon name="check" />
-          {t('yes')}
-        </button>
-        <button type="button" className="btn btn-soft" disabled={leaving} onClick={() => decide(false)}>
-          {t('notYet')}
-        </button>
-      </div>
+      {asking ? (
+        <>
+          <p className="meta">{t('notYetWhy', {kid: kid?.name ?? ''})}</p>
+          <div className="list">
+            {NOT_YET_REASONS.map(reason => (
+              <button key={reason} type="button" className="btn btn-soft" disabled={leaving} onClick={() => decide(false, reason)}>
+                {t(`reason_${reason}`)}
+              </button>
+            ))}
+            <button type="button" className="btn btn-soft" disabled={leaving} onClick={() => decide(false)}>
+              {t('reasonNone')}
+            </button>
+          </div>
+        </>
+      ) : (
+        <div className="button-row">
+          <button type="button" className="btn btn-gold" disabled={leaving} onClick={() => decide(true)}>
+            <Icon name="check" />
+            {t('yes')}
+          </button>
+          <button type="button" className="btn btn-soft" disabled={leaving} onClick={() => setAsking(true)}>
+            {t('notYet')}
+          </button>
+        </div>
+      )}
     </li>
   );
 }

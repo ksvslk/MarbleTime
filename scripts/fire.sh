@@ -37,6 +37,10 @@ case "$cmd" in
     pkg="${1:?package}"; a11y="${2:-}"
     adb -s "$FIRETV" shell appops set "$pkg" GET_USAGE_STATS allow
     adb -s "$FIRETV" shell appops set "$pkg" SYSTEM_ALERT_WINDOW allow
+    # Android 13+ only (the Android TV emulator): the 5- and 1-minute notes are toasts, hidden while notifications are off.
+    adb -s "$FIRETV" shell pm grant "$pkg" android.permission.POST_NOTIFICATIONS 2>/dev/null || true
+    # Android saves app-op changes up to 30 minutes later; a restart before that forgets them (seen on the emulator).
+    adb -s "$FIRETV" shell appops write-settings >/dev/null
     adb -s "$FIRETV" shell dumpsys deviceidle whitelist +"$pkg"
     if [ -n "$a11y" ]; then
       # Note: this replaces the list of enabled accessibility services (VoiceView users would lose theirs).

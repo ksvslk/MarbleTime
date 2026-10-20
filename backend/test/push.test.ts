@@ -53,9 +53,14 @@ describe('pushes when a kid says "I did it!"', () => {
     const id = randomUUID();
     const res = await f.claim(f.mia.id, f.toys.id, f.clock.now, id);
     expect(res.status).toBe(201);
+    // What a yes gives, the two answers a grown-up can give on the notification itself, and (for a tap on it) the
+    // page where jobs are approved.
     expect(f.pushes).toEqual([{
       endpoint: browser('phone').endpoint,
-      payload: {title: 'Mia: Toys away is done', body: '+10 min · tap to answer', data: {url: '/', claimId: id}},
+      payload: {
+        title: 'Mia: Toys away is done', body: '+10 min', actions: [{action: 'yes', title: 'Yes'}, {action: 'not_yet', title: 'Not yet'}],
+        data: {url: '/', claimId: id, token: expect.stringMatching(/^[\w-]{43}$/)},
+      },
     }]);
     await f.claim(f.mia.id, f.toys.id, f.clock.now, id); // the TV's outbox resends: no second push
     expect(f.pushes).toHaveLength(1);
@@ -66,9 +71,41 @@ describe('pushes when a kid says "I did it!"', () => {
     await f.mom.patch('/family', {lang: 'et'});
     await f.mom.post('/push/subscriptions', browser('phone'));
     await f.claim(f.mia.id, f.toys.id);
-    expect(f.pushes[0].payload).toMatchObject({title: 'Mia: Toys away – tehtud', body: '+10 min · puuduta, et vastata'});
-    expect(claimNotice('de', 'Leo', 'Tisch decken', 15)).toEqual({title: 'Leo: Tisch decken – erledigt', body: '+15 Min. · tippen zum Antworten'});
-    expect(claimNotice('es', 'Leo', 'Poner la mesa', 15)).toEqual({title: 'Leo: Poner la mesa – hecho', body: '+15 min · toca para responder'});
+    expect(f.pushes[0].payload).toMatchObject({title: 'Mia: Toys away – tehtud', body: '+10 min', actions: [{action: 'yes', title: 'Jah'}, {action: 'not_yet', title: 'Veel mitte'}]});
+    expect(claimNotice('de', 'Leo', {choreTitle: 'Tisch decken', minutes: 20})).toMatchObject({title: 'Leo: Tisch decken – erledigt', body: '+20 Min.', actions: [{title: 'Ja'}, {title: 'Noch nicht'}]});
+    // The body says what the kid's card showed: a new character, marbles and a character, or a thank-you.
+    expect(claimNotice('es', 'Leo', {choreTitle: 'Poner la mesa', minutes: 20, promised: {reward: 'character', minutes: 10}})).toMatchObject({title: 'Leo: Poner la mesa – hecho', body: '+10 min + un personaje nuevo'});
+    expect(claimNotice('en', 'Leo', {choreTitle: 'Set the table', minutes: 20, promised: {reward: 'character', minutes: 0}}).body).toBe('a new character');
+    expect(claimNotice('et', 'Leo', {choreTitle: 'Hambad', minutes: 10, promised: {reward: 'praise', minutes: 0}}).body).toBe('aitäh');
+  });
+
+  it('lets a grown-up answer on the notification: once, as that parent, with the pass their browser was sent', async () => {
+    const f = await family();
+    await f.mom.patch('/me', {name: 'Mom'});
+    await f.mom.post('/push/subscriptions', browser('phone'));
+    await f.mom.post('/push/subscriptions', browser('laptop'));
+    const {body: claim} = await f.claim(f.mia.id, f.toys.id);
+    const [phone, laptop] = f.pushes.map(p => p.payload.data.token);
+    expect(phone).not.toBe(laptop);
+    // No sign-in is sent: the pass is the secret.
+    const yes = await f.open.post('/push/decisions', {token: phone, yes: true});
+    expect(yes.status).toBe(200);
+    expect(yes.body).toMatchObject({id: claim.id, status: 'approved', decidedBy: 'parent', approverName: 'Mom', reward: 'marbles', minutesCredited: 10});
+    expect(await f.balance(f.mia.id)).toBe(600);
+    // A pass works once; the other browser's pass finds the claim already decided.
+    expect((await f.open.post('/push/decisions', {token: phone, yes: true})).status).toBe(404);
+    expect((await f.open.post('/push/decisions', {token: laptop, yes: false})).body.error.code).toBe('already_decided');
+    // "Not yet" from the notification, and a pass that is a day old or made up.
+    const {body: second} = await f.claim(f.leo.id, f.teeth.id);
+    const tokens = f.pushes.slice(2).map(p => p.payload.data.token);
+    expect((await f.open.post('/push/decisions', {token: tokens[0], yes: false})).body).toMatchObject({id: second.id, status: 'rejected'});
+    const {body: third} = await f.claim(f.leo.id, f.teeth.id);
+    const late = f.pushes[4].payload.data.token;
+    f.clock.now += 25 * 60 * 60 * 1000;
+    expect((await f.open.post('/push/decisions', {token: late, yes: true})).status).toBe(404);
+    expect((await f.mom.get('/claims?status=waiting')).body.claims.map((c: {id: string}) => c.id)).toContain(third.id);
+    expect((await f.open.post('/push/decisions', {token: 'x'.repeat(43), yes: true})).status).toBe(404);
+    expect((await f.open.post('/push/decisions', {token: 'short', yes: true})).status).toBe(400);
   });
 
   it('forgets browsers the push service says are gone (404/410), keeps the rest, and never fails the claim', async () => {

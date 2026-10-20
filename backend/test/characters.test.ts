@@ -46,6 +46,26 @@ describe('making a character (POST /children/{id}/characters)', () => {
     expect(await list(f, f.mia.id)).toEqual([res.body]);
   });
 
+  it('takes the kid\'s words from the TV too (the remote\'s keyboard), with the same rules and no grown-up\'s PIN', async () => {
+    const f = await family();
+    expect((await f.tv.post(`/device/children/${f.mia.id}/characters`, {description: IDEA})).body.error.code).toBe('no_tokens');
+    await f.giveTokens(f.mia.id, 1);
+    f.director.json$.push(no('Let\'s draw a friendly robot instead!'));
+    const refused = await f.tv.post(`/device/children/${f.mia.id}/characters`, {description: 'a robot with a real gun'});
+    expect([refused.status, refused.body.error]).toEqual([422, {code: 'idea_not_ok', message: 'Let\'s draw a friendly robot instead!'}]);
+    expect(await tokens(f, f.mia.id)).toBe(1);
+    f.director.json$.push(yes());
+    const res = await f.tv.post(`/device/children/${f.mia.id}/characters`, {description: IDEA});
+    expect(res.status).toBe(202);
+    expect(res.body).toMatchObject({childId: f.mia.id, status: 'drawing', description: IDEA, name: 'Pancake Dragon'});
+    expect(await tokens(f, f.mia.id)).toBe(0);
+    expect(f.drawingJobs).toEqual([{familyId: f.familyId, characterId: res.body.id}]);
+    expect((await f.tv.post(`/device/children/${f.mia.id}/characters`, {description: ''})).status).toBe(400);
+    // Another family's TV can't reach this kid.
+    const other = await family();
+    expect((await other.tv.post(`/device/children/${f.mia.id}/characters`, {description: IDEA})).status).toBe(404);
+  });
+
   it('turns a no from the art director into 422 idea_not_ok with its kind sentence; the token is kept', async () => {
     const f = await family();
     await f.giveTokens(f.mia.id, 1);

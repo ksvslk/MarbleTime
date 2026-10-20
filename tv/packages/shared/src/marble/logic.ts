@@ -1,4 +1,4 @@
-import type {CharacterMood, CharacterVoice, ServerAdjustment, ServerState} from './api';
+import type {CharacterMood, CharacterVoice, NotYetReason, ServerAdjustment, ServerState} from './api';
 import {DEMO_PIN, EMPTY_FAMILY, Family, Job, Kid, KidId} from './data';
 import {Lang, LANGS} from './i18n';
 import {sha256Hex} from './sha256';
@@ -14,14 +14,41 @@ export type Screen =
   | {name: 'yay'; kidId: KidId; marbles: number; why: Why}
   | {name: 'meet'; kidId: KidId; characterId: string}
   | {name: 'gallery'; kidId: KidId}
-  | {name: 'pin'}
-  | {name: 'grownups'};
+  /** The kid describes their new character on the TV (they have a character token). */
+  | {name: 'characterNew'; kidId: KidId}
+  /** The grown-ups PIN; `for`: strict mode asked for it (to open the TV's settings, or 30 more minutes at bedtime). */
+  | {name: 'pin'; for?: 'settings' | 'bedtime'}
+  | {name: 'grownups'}
+  | {name: 'puzzle'; kidId: KidId}
+  /** A finished puzzle session: the star it earned (none for a second session in a day) and the character at the last star. */
+  | {name: 'puzzleDone'; kidId: KidId; star: boolean; character: boolean; marks: boolean[]}
+  /** Strict mode: who is watching (before a video app, or because it asked: nobody was picked, a jar is empty, bedtime). */
+  | {name: 'watch'; why?: 'who' | 'empty' | 'bedtime'};
 
 /**
- * What an approved job gave (docs/08, Decisions 2–4): marbles into the jar, as many as fit under the daily ceiling;
- * a new character when the jar was already full; or praise alone for a routine job.
+ * What a job gives (docs/08, Decisions 2–4): marbles into the jar when they all fit under the daily ceiling; a new
+ * character when they don't (with the marbles that did fit, if any); or praise alone (only on claims promised it
+ * before Oct 13, when a job could be marked routine).
  */
 export type Reward = 'marbles' | 'character' | 'praise';
+/** A reward as a job card shows it: `minutes` go into the jar (0 for praise, and for a character from a full jar). */
+export type Gives = {reward: Reward; minutes: number};
+
+export type Used = {baseMin: number; earnedMin: number};
+
+/**
+ * A kid's puzzles (backend/openapi.yaml, Puzzles): one short session a day earns a star, `starsNeeded` stars earn a
+ * new character, never TV time. `levels` is the kid's level per subject, as the backend placed them.
+ */
+export interface Puzzles {
+  on: boolean;
+  stars: number;
+  starsNeeded: number;
+  doneToday: boolean;
+  levels: Record<string, number>;
+}
+/** Until the backend says otherwise: no puzzles (they come from the backend's bank, so an unpaired TV has none). */
+export const NEW_PUZZLES: Puzzles = {on: false, stars: 0, starsNeeded: 5, doneToday: false, levels: {}};
 
 export interface Claim {
   id: string;
@@ -30,8 +57,12 @@ export interface Claim {
   status: 'waiting' | 'approved' | 'rejected';
   at: number;
   decidedAt?: number;
+  /** What the job card showed when the kid said "I did it!": what a yes gives. */
+  promised?: Gives;
   reward?: Reward;
   minutesCredited?: number;
+  /** Why a grown-up said "not yet", if they gave a reason. */
+  notYetReason?: NotYetReason;
   /** The approving parent's name as kids see it ("Dad"); none when approved on the TV. */
   approverName?: string;
 }
@@ -71,7 +102,9 @@ export interface Link {
 export type Outbox =
   | {kind: 'claim'; id: string; childId: KidId; choreId: string; at: number}
   | {kind: 'undo'; id: string; claimId: string}
-  | {kind: 'decide'; id: string; claimId: string; yes: boolean}
+  | {kind: 'decide'; id: string; claimId: string; yes: boolean; reason?: NotYetReason}
+  | {kind: 'puzzle'; id: string; childId: KidId; answers: {id: string; right: boolean}[]}
+  | {kind: 'usage'; id: string; childId: KidId; seconds: number}
   | {kind: 'settings'; id: 'settings'; lang?: Lang; caps?: boolean; voice?: boolean};
 
 export interface State {
@@ -86,6 +119,14 @@ export interface State {
   voice: boolean;
   /** Earned minutes each kid hasn't used yet (the daily base comes on top, up to the ceiling). */
   balances: Record<KidId, number>;
+  /** TV each kid has watched today, in minutes: how much of today's base, and how much earned time (already out of `balances`). */
+  used: Record<KidId, Used>;
+  /** Each kid's puzzles, as the backend says; a kid not listed has none. */
+  puzzles: Record<KidId, Puzzles>;
+  /** The backend's time left today per kid, in seconds: what a strict-mode TV counts down from. */
+  leftSec: Record<KidId, number>;
+  /** This TV counts watched time and keeps video apps for the kids who are watching (the parent app's TV mode "strict"). */
+  strict: boolean;
   claims: Claim[];
   /** Approvals made while the kid was away; shown as "Yay!" when the kid opens the board. */
   celebrations: Celebration[];
@@ -107,7 +148,11 @@ export type Action =
   | {type: 'go'; screen: Screen}
   | {type: 'claim'; kidId: KidId; jobId: string}
   | {type: 'undoClaim'; kidId: KidId; jobId: string}
-  | {type: 'decide'; claimId: string; yes: boolean}
+  | {type: 'decide'; claimId: string; yes: boolean; reason?: NotYetReason}
+  | {type: 'puzzleDone'; kidId: KidId; answers: {id: string; right: boolean}[]}
+  | {type: 'watched'; kidId: KidId; seconds: number}
+  /** The backend took the kid's idea: a character is being drawn, and the token is used. */
+  | {type: 'characterStarted'; kidId: KidId; character: Character}
   | {type: 'setLang'; lang: Lang}
   | {type: 'setCaps'; caps: boolean}
   | {type: 'setVoice'; voice: boolean}
@@ -127,6 +172,10 @@ export const initialState: State = {
   caps: false,
   voice: true,
   balances: {},
+  used: {},
+  puzzles: {},
+  leftSec: {},
+  strict: false,
   claims: [],
   celebrations: [],
   adjustments: [],
@@ -167,7 +216,9 @@ export function reducer(state: State, action: Action): State {
       if (state.claims.some(c => c.kidId === action.kidId && c.jobId === action.jobId && c.status === 'waiting')) {
         return {...state, screen: {name: 'claimed', kidId: action.kidId, jobId: action.jobId}};
       }
-      const claim: Claim = {id: newId(), kidId: action.kidId, jobId: action.jobId, status: 'waiting', at: Date.now()};
+      // What the card shows now is what a yes will give, whatever else is decided first.
+      const promised = rewardFor(state, action.kidId, jobOf(state, action.kidId, action.jobId));
+      const claim: Claim = {id: newId(), kidId: action.kidId, jobId: action.jobId, status: 'waiting', at: Date.now(), promised};
       return {
         ...state,
         claims: [...state.claims, claim],
@@ -189,12 +240,13 @@ export function reducer(state: State, action: Action): State {
     case 'decide': {
       const claim = state.claims.find(c => c.id === action.claimId);
       if (!claim || claim.status !== 'waiting') return state;
-      const outbox = queue(state, {kind: 'decide', id: `decide-${claim.id}`, claimId: claim.id, yes: action.yes});
+      const reason = action.yes ? undefined : action.reason;
+      const outbox = queue(state, {kind: 'decide', id: `decide-${claim.id}`, claimId: claim.id, yes: action.yes, ...(reason && {reason})});
       if (!action.yes) {
-        return {...state, outbox, claims: state.claims.map(c => (c.id === claim.id ? {...c, status: 'rejected', decidedAt: Date.now()} : c))};
+        return {...state, outbox, claims: state.claims.map(c => (c.id === claim.id ? {...c, status: 'rejected', decidedAt: Date.now(), ...(reason && {notYetReason: reason})} : c))};
       }
       // The same rule as the backend's, so the TV is right offline too; the next sync has the final word.
-      const {reward, minutes} = rewardFor(state, claim.kidId, jobOf(state, claim.kidId, claim.jobId));
+      const {reward, minutes} = givenFor(state, claim);
       return {
         ...state,
         outbox,
@@ -204,6 +256,47 @@ export function reducer(state: State, action: Action): State {
         celebrations: [...state.celebrations, {id: claim.id, kidId: claim.kidId, marbles: minutes / MIN_PER_MARBLE, why: {kind: 'job', jobId: claim.jobId, reward}}],
       };
     }
+    case 'characterStarted':
+      return {
+        ...state,
+        characters: [...state.characters.filter(c => c.id !== action.character.id), action.character],
+        family: {...state.family, kids: state.family.kids.map(k => (k.id === action.kidId ? {...k, characterTokens: Math.max(0, (k.characterTokens ?? 0) - 1)} : k))},
+        screen: {name: 'gallery', kidId: action.kidId},
+      };
+    case 'watched': {
+      // Time on MarbleTime's own screen time (puzzles, the kid's characters) is TV time: it leaves the jar here at
+      // once, today's base first and then earned time (the backend's rule), and is reported like everything else.
+      const kid = kidOf(state, action.kidId);
+      if (!kid || action.seconds < 1) return state;
+      const minutes = Math.round(action.seconds / 60);
+      const used = usedOf(state, action.kidId);
+      const fromBase = Math.min(minutes, Math.max(0, kid.dailyBaseMin - used.baseMin));
+      const fromEarned = Math.min(minutes - fromBase, balanceOf(state, action.kidId));
+      const left = state.leftSec[action.kidId];
+      return {
+        ...state,
+        used: {...state.used, [action.kidId]: {baseMin: used.baseMin + fromBase, earnedMin: used.earnedMin + fromEarned}},
+        balances: {...state.balances, [action.kidId]: balanceOf(state, action.kidId) - fromEarned},
+        leftSec: left === undefined ? state.leftSec : {...state.leftSec, [action.kidId]: Math.max(0, left - action.seconds)},
+        outbox: queue(state, {kind: 'usage', id: newId(), childId: action.kidId, seconds: Math.min(3600, Math.round(action.seconds))}),
+      };
+    }
+    case 'puzzleDone': {
+      // The backend's rule (puzzle-results.ts), so the TV is right offline too: every finished round earns a star,
+      // and the last star needed becomes a new character.
+      const now = puzzlesOf(state, action.kidId);
+      const star = true;
+      const character = now.stars + 1 >= now.starsNeeded;
+      const next: Puzzles = {...now, doneToday: true, stars: character ? 0 : now.stars + 1};
+      return {
+        ...state,
+        puzzles: {...state.puzzles, [action.kidId]: next},
+        family: character ? withToken(state.family, action.kidId) : state.family,
+        outbox: queue(state, {kind: 'puzzle', id: newId(), childId: action.kidId, answers: action.answers}),
+        // How the round went, question by question (right or missed), for the screen that ends it.
+        screen: {name: 'puzzleDone', kidId: action.kidId, star, character, marks: action.answers.map(answer => answer.right)},
+      };
+    }
     case 'setLang':
       return {...state, lang: action.lang, outbox: queueSettings(state, {lang: action.lang})};
     case 'setCaps':
@@ -211,7 +304,7 @@ export function reducer(state: State, action: Action): State {
     case 'setVoice':
       return {...state, voice: action.voice, outbox: queueSettings(state, {voice: action.voice})};
     case 'setFamily':
-      return {...state, family: {kids: action.family.kids.map(normalKid), jobs: action.family.jobs}, balances: action.balances ?? {}, claims: [], celebrations: [], characters: [], seenCharacters: [], screen: {name: 'who'}, demo: true};
+      return {...state, family: {kids: action.family.kids.map(normalKid), jobs: action.family.jobs}, balances: action.balances ?? {}, used: {}, puzzles: {}, claims: [], celebrations: [], characters: [], seenCharacters: [], screen: {name: 'who'}, demo: true};
     case 'celebrated':
       return {...state, celebrations: state.celebrations.filter(c => c.id !== action.id)};
     case 'restore':
@@ -245,6 +338,20 @@ export function normalKid(kid: Kid): Kid {
   return {...kid, dailyMaxMin, dailyBaseMin, characterTokens: kid.characterTokens ?? 0};
 }
 
+const clockMinutes = (clock: string) => Number(clock.slice(0, 2)) * 60 + Number(clock.slice(3, 5));
+
+/** A kid's bedtime as strict mode's counter takes it: minutes after local midnight (none: no bedtime). */
+export const bedtimeMinutes = (kid: Pick<Kid, 'bedtime'>) => kid.bedtime && {bedFrom: clockMinutes(kid.bedtime.from), bedTo: clockMinutes(kid.bedtime.to)};
+
+/** The kid's bedtime has begun at `time` (the TV's local time); it may run past midnight. */
+export function inBedtime(kid: Pick<Kid, 'bedtime'>, time: number): boolean {
+  const window = bedtimeMinutes(kid);
+  if (!window) return false;
+  const d = new Date(time);
+  const now = d.getHours() * 60 + d.getMinutes();
+  return window.bedFrom <= window.bedTo ? now >= window.bedFrom && now < window.bedTo : now >= window.bedFrom || now < window.bedTo;
+}
+
 /** A job's worth: one to three marbles. */
 const jobMinutes = (minutes: number) => Math.min(30, Math.max(MIN_PER_MARBLE, Math.ceil(minutes / MIN_PER_MARBLE) * MIN_PER_MARBLE));
 
@@ -254,7 +361,7 @@ export function familyFromServer(server: ServerState, now: number): Family {
   const due = (repeat: ServerState['chores'][number]['repeat']) => repeat.kind !== 'weekdays' || repeat.days.includes(weekday);
   return {
     kids: server.children.map(c =>
-      normalKid({id: c.id, name: c.name, avatar: c.avatar, avatarBg: COLORS[c.color] ?? colors.sky, age: c.age, dailyBaseMin: c.dailyBaseMin as number, dailyMaxMin: c.dailyMaxMin as number, characterTokens: c.characterTokens}),
+      normalKid({id: c.id, name: c.name, avatar: c.avatar, avatarBg: COLORS[c.color] ?? colors.sky, age: c.age, dailyBaseMin: c.dailyBaseMin as number, dailyMaxMin: c.dailyMaxMin as number, characterTokens: c.characterTokens, ...(c.bedtime && {bedtime: c.bedtime})}),
     ),
     jobs: Object.fromEntries(
       server.children.map(child => [
@@ -281,7 +388,7 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
       .map((c): Claim => {
         const here = decided.get(c.id);
         const status = c.status === 'waiting' && here !== undefined ? (here ? 'approved' : 'rejected') : c.status;
-        return {id: c.id, kidId: c.childId, jobId: c.choreId, status, at: c.createdAt, decidedAt: c.decidedAt, reward: c.reward, minutesCredited: c.minutesCredited, approverName: c.approverName};
+        return {id: c.id, kidId: c.childId, jobId: c.choreId, status, at: c.createdAt, decidedAt: c.decidedAt, promised: c.promised, reward: c.reward, minutesCredited: c.minutesCredited, notYetReason: c.notYetReason, approverName: c.approverName};
       }),
     ...state.claims.filter(c => pendingClaims.has(c.id)),
   ];
@@ -300,14 +407,23 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
   // Settings changed here and not sent yet stay as the TV has them.
   const mine = state.outbox.some(o => o.kind === 'settings');
   const family = familyFromServer(server, now);
+  const screen = checked(family, state.screen);
+  // The kid was being asked for their character's words here and the token went meanwhile (said into the phone):
+  // on to the collection, where the new character is being drawn.
+  const saidElsewhere = screen.name === 'characterNew' && tokensOf(state, screen.kidId) > 0 && !family.kids.find(k => k.id === screen.kidId)?.characterTokens;
   return {
     ...state,
-    screen: checked(family, state.screen),
+    screen: saidElsewhere ? {name: 'gallery', kidId: screen.kidId} : screen,
     lang: mine ? state.lang : server.family.lang,
     caps: mine ? state.caps : server.family.caps,
     voice: mine ? state.voice : server.family.voice,
     family,
     balances: Object.fromEntries(server.children.map(c => [c.id, Math.floor(c.balanceSec / 60)])),
+    // A session finished here and not yet with the backend stays as the TV has it.
+    puzzles: Object.fromEntries(server.children.map(c => [c.id, state.outbox.some(o => o.kind === 'puzzle' && o.childId === c.id) ? puzzlesOf(state, c.id) : (c.puzzles ?? NEW_PUZZLES)])),
+    leftSec: Object.fromEntries(server.children.flatMap(c => (c.leftTodaySec === undefined ? [] : [[c.id, c.leftTodaySec]]))),
+    strict: server.device?.mode === 'strict',
+    used: Object.fromEntries(server.children.map(c => [c.id, usedFromServer(c, family.kids.find(k => k.id === c.id)?.dailyBaseMin ?? 0)])),
     claims,
     celebrations: [
       // A character a grown-up removed is never introduced.
@@ -366,21 +482,41 @@ const withToken = (family: Family, kidId: KidId): Family => ({
   kids: family.kids.map(k => (k.id === kidId ? {...k, characterTokens: (k.characterTokens ?? 0) + 1} : k)),
 });
 
-/** TV time in the jar today: the daily base plus what was earned, never above the ceiling (the jar's size). */
+/**
+ * What the backend says a kid watched today, in minutes. Left time is rounded down and watched time up, so the TV
+ * never shows more than there is.
+ */
+function usedFromServer(child: {balanceSec: number; usedTodaySec?: number; leftTodaySec?: number}, dailyBaseMin: number): Used {
+  if (child.usedTodaySec === undefined || child.leftTodaySec === undefined) return {baseMin: 0, earnedMin: 0};
+  const baseLeftSec = Math.max(0, child.leftTodaySec - child.balanceSec);
+  const baseUsedSec = Math.max(0, dailyBaseMin * 60 - baseLeftSec);
+  return {baseMin: dailyBaseMin - Math.floor(baseLeftSec / 60), earnedMin: Math.ceil(Math.max(0, child.usedTodaySec - baseUsedSec) / 60)};
+}
+const usedOf = (state: State, kidId: KidId): Used => state.used[kidId] ?? {baseMin: 0, earnedMin: 0};
+
+/** The jar: TV time left today = what is left of the daily base plus earned time not yet watched, never above the ceiling. */
 export function timeToday(state: State, kidId: KidId): number {
   const kid = kidOf(state, kidId);
   if (!kid) return 0;
-  return Math.max(0, Math.min(kid.dailyMaxMin, kid.dailyBaseMin + balanceOf(state, kidId)));
+  return Math.max(0, Math.min(kid.dailyMaxMin, Math.max(0, kid.dailyBaseMin - usedOf(state, kidId).baseMin) + balanceOf(state, kidId)));
 }
 
-/** How many marbles today's jar holds: the ceiling, in marbles. */
-export const jarSize = (state: State, kidId: KidId) => Math.floor((kidOf(state, kidId)?.dailyMaxMin ?? 0) / MIN_PER_MARBLE);
+/**
+ * Who's watching (strict mode): the kids still picked. A kid who can't watch any more (their jar ran out, the
+ * backend's count can arrive after the lock; their bedtime began) drops out, so they never keep a sibling from watching.
+ */
+export function stillPicked(picked: KidId[], canWatch: (kidId: KidId) => boolean): KidId[] {
+  return picked.filter(canWatch);
+}
 
-/** Minutes that still fit in today's jar. */
+/** Minutes that can still be earned into today's jar: what was watched plus what is left never passes the ceiling. */
 export function jarRoom(state: State, kidId: KidId): number {
   const kid = kidOf(state, kidId);
-  return kid ? Math.max(0, kid.dailyMaxMin - kid.dailyBaseMin - balanceOf(state, kidId)) : 0;
+  return kid ? Math.max(0, kid.dailyMaxMin - kid.dailyBaseMin - balanceOf(state, kidId) - usedOf(state, kidId).earnedMin) : 0;
 }
+
+/** How many marbles today's jar holds now: the time left plus what can still be earned (the whole ceiling until TV is watched). */
+export const jarSize = (state: State, kidId: KidId) => Math.floor((timeToday(state, kidId) + jarRoom(state, kidId)) / MIN_PER_MARBLE);
 
 /** Full: not even one more marble fits, so the next approved job earns a new character. */
 export const jarFull = (state: State, kidId: KidId) => jarRoom(state, kidId) < MIN_PER_MARBLE;
@@ -396,12 +532,62 @@ export const drawingFor = (state: State, kidId: KidId) => state.characters.some(
 /** New characters the kid has earned and not asked for yet (a grown-up types or records the kid's idea). */
 export const tokensOf = (state: State, kidId: KidId) => kidOf(state, kidId)?.characterTokens ?? 0;
 
-/** What approving this job gives now: the backend's rule (docs/08, Decisions 2–4), so the TV can tell the kid offline. */
-export function rewardFor(state: State, kidId: KidId, job: Job | undefined): {reward: Reward; minutes: number} {
-  if (!job || job.routine) return {reward: 'praise', minutes: 0};
-  const room = jarRoom(state, kidId);
-  if (room < MIN_PER_MARBLE) return {reward: 'character', minutes: 0};
-  return {reward: 'marbles', minutes: Math.min(job.minutes, Math.floor(room / MIN_PER_MARBLE) * MIN_PER_MARBLE)};
+/** Room in today's jar already promised to the kid's waiting jobs. */
+const reservedFor = (state: State, kidId: KidId) =>
+  state.claims.reduce((sum, c) => sum + (c.kidId === kidId && c.status === 'waiting' ? (c.promised?.minutes ?? 0) : 0), 0);
+
+/**
+ * What saying "I did it!" for this job would give now: the backend's rule (budget.ts rewardFor; docs/08, Decisions
+ * 2–4), so the TV can tell the kid offline. A job that doesn't fit gives the marbles that do and a new character.
+ */
+export function rewardFor(state: State, kidId: KidId, job: Job | undefined): Gives {
+  // Every job gives TV time (the founder, Oct 13): a job once marked routine is a job like any other.
+  if (!job) return {reward: 'praise', minutes: 0};
+  const room = Math.max(0, Math.floor((jarRoom(state, kidId) - reservedFor(state, kidId)) / MIN_PER_MARBLE) * MIN_PER_MARBLE);
+  return job.minutes <= room ? {reward: 'marbles', minutes: job.minutes} : {reward: 'character', minutes: room};
+}
+
+/** What a job card shows: for a job that is waiting for a grown-up, what it was promised. */
+export function givesOf(state: State, kidId: KidId, job: Job): Gives {
+  const waiting = state.claims.find(c => c.kidId === kidId && c.jobId === job.id && c.status === 'waiting');
+  return waiting?.promised ?? rewardFor(state, kidId, job);
+}
+
+/**
+ * What a yes gives a waiting claim: its promise (the backend's keptPromise). Only the jar's maximum can still cut
+ * it: then the part that fits goes in and the rest is a character. A claim from before promises gets today's room.
+ */
+export function givenFor(state: State, claim: Claim): Gives {
+  const promised = claim.promised;
+  if (!promised) {
+    const job = jobOf(state, claim.kidId, claim.jobId);
+    if (!job) return {reward: 'praise', minutes: 0};
+    const room = Math.floor(jarRoom(state, claim.kidId) / MIN_PER_MARBLE) * MIN_PER_MARBLE;
+    return job.minutes <= room ? {reward: 'marbles', minutes: job.minutes} : {reward: 'character', minutes: room};
+  }
+  if (promised.reward === 'praise') return promised;
+  const fits = Math.min(promised.minutes, Math.floor(jarRoom(state, claim.kidId) / MIN_PER_MARBLE) * MIN_PER_MARBLE);
+  return fits < promised.minutes ? {reward: 'character', minutes: fits} : promised;
+}
+
+/**
+ * Screens that are screen time themselves: puzzles and the kid's characters. Time on them comes out of the kid's
+ * jar like any other TV time (docs/08 §1.1: one daily maximum for everything on the TV); the board and its jobs don't.
+ */
+export const screenTimeKid = (screen: Screen): KidId | undefined =>
+  screen.name === 'puzzle' || screen.name === 'puzzleDone' || screen.name === 'gallery' || screen.name === 'meet' || screen.name === 'characterNew' ? screen.kidId : undefined;
+
+/** A kid's puzzles as this TV knows them. */
+export const puzzlesOf = (state: State, kidId: KidId): Puzzles => state.puzzles[kidId] ?? NEW_PUZZLES;
+
+/**
+ * What a puzzle shows and says once the kid has answered. A right answer gets its "Yes!" and nothing more (the
+ * founder, Oct 13: no explanation after a right answer). A miss gets "Look:" and the reason, which says what is
+ * right with no word about the miss: explaining is what helps after an error (docs/08 §3.2; research R3: explain
+ * when the question was hard for the child, a brief ✓ when it wasn't).
+ */
+export function afterAnswer(right: boolean, words: {yes: string; look: string; reason: string}): {lead: string; text: string; say: string[]} {
+  return right ? {lead: words.yes, text: '', say: [words.yes]} : {lead: words.look, text: words.reason, say: [words.reason]};
 }
 
 /** Nothing to show until a phone is paired (test links aside): the welcome screen with its QR code. */
@@ -449,6 +635,10 @@ export function restore(state: State, saved: unknown): State {
     voice: typeof saved.voice === 'boolean' ? saved.voice : state.voice,
     family,
     balances: isRecord(saved.balances) ? (saved.balances as Record<KidId, number>) : state.balances,
+    used: isRecord(saved.used) ? (saved.used as Record<KidId, Used>) : state.used,
+    puzzles: isRecord(saved.puzzles) ? (saved.puzzles as Record<KidId, Puzzles>) : state.puzzles,
+    leftSec: isRecord(saved.leftSec) ? (saved.leftSec as Record<KidId, number>) : state.leftSec,
+    strict: saved.strict === true,
     claims: Array.isArray(saved.claims) ? (saved.claims as Claim[]) : state.claims,
     // Celebrations saved in an older shape (no id, no reward, a game) are dropped rather than shown wrong.
     celebrations: Array.isArray(saved.celebrations)

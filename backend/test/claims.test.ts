@@ -10,6 +10,7 @@ describe('claims', () => {
     expect(first.status).toBe(201);
     expect(first.body).toEqual({
       id, childId: f.mia.id, choreId: f.toys.id, choreTitle: 'Toys away', status: 'waiting', minutes: 10, createdAt: MONDAY_NOON,
+      promised: {reward: 'marbles', minutes: 10},
     });
     f.clock.now += MINUTE;
     const again = await f.claim(f.mia.id, f.toys.id, f.clock.now, id);
@@ -50,6 +51,24 @@ describe('claims', () => {
     expect(late.status).toBe(409);
     expect(await f.balance(f.leo.id)).toBe(0);
     expect((await f.mom.post('/claims/nope/approve')).status).toBe(404);
+  });
+
+  it('keeps the reason a grown-up gives with "not yet", from the phone or the TV, and tells the TV', async () => {
+    const f = await family();
+    const {body: one} = await f.claim(f.mia.id, f.toys.id);
+    const phone = await f.mom.post(`/claims/${one.id}/reject`, {reason: 'not_finished'});
+    expect(phone.body).toMatchObject({status: 'rejected', notYetReason: 'not_finished'});
+    const {body: two} = await f.claim(f.leo.id, f.teeth.id);
+    const tv = await f.tv.post(`/device/claims/${two.id}/decide`, {yes: false, pin: '1234', reason: 'together'});
+    expect(tv.body).toMatchObject({status: 'rejected', notYetReason: 'together'});
+    const {body: state} = await f.tv.get('/device/state');
+    expect(state.claims.map((c: {id: string; notYetReason?: string}) => [c.id, c.notYetReason]).sort()).toEqual([[one.id, 'not_finished'], [two.id, 'together']].sort());
+    // A reason is optional, and only the known ones are taken; a yes never carries one.
+    const {body: three} = await f.claim(f.mia.id, f.toys.id);
+    expect((await f.mom.post(`/claims/${three.id}/reject`, {reason: 'lazy'})).status).toBe(400);
+    expect((await f.mom.post(`/claims/${three.id}/reject`)).body.notYetReason).toBeUndefined();
+    const {body: four} = await f.claim(f.mia.id, f.toys.id);
+    expect((await f.tv.post(`/device/claims/${four.id}/decide`, {yes: true, pin: '1234', reason: 'later'})).body.notYetReason).toBeUndefined();
   });
 
   it('allows a job once per day: a waiting or approved claim holds the day, a rejected one frees it', async () => {

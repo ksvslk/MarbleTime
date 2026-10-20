@@ -1,13 +1,13 @@
 # 01 · Hackathon brief: what the rules mean for this project
 
-Source: <https://amazonappdev2026.devpost.com> (overview, rules, resources, FAQ, updates), read 2026-10-02.
+Source: <https://amazonappdev2026.devpost.com> (overview, rules, resources, FAQ, updates), read 2026-10-02, re-read 2026-10-14.
 
 ## Key dates
 
 | What | Official time | Your time (EEST, UTC+3) |
 |---|---|---|
 | **Submission deadline** | **Fri Oct 23 2026, 12:00 PDT** | **Fri Oct 23, 22:00** |
-| AWS credits request ($150 per person, every teammate can ask) | by Oct 21, 12:00 PT | Oct 21, 22:00 |
+| AWS credits request ($150 per person, every teammate can ask) | ~~by Oct 21, 12:00 PT~~ **closed Oct 7** ("We are out of credit codes") | |
 | Judging | Oct 26 (dates page) / Nov 9 (rules) → Nov 20 | |
 | Winners announced | ~Dec 3 2026 | |
 
@@ -23,6 +23,16 @@ Source: <https://amazonappdev2026.devpost.com> (overview, rules, resources, FAQ,
 - Judges' own examples:
   - *Obvious:* basic streaming UI, simple video player, remote-controlled game.
   - *Creative:* AI viewing that adapts to household patterns, CV fitness, **multi-modal UX combining voice + D-pad + visuals in one flow**.
+
+## AI models: what the rules and the providers' terms allow (checked Oct 14)
+
+- **The Fire TV track needs no AI and no Bedrock.** "Any framework or language is acceptable"; the requirement is that the app runs on Fire OS or Vega OS. Fire TV is the one track exempt from the "call the track's technology in code" rule.
+- **The AWS Builder mini-challenge wants AWS services**, "i.e. Amazon Bedrock, AgentCore, Strands SDK, Kiro Crew, SageMaker, etc.", described in the feedback answer. Lambda, DynamoDB and Cognito count as AWS services, but the judges' examples call "single Bedrock call for text generation, S3 for storage" obvious and "Bedrock + AgentCore + Strands" creative.
+- **Third-party APIs only within their terms:** "Entrant must be authorized to use them in accordance with any terms and conditions or licensing requirements of the tool."
+- **Google's terms rule Gemini out of a kids' app at runtime.** Google Cloud Service Specific Terms, Generative AI Services, (d) Age Restrictions: "Customer will not, and will not allow End Users to, use a Generative AI Service as part of a website, Customer Application, or other online service that is directed towards or is likely to be accessed by individuals under the age of 18." The Vertex AI API (now "Gemini Enterprise Agent Platform API") is a Generative AI Service, and the Gemini API key terms say the same. MarbleTime's TV side is for ages 4–10, so character making (listening, drawing, voices) and on-demand puzzle writing can't run on Gemini. Content made ahead of time (the puzzle banks, the TV's recorded clips) is a greyer case: Gemini isn't part of the running app, only its output is. [A: our reading, not legal advice]
+- **Other models on Vertex AI follow their makers' terms.** Google's Claude page: "Anthropic models are not a Google product, and their availability … is subject to the terms for 'Separate Offerings' … and separate terms found in the relevant model card", so Claude on Vertex follows Anthropic's Usage Policy (below), not Google's age rule [A: our reading; Google doesn't say so about the age rule in so many words]. Open models in Model Garden come under their own licences (model cards). **This project has no Claude quota on Vertex:** Haiku 5.5 and Sonnet 5.5 both answer `429 RESOURCE_EXHAUSTED … Please submit a quota increase request` (Oct 14). Google's Estonian voices: 30 Chirp 3 HD ("Powered by our latest generation of generative models", so under the age rule) and one older Standard voice, `et-EE-Standard-A`.
+- **AWS and Anthropic allow kids' products, with conditions.** AWS Service Terms §50.4: give end users of AI Services privacy notices and get their consent (Lex adds a COPPA flag for under-13s); no age bar. Anthropic's Usage Policy: "Products serving minors … must comply with the additional guidelines outlined in our Support article and all applicable laws", which also binds Claude on Bedrock (§50.12.1, third-party model terms).
+- **Speech on AWS:** Transcribe lists Estonian; Polly has no Estonian voice.
 
 ## How judging works
 

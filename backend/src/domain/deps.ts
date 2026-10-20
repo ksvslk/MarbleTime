@@ -1,10 +1,13 @@
 import type {AiModel} from '../ai/model';
 import type {IconPicker} from '../icons';
+import type {PuzzleItem} from '../puzzles/items';
+import type {PuzzleJob} from '../puzzles/daily';
 import type {DrawingJob} from './drawing';
 import type {PushSender} from './push';
 import type {SendRealtime} from './realtime';
 import type {Repo} from './repo';
 import type {SpeechServices} from './speech';
+import type {Lang} from './types';
 
 /** What the domain needs from outside; tests pass a memory repo, a clock they control and stand-in models. */
 export interface Deps {
@@ -26,6 +29,13 @@ export interface Deps {
   sendRealtime: SendRealtime;
   /** The realtime address the TV connects to (DeviceState.realtimeUrl); none where there is no realtime. */
   realtimeUrl?: string;
+  /** The puzzle bank for a language (default: the banks that ship with the backend, puzzles/bank.ts); tests pass a small fixed one. */
+  puzzles?: (lang: Lang) => PuzzleItem[];
+  /**
+   * Starts writing a kid's next puzzle session without waiting for it (dev server: in process; where no model can be
+   * reached there is none, and sessions come from the bank alone).
+   */
+  startPuzzles?: (job: PuzzleJob) => Promise<void>;
   /** Web Push to parents' browsers. */
   push: PushSender;
   /**

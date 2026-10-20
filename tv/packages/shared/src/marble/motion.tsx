@@ -93,6 +93,13 @@ export function Twinkle({delay = 0, style, children}: Props & {delay?: number}) 
   return <Animated.View style={[style, {transform}]}>{children}</Animated.View>;
 }
 
+/** Beats gently: "this is the one you would get" (the next star, the next character). */
+export function Beat({style, children}: Props) {
+  const v = useForever(900);
+  const transform = useRef([{scale: wave(v, 0.85, 1.2)}]).current;
+  return <Animated.View style={[style, {transform}]}>{children}</Animated.View>;
+}
+
 /** Turns over every few seconds, like an hourglass: "waiting". (Our hourglass icon looks the same upside down.) */
 export function Flip({every = 2600, style, children}: Props & {every?: number}) {
   const turn = 700;

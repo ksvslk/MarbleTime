@@ -10,18 +10,18 @@ const COGNITO = {
 describe('config', () => {
   it('reads the config.json the CDK stack writes (its own key names)', () => {
     const file = {
-      apiUrl: 'https://ny4o9o0um2.execute-api.us-east-1.amazonaws.com',
+      apiUrl: 'https://abc123defg.execute-api.us-east-1.amazonaws.com',
       region: 'us-east-1',
-      userPoolId: 'us-east-1_GgccsHMyo',
-      userPoolClientId: '6c4vor9joadnccf2n67vaqka70',
-      cognitoDomain: 'https://marbletime-dev-713072916910.auth.us-east-1.amazoncognito.com',
+      userPoolId: 'us-east-1_Example1',
+      userPoolClientId: 'exampleclientid0000000000',
+      cognitoDomain: 'https://marbletime-dev-123456789012.auth.us-east-1.amazoncognito.com',
     };
     expect(resolveConfig({}, file)).toEqual({
       ok: true,
       config: {
         apiUrl: file.apiUrl,
         auth: 'cognito',
-        cognito: {authority: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_GgccsHMyo', clientId: file.userPoolClientId, domain: file.cognitoDomain},
+        cognito: {authority: 'https://cognito-idp.us-east-1.amazonaws.com/us-east-1_Example1', clientId: file.userPoolClientId, domain: file.cognitoDomain},
       },
     });
   });

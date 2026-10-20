@@ -3,9 +3,11 @@
  * conditions, and every method's writes happen all at once or not at all. Values are copied in and out, so callers
  * can't change stored data by accident.
  */
-import type {ChildProfile, Decision, FamilyFields, Repo} from '../domain/repo';
+import {deserialize, serialize} from 'node:v8';
+import type {ChildProfile, Decision, FamilyFields, Repo, Used} from '../domain/repo';
+import type {PuzzleProgress, PuzzleRound, PuzzleSet} from '../puzzles/pick';
 import type {
-  Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushSubscription, Ref,
+  Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushPass, PushSubscription, Ref,
 } from '../domain/types';
 
 interface FamilyData {
@@ -22,12 +24,16 @@ interface FamilyData {
   art: Map<string, CharacterArt>;
   /** "<key>#<window start>" → uses in that window, and when the window ends */
   rates: Map<string, {count: number; until: number}>;
+  /** childId → the kid's next written puzzle session */
+  puzzleSets: Map<string, PuzzleSet>;
+  /** childId → the kid's finished puzzle rounds, newest last */
+  puzzleRounds: Map<string, PuzzleRound[]>;
 }
 
 const copy = <T>(value: T): T => structuredClone(value);
 const emptyData = (): FamilyData => ({
   children: new Map(), chores: new Map(), claims: new Map(), slots: new Map(), entries: new Map(), refs: new Map(), devices: new Map(),
-  characters: new Map(), art: new Map(), rates: new Map(),
+  characters: new Map(), art: new Map(), rates: new Map(), puzzleSets: new Map(), puzzleRounds: new Map(),
 });
 const slotOf = (claim: Claim) => `${claim.childId}#${claim.choreId}#${claim.slot}`;
 const newestFirst = (a: LedgerEntry, b: LedgerEntry) => b.createdAt - a.createdAt || (b.id > a.id ? 1 : b.id < a.id ? -1 : 0);
@@ -43,6 +49,38 @@ export class MemoryRepo implements Repo {
   private connections = new Map<string, Connection>();
   /** familyId → endpoint → subscription */
   private subscriptions = new Map<string, Map<string, PushSubscription>>();
+  /** sha256(token) → the pass */
+  private pushPasses = new Map<string, PushPass>();
+
+  /**
+   * Everything that should outlive a restart of the dev server, as bytes for a file. Not the realtime connections
+   * and leases: they belong to the process that made them.
+   */
+  snapshot(): Buffer {
+    const {families, stores, users, pairings, parentNames, subscriptions, pushPasses} = this;
+    return serialize({families, stores, users, pairings, parentNames, subscriptions, pushPasses});
+  }
+
+  /** Puts a snapshot() back. */
+  restore(bytes: Buffer) {
+    const saved = deserialize(bytes) as Record<string, unknown>;
+    const kept = (key: string) => {
+      if (!(saved[key] instanceof Map)) throw new Error(`not a MarbleTime data file: no ${key}`);
+      return saved[key] as Map<string, never>;
+    };
+    this.families = kept('families');
+    this.stores = kept('stores');
+    this.users = kept('users');
+    this.pairings = kept('pairings');
+    this.parentNames = kept('parentNames');
+    this.subscriptions = kept('subscriptions');
+    // Added later: a file from before has none.
+    this.pushPasses = saved.pushPasses instanceof Map ? (saved.pushPasses as Map<string, PushPass>) : new Map();
+    // A file from an older version may lack a kind of record added since.
+    for (const data of this.stores.values()) Object.assign(data, {...emptyData(), ...data});
+    this.connections.clear();
+    this.leases.clear();
+  }
 
   /** A family's data; for an unknown family a throwaway empty one (nothing is found, writes go nowhere). */
   private data(familyId: string): FamilyData {
@@ -108,6 +146,8 @@ export class MemoryRepo implements Repo {
     for (const ref of data.refs.keys()) if (ref.startsWith(`${childId}#`)) data.refs.delete(ref);
     for (const [id, character] of data.characters) if (character.childId === childId) data.characters.delete(id);
     for (const [id, art] of data.art) if (art.childId === childId) data.art.delete(id);
+    data.puzzleSets.delete(childId);
+    data.puzzleRounds.delete(childId);
   }
 
   async listChores(familyId: string) {
@@ -187,16 +227,48 @@ export class MemoryRepo implements Repo {
       .map(copy);
   }
 
-  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number} = {}) {
+  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number; used?: Used} = {}) {
     const data = this.data(familyId);
     const refKey = options.ref && `${entry.childId}#${options.ref.id}`;
     if (refKey && data.refs.has(refKey)) return 'duplicate' as const;
     const child = data.children.get(entry.childId);
     if (!child || child.balanceSec < (options.minBalanceSec ?? 0)) return 'changed' as const;
+    const {used} = options;
+    if (used && (child.usedDay !== used.prevDay || (used.prevDay === used.day && (child.usedBaseSec ?? 0) !== used.prevBaseSec))) return 'changed' as const;
     data.entries.set(entry.id, copy(entry));
     child.balanceSec += entry.deltaSec;
     child.debtSec += options.debtSec ?? 0;
+    if (used) Object.assign(child, {usedDay: used.day, usedBaseSec: used.baseSec, usedEarnedSec: used.earnedSec});
     if (refKey && options.ref) data.refs.set(refKey, copy(options.ref.value));
+    return 'ok' as const;
+  }
+
+  async getPuzzleSet(familyId: string, childId: string) {
+    const set = this.data(familyId).puzzleSets.get(childId);
+    return set && copy(set);
+  }
+
+  async putPuzzleSet(familyId: string, childId: string, set: PuzzleSet) {
+    if (this.stores.has(familyId)) this.data(familyId).puzzleSets.set(childId, copy(set));
+  }
+
+  async getPuzzleRounds(familyId: string, childId: string) {
+    return copy(this.data(familyId).puzzleRounds.get(childId) ?? []);
+  }
+
+  async putPuzzleRounds(familyId: string, childId: string, rounds: PuzzleRound[]) {
+    if (this.stores.has(familyId)) this.data(familyId).puzzleRounds.set(childId, copy(rounds));
+  }
+
+  async finishPuzzles(familyId: string, childId: string, done: {refId: string; day: string; stars: number; token: boolean; progress: PuzzleProgress; prevStars: number}) {
+    const data = this.data(familyId);
+    const refKey = `${childId}#${done.refId}`;
+    if (data.refs.has(refKey)) return 'duplicate' as const;
+    const child = data.children.get(childId);
+    if (!child || (child.puzzleStars ?? 0) !== done.prevStars) return 'changed' as const;
+    Object.assign(child, {puzzleStars: done.stars, puzzleDay: done.day, puzzleLevels: copy(done.progress.levels), puzzleStreaks: copy(done.progress.streaks), puzzleSeen: copy(done.progress.seen)});
+    if (done.token) child.characterTokens = (child.characterTokens ?? 0) + 1;
+    data.refs.set(refKey, {kind: 'puzzle'});
     return 'ok' as const;
   }
 
@@ -341,6 +413,16 @@ export class MemoryRepo implements Repo {
     if (this.pairings.has(pairing.code)) return false;
     this.pairings.set(pairing.code, copy(pairing));
     return true;
+  }
+
+  async putPushPass(hash: string, pass: PushPass) {
+    this.pushPasses.set(hash, copy(pass));
+  }
+
+  async takePushPass(hash: string) {
+    const pass = this.pushPasses.get(hash);
+    this.pushPasses.delete(hash);
+    return pass && copy(pass);
   }
 
   async getPairing(code: string) {

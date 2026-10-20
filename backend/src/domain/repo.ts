@@ -1,7 +1,8 @@
-import type {Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushSubscription, Ref} from './types';
+import type {PuzzleProgress, PuzzleRound, PuzzleSet} from '../puzzles/pick';
+import type {Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushPass, PushSubscription, Ref} from './types';
 
 export type FamilyFields = Partial<Pick<Family, 'name' | 'lang' | 'timezone' | 'caps' | 'voice' | 'pin'>>;
-export type ChildProfile = Partial<Pick<Child, 'name' | 'avatar' | 'color' | 'age' | 'dailyBaseMin' | 'dailyMaxMin'>>;
+export type ChildProfile = Partial<Pick<Child, 'name' | 'avatar' | 'color' | 'age' | 'dailyBaseMin' | 'dailyMaxMin' | 'puzzlesOff' | 'puzzleLevel' | 'bedtime'>>;
 
 /** How a claim gets decided: everything in it happens at once, or not at all. */
 export interface Decision {
@@ -68,8 +69,23 @@ export interface Repo {
    * Appends the entry and adds it to the child's balance (and `debtSec` to the penalty debt). With `minBalanceSec`,
    * only if the balance is at least that much. "changed": the child is gone, or the balance is below it.
    */
-  addEntry(familyId: string, entry: LedgerEntry, options?: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number}): Promise<'ok' | 'duplicate' | 'changed'>;
+  /**
+   * `used` (a USAGE entry): the kid's watched time on `day` after this entry, written only if the stored day is still
+   * `prevDay` and, on the same day, the stored base part is still `prevBaseSec`.
+   */
+  addEntry(familyId: string, entry: LedgerEntry, options?: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number; used?: Used}): Promise<'ok' | 'duplicate' | 'changed'>;
   getRef(familyId: string, childId: string, id: string): Promise<Ref | undefined>;
+  /** A kid's next written puzzle session (puzzles/pick.ts PuzzleSet); gone with the kid. */
+  getPuzzleSet(familyId: string, childId: string): Promise<PuzzleSet | undefined>;
+  putPuzzleSet(familyId: string, childId: string, set: PuzzleSet): Promise<void>;
+  /** A kid's finished puzzle rounds, newest last (puzzles/pick.ts PuzzleRound); gone with the kid. */
+  getPuzzleRounds(familyId: string, childId: string): Promise<PuzzleRound[]>;
+  putPuzzleRounds(familyId: string, childId: string, rounds: PuzzleRound[]): Promise<void>;
+  /**
+   * A finished puzzle session, all at once: the kid's stars, day and progress (levels, streaks, seen), a character token if one was earned, and
+   * the session's id (so it counts once). 'changed' if the stored stars are no longer `prevStars`.
+   */
+  finishPuzzles(familyId: string, childId: string, done: {refId: string; day: string; stars: number; token: boolean; progress: PuzzleProgress; prevStars: number}): Promise<'ok' | 'duplicate' | 'changed'>;
   /** The newest `limit` entries, newest first. */
   entries(familyId: string, childId: string, limit: number): Promise<LedgerEntry[]>;
   pendingEntries(familyId: string, childId: string): Promise<LedgerEntry[]>;
@@ -128,6 +144,9 @@ export interface Repo {
   releaseLease(name: string, holder: string): Promise<void>;
 
   /** False if the code is in use. */
+  /** A pass to answer a claim from its notification, under sha256(token); taking it returns it and removes it. */
+  putPushPass(hash: string, pass: PushPass): Promise<void>;
+  takePushPass(hash: string): Promise<PushPass | undefined>;
   createPairing(pairing: Pairing): Promise<boolean>;
   getPairing(code: string): Promise<Pairing | undefined>;
   /** Marks the pairing paired and creates the device; false if it isn't waiting or has expired at `now`. */
@@ -150,4 +169,13 @@ export interface Repo {
   listDevices(familyId: string): Promise<Device[]>;
   updateDevice(familyId: string, deviceId: string, fields: Partial<Pick<Device, 'name' | 'mode' | 'lastSeen' | 'appVersion' | 'pinFails'>>): Promise<Device | undefined>;
   deleteDevice(familyId: string, deviceId: string): Promise<void>;
+}
+
+/** A kid's watched time after a USAGE entry, and what was read before it (see Repo.addEntry). */
+export interface Used {
+  day: string;
+  baseSec: number;
+  earnedSec: number;
+  prevDay?: string;
+  prevBaseSec: number;
 }

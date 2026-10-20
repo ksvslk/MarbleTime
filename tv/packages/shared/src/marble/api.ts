@@ -18,6 +18,13 @@ export interface ServerChild {
   /** The daily ceiling: the jar's size (missing on a backend from before it existed). */
   dailyMaxMin?: number;
   characterTokens?: number;
+  /** TV watched today and the time left today (missing on a backend from before watched time was counted). */
+  usedTodaySec?: number;
+  leftTodaySec?: number;
+  /** Puzzles: stars toward the next character, today's session, the kid's levels (missing on a backend from before puzzles). */
+  puzzles?: {on: boolean; stars: number; starsNeeded: number; doneToday: boolean; levels: Record<string, number>};
+  /** When TV time ends for the night (absent: none). */
+  bedtime?: {from: string; to: string};
 }
 
 /** Gemini-TTS voices, picked by the backend's art director. */
@@ -88,9 +95,30 @@ export interface ServerClaim {
   decidedAt?: number;
   decidedBy?: 'parent' | 'tv';
   approverName?: string;
+  /** What the job card showed at "I did it!", and so what a yes gives. */
+  promised?: {reward: 'marbles' | 'character' | 'praise'; minutes: number};
   reward?: 'marbles' | 'character' | 'praise';
   minutesCredited?: number;
+  notYetReason?: NotYetReason;
 }
+
+/** One puzzle as the backend sends it (Puzzle in backend/openapi.yaml): written by a model ahead of time and checked. */
+export interface ServerPuzzle {
+  id: string;
+  subject: string;
+  level: number;
+  prompt: string;
+  /** Emoji the question is about, shown in a row. */
+  picture: string[];
+  /** Three answers, all words or all emoji. */
+  choices: {text?: string; emoji?: string}[];
+  answer: number;
+  reason: string;
+}
+
+/** Why a grown-up said "not yet" (NotYetReason in backend/openapi.yaml). */
+export type NotYetReason = 'not_finished' | 'together' | 'later';
+export const NOT_YET_REASONS: NotYetReason[] = ['not_finished', 'together', 'later'];
 
 /** GET /device/state */
 export interface ServerState {
@@ -118,12 +146,14 @@ interface Call {
   token?: string;
   body?: unknown;
   etag?: string;
+  /** How long the answer may take (default 8 s). */
+  timeoutMs?: number;
 }
 
 /** One request with a timeout. Network trouble throws a plain Error; an answer with an error status throws ApiError. */
-async function call<T>(base: string, path: string, {method = 'GET', token, body, etag}: Call): Promise<{status: number; data?: T; etag?: string}> {
+async function call<T>(base: string, path: string, {method = 'GET', token, body, etag, timeoutMs = 8000}: Call): Promise<{status: number; data?: T; etag?: string}> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 8000);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const headers: Record<string, string> = {Accept: 'application/json'};
     if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -156,10 +186,29 @@ export const api = {
   claim: (base: string, token: string, claim: {id: string; childId: string; choreId: string; at: number}) =>
     call<ServerClaim>(base, '/device/claims', {method: 'POST', token, body: claim}),
 
+  /**
+   * A kid's new character from their own words, said or typed on the TV (uses one character token). The art director
+   * answers inside the call, which can take a while; a no is ApiError 422 with a kind sentence to show the kid.
+   */
+  createCharacter: (base: string, token: string, childId: string, description: string) =>
+    call<ServerCharacter>(base, `/device/children/${encodeURIComponent(childId)}/characters`, {method: 'POST', token, body: {description}, timeoutMs: 40000}),
+
+  /** Time a kid spent on MarbleTime's own screen time (puzzles, their characters), in seconds: it comes out of their jar. */
+  usage: (base: string, token: string, usage: {id: string; childId: string; seconds: number}) =>
+    call<ServerChild>(base, '/device/usage', {method: 'POST', token, body: usage}),
+
+  /** A kid's next puzzle session (the one written for them, or one from the bank); null when there is none to play. */
+  puzzleSession: (base: string, token: string, childId: string) =>
+    call<{questions: ServerPuzzle[]; spare?: ServerPuzzle}>(base, `/device/puzzles/session?childId=${encodeURIComponent(childId)}`, {token}).then(answer => answer.data ?? null),
+
+  /** A finished puzzle session: the kid's first answer to each puzzle. */
+  puzzleResult: (base: string, token: string, result: {id: string; childId: string; answers: {id: string; right: boolean}[]}) =>
+    call<ServerChild>(base, '/device/puzzles/results', {method: 'POST', token, body: result}),
+
   undo: (base: string, token: string, claimId: string) => call(base, `/device/claims/${claimId}`, {method: 'DELETE', token}),
 
-  decide: (base: string, token: string, claimId: string, yes: boolean, pin: string) =>
-    call<ServerClaim>(base, `/device/claims/${claimId}/decide`, {method: 'POST', token, body: {yes, pin}}),
+  decide: (base: string, token: string, claimId: string, yes: boolean, pin: string, reason?: NotYetReason) =>
+    call<ServerClaim>(base, `/device/claims/${claimId}/decide`, {method: 'POST', token, body: {yes, pin, ...(reason && {reason})}}),
 
   /** Grown-ups changed settings on the TV (checked with the family PIN). */
   settings: (base: string, token: string, settings: {lang?: Lang; caps?: boolean; voice?: boolean}, pin: string) =>

@@ -1,0 +1,11 @@
+{
+  "platform": {
+    "default": "both",
+    "paths": {
+      "tv/packages/vega/": "vega_os",
+      "tv/packages/expotv/": "fire_os",
+      "apps/demo-cartoons/": "fire_os",
+      "tv/packages/shared/": "both"
+    }
+  }
+}

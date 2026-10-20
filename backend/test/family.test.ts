@@ -41,12 +41,25 @@ describe('kids', () => {
     const f = await family();
     expect(f.mia).toEqual({
       id: expect.any(String), name: 'Mia', avatar: 'bear', color: 'gold', age: 5, balanceSec: 0, dailyBaseMin: 30, dailyMaxMin: 60, characterTokens: 0,
+      usedTodaySec: 0, leftTodaySec: 1800, puzzles: {on: true, stars: 0, starsNeeded: 5, doneToday: false, levels: {}, level: 0, levelAges: ['4–5', '6', '7–8', '9–10']},
     });
     expect(f.leo).toMatchObject({age: 8, dailyMaxMin: 90, dailyBaseMin: 50, characterTokens: 0});
     const {body: ann} = await f.mom.post('/children', {name: 'Ann', avatar: 'bunny', color: 'mint', age: 7, dailyMaxMin: 120});
     expect(ann).toMatchObject({dailyMaxMin: 120, dailyBaseMin: 60});
     const {body: ben} = await f.mom.post('/children', {name: 'Ben', avatar: 'bear', color: 'sky', age: 9, dailyMaxMin: 70, dailyBaseMin: 0});
     expect(ben).toMatchObject({dailyMaxMin: 70, dailyBaseMin: 0});
+  });
+
+  it('keeps a kid\'s bedtime (past midnight too), removes it with null, and refuses a time that isn\'t one', async () => {
+    const f = await family();
+    const path = `/children/${f.mia.id}`;
+    expect((await f.mom.patch(path, {bedtime: {from: '19:30', to: '07:00'}})).body.bedtime).toEqual({from: '19:30', to: '07:00'});
+    expect((await f.mom.get('/family')).body.children.find((c: {id: string}) => c.id === f.mia.id).bedtime).toEqual({from: '19:30', to: '07:00'});
+    expect((await f.mom.patch(path, {name: 'Mia'})).body.bedtime).toEqual({from: '19:30', to: '07:00'}); // other changes keep it
+    expect((await f.mom.patch(path, {bedtime: null})).body.bedtime).toBeUndefined();
+    for (const bad of [{from: '19:30'}, {from: '7:30', to: '19:00'}, {from: '24:00', to: '07:00'}, {from: '20:00', to: '20:00'}, 'never']) {
+      expect((await f.mom.patch(path, {bedtime: bad})).status).toBe(400);
+    }
   });
 
   it('never goes above the guideline for the age, and keeps the base within the maximum', async () => {
@@ -135,15 +148,15 @@ describe('jobs', () => {
     const {body: dishes} = await f.mom.post('/chores', {title: 'Tühjenda nõudepesumasin', minutes: 20, childIds: [f.leo.id, f.leo.id]});
     expect(dishes).toMatchObject({icon: 'table', color: 'sky', childIds: [f.leo.id]});
     const {body: own} = await f.mom.post('/chores', {title: 'Something', icon: 'heart', color: 'gold', minutes: 30, routine: true, childIds: [f.leo.id], repeat: {kind: 'weekdays', days: [5, 1]}});
-    expect(own).toMatchObject({icon: 'heart', color: 'gold', minutes: 30, routine: true, repeat: {kind: 'weekdays', days: [1, 5]}});
+    expect(own).toMatchObject({icon: 'heart', color: 'gold', minutes: 30, routine: false, repeat: {kind: 'weekdays', days: [1, 5]}}); // routine is accepted and ignored
   });
 
-  it('edits only what is given (routine stays as it was unless sent), and refuses kids from elsewhere', async () => {
+  it('edits only what is given (routine is ignored: every job gives its minutes), and refuses kids from elsewhere', async () => {
     const f = await family();
     const res = await f.mom.patch(`/chores/${f.toys.id}`, {minutes: 20, repeat: {kind: 'once'}});
     expect(res.body).toEqual({...f.toys, minutes: 20, repeat: {kind: 'once'}});
-    expect((await f.mom.patch(`/chores/${f.toys.id}`, {routine: true})).body.routine).toBe(true);
-    expect((await f.mom.patch(`/chores/${f.toys.id}`, {title: 'Toys back in the box'})).body).toMatchObject({routine: true, minutes: 20});
+    expect((await f.mom.patch(`/chores/${f.toys.id}`, {routine: true})).body.routine).toBe(false);
+    expect((await f.mom.patch(`/chores/${f.toys.id}`, {title: 'Toys back in the box'})).body).toMatchObject({routine: false, minutes: 20});
     expect((await f.mom.patch(`/chores/${f.toys.id}`, {routine: false})).body.routine).toBe(false);
     const stranger = await f.mom.patch(`/chores/${f.toys.id}`, {childIds: ['someone-else']});
     expect(stranger.status).toBe(400);

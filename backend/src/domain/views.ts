@@ -3,7 +3,8 @@
  * internal fields never leak and the same data always serialises the same way (the TV's ETag relies on it).
  * Stored values from before the daily budget (job minutes in 5s, kids without a maximum) are read by today's rules.
  */
-import {budgetOf, jobMinutes} from './budget';
+import {budgetOf, jobMinutes, leftTodaySec, usedTodaySec} from './budget';
+import {puzzlesOf} from './puzzles';
 import {voiceStyleOf} from './voice-style';
 import {type Character, type CharacterArt, type CharacterCard, type Chore, type Child, type Claim, type Device, type Family, type Layer, type LedgerEntry, type Repeat, voiceOf} from './types';
 
@@ -15,14 +16,15 @@ export const childView = (c: Child) => {
   const {dailyBaseMin, dailyMaxMin} = budgetOf(c);
   return {
     id: c.id, name: c.name, avatar: c.avatar, color: c.color, age: c.age, balanceSec: c.balanceSec, dailyBaseMin, dailyMaxMin,
-    characterTokens: c.characterTokens ?? 0,
+    characterTokens: c.characterTokens ?? 0, usedTodaySec: usedTodaySec(c), leftTodaySec: leftTodaySec(c), puzzles: puzzlesOf(c),
+    ...(c.bedtime && {bedtime: {from: c.bedtime.from, to: c.bedtime.to}}),
   };
 };
 
 const repeatView = (r: Repeat): Repeat => (r.kind === 'weekdays' ? {kind: r.kind, days: [...r.days]} : {kind: r.kind});
 
 export const choreView = (k: Chore) => ({
-  id: k.id, title: k.title, icon: k.icon, color: k.color, minutes: jobMinutes(k.minutes), routine: k.routine ?? false, repeat: repeatView(k.repeat),
+  id: k.id, title: k.title, icon: k.icon, color: k.color, minutes: jobMinutes(k.minutes), routine: false, repeat: repeatView(k.repeat),
   childIds: [...k.childIds], createdAt: k.createdAt,
 });
 
@@ -31,8 +33,10 @@ export const claimView = (c: Claim) => ({
   ...(c.decidedAt !== undefined && {decidedAt: c.decidedAt}),
   ...(c.decidedBy !== undefined && {decidedBy: c.decidedBy}),
   ...(c.approverName !== undefined && {approverName: c.approverName}),
+  ...(c.promised !== undefined && {promised: c.promised}),
   ...(c.reward !== undefined && {reward: c.reward}),
   ...(c.minutesCredited !== undefined && {minutesCredited: c.minutesCredited}),
+  ...(c.notYetReason !== undefined && {notYetReason: c.notYetReason}),
 });
 
 export const entryView = (e: LedgerEntry) => ({
@@ -40,6 +44,7 @@ export const entryView = (e: LedgerEntry) => ({
   ...(e.refId !== undefined && {refId: e.refId}),
   createdBy: e.createdBy, createdAt: e.createdAt,
   ...(e.handoff !== undefined && {handoff: e.handoff}),
+  ...(e.baseSec !== undefined && {baseSec: e.baseSec}),
 });
 
 /** A bonus (+) or minutes taken away (−, what was actually taken), so the TV can say why a jar changed. */

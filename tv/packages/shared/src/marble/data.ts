@@ -57,7 +57,7 @@ export const JOB_ICONS = [
 export type JobIconName = (typeof JOB_ICONS)[number]['name'];
 export type IconName =
   | JobIconName
-  | 'hourglass' | 'thumbs' | 'play' | 'speaker' | 'check' | 'lock' | 'lockopen' | 'undo' | 'clock' | 'shapes' | 'message' | 'sparkle' | 'home' | 'games';
+  | 'hourglass' | 'thumbs' | 'play' | 'speaker' | 'check' | 'lock' | 'lockopen' | 'undo' | 'clock' | 'shapes' | 'message' | 'sparkle' | 'starfull' | 'mystery' | 'tv' | 'home' | 'games';
 
 export interface Kid {
   id: KidId;
@@ -71,6 +71,8 @@ export interface Kid {
   dailyMaxMin: number;
   /** New characters earned (jobs approved while the jar was full) and not yet made. */
   characterTokens?: number;
+  /** When TV time ends for the night, local time ("19:30" to "07:00"); strict mode closes video apps then. */
+  bedtime?: {from: string; to: string};
 }
 
 /** A real-life job, written by a parent (any length, any language; screens must fit it). */
@@ -111,12 +113,12 @@ const JOBS: Record<KidId, Job[]> = {
   mia: [
     {id: 'toys', title: TOYS, icon: 'toys', color: colors.peach, minutes: 10},
     {id: 'cat', title: CAT, icon: 'cat', color: colors.mint, minutes: 20},
-    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10, routine: true},
+    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10},
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
   leo: [
     {id: 'table', title: TABLE, icon: 'table', color: colors.peach, minutes: 20},
-    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10, routine: true},
+    {id: 'teeth', title: TEETH, icon: 'tooth', color: colors.sky, minutes: 10},
     {id: 'pajamas', title: PAJAMAS, icon: 'moon', color: colors.lilac, minutes: 10},
   ],
 };
@@ -140,7 +142,7 @@ export const STRESS_FAMILY: Family = {
       {id: 'lego', title: 'Put all the LEGO back in the big blue box under the bed', icon: 'toys', color: colors.mint, minutes: 20},
       {id: 'et', title: 'Tühjenda nõudepesumasin ja pühi köögilaud puhtaks', icon: 'table', color: colors.sky, minutes: 20},
       {id: 'es', title: 'Recoger los juguetes del salón antes de cenar', icon: 'toys', color: colors.lilac, minutes: 10},
-      {id: 'x', title: 'X', icon: 'star', color: colors.peach, minutes: 10, routine: true},
+      {id: 'x', title: 'X', icon: 'star', color: colors.peach, minutes: 10},
     ],
     onnela: [
       {id: 'long', title: 'Supercalifragilisticexpialidocious', icon: 'star', color: colors.lilac, minutes: 30},

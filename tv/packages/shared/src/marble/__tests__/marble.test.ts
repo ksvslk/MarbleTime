@@ -1,12 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {JOB_ICONS, SAMPLE_FAMILY} from '../data';
-import {LANGS, STRINGS} from '../i18n';
+import {LANGS, STRINGS, t} from '../i18n';
 import {CAPS_WIDTH, fitFontSize, linesNeeded} from '../fit';
 import type {ServerState} from '../api';
 import {
-  applyServer, celebrationToShow, checkPin, defaultDailyMax, firstSyncPending, initialState, isDone, jarFull, jarRoom, jarSize, Link, localDay, marblesIn,
-  needsPairing, normalKid, notYetToday, reducer, restore, rewardFor, State, takenToday, timeToday, toSaved,
+  afterAnswer,
+  applyServer, celebrationToShow, checkPin, defaultDailyMax, firstSyncPending, givenFor, givesOf, initialState, isDone, jarFull, jarRoom, jarSize, Link, localDay, marblesIn,
+  needsPairing, normalKid, notYetToday, puzzlesOf, reducer, restore, rewardFor, screenTimeKid, State, stillPicked, takenToday, timeToday, toSaved,
+  bedtimeMinutes, inBedtime,
 } from '../logic';
 import {sha256Hex} from '../sha256';
 import {spokenLines, voiceKey} from '../voiceLines';
@@ -48,21 +50,148 @@ describe('today’s jar: a budget with a ceiling (docs/08)', () => {
     expect([no.balances.mia, no.celebrations.length, no.claims[0].status]).toEqual([10, 0, 'rejected']);
   });
 
-  it('only what fits goes in; once the jar is full, a job earns a new character instead', () => {
+  it('a job that only partly fits fills the jar and earns a new character for the rest; a full jar gives the character alone', () => {
     const almost: State = {...sample, balances: {...sample.balances, mia: 20}}; // 30 + 20 = 50 of 60: one marble fits
     const partly = approve(almost, 'mia', 'cat'); // a 20-minute job
-    expect(mia(partly)[0]).toMatchObject({reward: 'marbles', minutesCredited: 10});
+    expect(mia(partly)[0]).toMatchObject({promised: {reward: 'character', minutes: 10}, reward: 'character', minutesCredited: 10});
     expect([timeToday(partly, 'mia'), jarFull(partly, 'mia')]).toEqual([60, true]);
+    expect(partly.family.kids.find(k => k.id === 'mia')?.characterTokens).toBe(1);
+    expect(partly.celebrations[0]).toMatchObject({marbles: 1, why: {kind: 'job', jobId: 'cat', reward: 'character'}});
     const extra = approve(partly, 'mia', 'toys');
     expect(extra.balances.mia).toBe(partly.balances.mia);
-    expect(extra.family.kids.find(k => k.id === 'mia')?.characterTokens).toBe(1);
+    expect(extra.family.kids.find(k => k.id === 'mia')?.characterTokens).toBe(2);
     expect(extra.celebrations[extra.celebrations.length - 1]).toMatchObject({marbles: 0, why: {kind: 'job', jobId: 'toys', reward: 'character'}});
   });
 
-  it('a routine job is praised, without a marble', () => {
+  it('what the card showed at "I did it!" is what a yes gives: waiting jobs hold their room', () => {
+    const job = (id: string) => SAMPLE_FAMILY.jobs.mia.find(j => j.id === id)!;
+    // Mia has room for two marbles. The cat (2 marbles) is claimed first, so the toys card (1 marble) now shows a character.
+    expect(givesOf(sample, 'mia', job('toys'))).toEqual({reward: 'marbles', minutes: 10});
+    const cat = reducer(sample, {type: 'claim', kidId: 'mia', jobId: 'cat'});
+    expect(givesOf(cat, 'mia', job('cat'))).toEqual({reward: 'marbles', minutes: 20});
+    expect(givesOf(cat, 'mia', job('toys'))).toEqual({reward: 'character', minutes: 0});
+    const both = reducer(cat, {type: 'claim', kidId: 'mia', jobId: 'toys'});
+    const [catClaim, toysClaim] = ['cat', 'toys'].map(id => both.claims.find(c => c.jobId === id)!);
+    // Toys is approved first: it still gives the character it showed, and the cat still gets its two marbles.
+    const toysDone = reducer(both, {type: 'decide', claimId: toysClaim.id, yes: true});
+    expect(toysDone.claims.find(c => c.id === toysClaim.id)).toMatchObject({reward: 'character', minutesCredited: 0});
+    const catDone = reducer(toysDone, {type: 'decide', claimId: catClaim.id, yes: true});
+    expect(catDone.claims.find(c => c.id === catClaim.id)).toMatchObject({reward: 'marbles', minutesCredited: 20});
+    expect([catDone.balances.mia, timeToday(catDone, 'mia')]).toEqual([30, 60]);
+    // A "not yet" frees the room for the next card.
+    const catNo = reducer(both, {type: 'decide', claimId: catClaim.id, yes: false, reason: 'not_finished'});
+    expect(catNo.claims.find(c => c.id === catClaim.id)).toMatchObject({status: 'rejected', notYetReason: 'not_finished'});
+    expect(rewardFor(catNo, 'mia', job('cat'))).toEqual({reward: 'marbles', minutes: 20});
+  });
+
+  it('a promise never goes over the jar: if it filled meanwhile, the rest is a character', () => {
+    const claimed = reducer(sample, {type: 'claim', kidId: 'mia', jobId: 'cat'});
+    const fuller: State = {...claimed, balances: {...claimed.balances, mia: 20}}; // a bonus came in: one marble of room left
+    expect(givenFor(fuller, fuller.claims[0])).toEqual({reward: 'character', minutes: 10});
+    const done = reducer(fuller, {type: 'decide', claimId: fuller.claims[0].id, yes: true});
+    expect([done.balances.mia, done.family.kids.find(k => k.id === 'mia')?.characterTokens]).toEqual([30, 1]);
+  });
+
+  it('the jar is the time left: watched time leaves it (base first), and what was watched can\'t be earned again today', () => {
+    // Mia: a 60-minute jar, 30 given, 10 earned. She watched 20 minutes of the base.
+    const watched: State = {...sample, used: {mia: {baseMin: 20, earnedMin: 0}}};
+    expect([timeToday(watched, 'mia'), jarRoom(watched, 'mia'), jarSize(watched, 'mia')]).toEqual([20, 20, 4]);
+    // Later she watched the rest of the base and her earned marble: nothing left, two marbles still to earn.
+    const empty: State = {...sample, balances: {...sample.balances, mia: 0}, used: {mia: {baseMin: 30, earnedMin: 10}}};
+    expect([timeToday(empty, 'mia'), jarRoom(empty, 'mia'), jarSize(empty, 'mia'), jarFull(empty, 'mia')]).toEqual([0, 20, 2, false]);
+    // The backend's seconds become minutes, left rounded down and watched rounded up.
+    const server = applyServer({...initialState, link: {token: 't', deviceId: 'd', familyName: 'F'} as Link}, {
+      family: {id: 'f', name: 'F', lang: 'en', caps: false, voice: true, pin: null},
+      children: [{id: 'k1', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, balanceSec: 300, dailyBaseMin: 30, dailyMaxMin: 60, usedTodaySec: 2100, leftTodaySec: 300}],
+      chores: [], claims: [], today: '2026-10-12', serverTime: 0,
+    }, 0);
+    expect(server.used.k1).toEqual({baseMin: 30, earnedMin: 5});
+    expect([timeToday(server, 'k1'), jarRoom(server, 'k1')]).toEqual([5, 20]);
+  });
+
+  it('counts and locks only when the grown-ups set this TV to strict mode, from the backend\'s seconds left', () => {
+    const server = (mode: 'strict' | 'amazon_kids') => applyServer({...initialState, link: {token: 't', deviceId: 'd', familyName: 'F'} as Link}, {
+      family: {id: 'f', name: 'F', lang: 'en', caps: false, voice: true, pin: null}, device: {id: 'd', name: 'TV', mode},
+      children: [{id: 'k1', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, balanceSec: 0, dailyBaseMin: 30, dailyMaxMin: 60, usedTodaySec: 30, leftTodaySec: 1770}],
+      chores: [], claims: [], today: '2026-10-12', serverTime: 0,
+    }, 0);
+    expect([server('strict').strict, server('amazon_kids').strict, server('strict').leftSec]).toEqual([true, false, {k1: 1770}]);
+  });
+
+  it('who is watching: a kid whose jar ran out since being picked drops out, so a sibling with time can still watch', () => {
+    const left: Record<string, number> = {mia: 600, leo: 0, ada: 59};
+    expect(stillPicked(['leo', 'mia', 'ada'], kidId => (left[kidId] ?? 0) >= 60)).toEqual(['mia']);
+    expect(stillPicked([], () => true)).toEqual([]);
+  });
+
+  it('bedtime: a kid’s bedtime is in the TV’s local time and may run past midnight', () => {
+    const at = (h: number, m: number) => new Date(2026, 9, 19, h, m).getTime();
+    const night = {bedtime: {from: '19:30', to: '07:00'}};
+    expect([at(19, 29), at(19, 30), at(23, 59), at(0, 0), at(6, 59), at(7, 0), at(12, 0)].map(time => inBedtime(night, time)))
+      .toEqual([false, true, true, true, true, false, false]);
+    expect([at(13, 0), at(15, 0)].map(time => inBedtime({bedtime: {from: '13:00', to: '15:00'}}, time))).toEqual([true, false]);
+    expect(inBedtime({}, at(21, 0))).toBe(false);
+    expect(bedtimeMinutes(night)).toEqual({bedFrom: 19 * 60 + 30, bedTo: 7 * 60});
+  });
+
+  it('a right answer gets "Yes!" and no explanation; a miss gets the reason, with no word about the miss', () => {
+    const words = {yes: 'Yes!', look: 'Look:', reason: 'A dog barks.'};
+    expect(afterAnswer(true, words)).toEqual({lead: 'Yes!', text: '', say: ['Yes!']});
+    expect(afterAnswer(false, words)).toEqual({lead: 'Look:', text: 'A dog barks.', say: ['A dog barks.']});
+  });
+  it('every finished puzzle round earns a star, the fifth star a new character, and never TV time', () => {
+    const on = {on: true, stars: 0, starsNeeded: 5, doneToday: false, levels: {}};
+    const paired: State = {...sample, link: {token: 't', deviceId: 'd', familyName: 'F'} as Link, puzzles: {mia: on}};
+    const answers = [{id: 'aaaaaaaaaaaaaaaa', right: true}, {id: 'bbbbbbbbbbbbbbbb', right: false}];
+    const first = reducer(paired, {type: 'puzzleDone', kidId: 'mia', answers});
+    expect(puzzlesOf(first, 'mia')).toEqual({...on, stars: 1, doneToday: true});
+    // The screen that ends the round knows how each question went.
+    expect(first.screen).toEqual({name: 'puzzleDone', kidId: 'mia', star: true, character: false, marks: answers.map(a => a.right)});
+    // The kid's first answers go to the backend, which moves their levels.
+    expect(first.outbox).toEqual([{kind: 'puzzle', id: first.outbox[0].id, childId: 'mia', answers}]);
+    expect([first.balances.mia, timeToday(first, 'mia')]).toEqual([sample.balances.mia, timeToday(sample, 'mia')]);
+    // A second round the same day earns the second star.
+    const again = reducer(first, {type: 'puzzleDone', kidId: 'mia', answers: []});
+    expect([puzzlesOf(again, 'mia').stars, again.screen]).toEqual([2, {name: 'puzzleDone', kidId: 'mia', star: true, character: false, marks: []}]);
+    // The last star needed becomes a character token, and the stars start again.
+    const almost: State = {...paired, puzzles: {mia: {...on, stars: 4}}};
+    const fifth = reducer(almost, {type: 'puzzleDone', kidId: 'mia', answers: []});
+    expect([puzzlesOf(fifth, 'mia').stars, fifth.family.kids.find(k => k.id === 'mia')?.characterTokens, fifth.screen]).toEqual([0, 1, {name: 'puzzleDone', kidId: 'mia', star: true, character: true, marks: []}]);
+    // The backend's stars and levels replace the TV's, except while a finished session is still on its way there.
+    const fromServer = (state: State) => applyServer(state, {
+      family: {id: 'f', name: 'F', lang: 'en', caps: false, voice: true, pin: null},
+      children: [{id: 'mia', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, balanceSec: 0, puzzles: {on: true, stars: 3, starsNeeded: 5, doneToday: false, levels: {logic: 2}}}],
+      chores: [], claims: [], today: '2026-10-12', serverTime: 0,
+    }, 0);
+    expect(puzzlesOf(fromServer(first), 'mia').stars).toBe(1);
+    expect(puzzlesOf(fromServer({...first, outbox: []}), 'mia')).toMatchObject({stars: 3, levels: {logic: 2}});
+    // Puzzles come from the backend's bank: an unpaired TV, or a backend from before puzzles, shows no puzzle card.
+    expect(puzzlesOf(sample, 'mia').on).toBe(false);
+    const old = applyServer(paired, {family: {id: 'f', name: 'F', lang: 'en', caps: false, voice: true, pin: null}, children: [{id: 'mia', name: 'Mia', avatar: 'bear', color: 'gold', age: 5, balanceSec: 0}], chores: [], claims: [], today: '2026-10-12', serverTime: 0}, 0);
+    expect(puzzlesOf(old, 'mia').on).toBe(false);
+  });
+
+  it('time in puzzles and with characters is TV time: it leaves the jar (base first) and is reported; the board is free', () => {
+    expect([{name: 'puzzle', kidId: 'mia'}, {name: 'puzzleDone', kidId: 'mia', star: true, character: false, marks: []}, {name: 'gallery', kidId: 'mia'}, {name: 'meet', kidId: 'mia', characterId: 'c'}].map(sc => screenTimeKid(sc as State['screen']))).toEqual(['mia', 'mia', 'mia', 'mia']);
+    expect([{name: 'who'}, {name: 'board', kidId: 'mia'}, {name: 'claimed', kidId: 'mia', jobId: 'toys'}, {name: 'grownups'}].map(sc => screenTimeKid(sc as State['screen']))).toEqual([undefined, undefined, undefined, undefined]);
+    // Mia: 30 given, 10 earned. Three minutes of puzzles come out of the base; the report goes out in seconds.
+    const paired: State = {...sample, link: {token: 't', deviceId: 'd', familyName: 'F'} as Link, leftSec: {mia: 2400}};
+    const played = reducer(paired, {type: 'watched', kidId: 'mia', seconds: 180});
+    expect([timeToday(played, 'mia'), played.balances.mia, played.used.mia, played.leftSec.mia]).toEqual([37, 10, {baseMin: 3, earnedMin: 0}, 2220]);
+    expect(played.outbox).toEqual([{kind: 'usage', id: played.outbox[0].id, childId: 'mia', seconds: 180}]);
+    // Once the base is gone, earned marbles go, and what was watched can't be earned again today.
+    const long = reducer(paired, {type: 'watched', kidId: 'mia', seconds: 35 * 60});
+    expect([timeToday(long, 'mia'), long.balances.mia, long.used.mia, jarRoom(long, 'mia')]).toEqual([5, 5, {baseMin: 30, earnedMin: 5}, 20]);
+    // Never below an empty jar, and less than a second is nothing.
+    expect(timeToday(reducer(paired, {type: 'watched', kidId: 'mia', seconds: 3600}), 'mia')).toBe(0);
+    expect(reducer(paired, {type: 'watched', kidId: 'mia', seconds: 0.4})).toBe(paired);
+  });
+
+  it('every job gives TV time: a job once marked routine earns its marble like any other', () => {
+    const teeth = {...SAMPLE_FAMILY.jobs.mia.find(j => j.id === 'teeth')!, routine: true};
+    expect(rewardFor(sample, 'mia', teeth)).toEqual({reward: 'marbles', minutes: 10});
     const s = approve(sample, 'mia', 'teeth');
-    expect([s.balances.mia, mia(s)[0].reward, mia(s)[0].minutesCredited]).toEqual([10, 'praise', 0]);
-    expect(rewardFor(sample, 'mia', SAMPLE_FAMILY.jobs.mia.find(j => j.id === 'teeth'))).toEqual({reward: 'praise', minutes: 0});
+    expect([s.balances.mia, mia(s)[0].reward, mia(s)[0].minutesCredited]).toEqual([20, 'marbles', 10]);
   });
 
   it('a decision counts once, and claiming twice makes one claim', () => {
@@ -139,7 +268,21 @@ describe('job icons (the AI picks one per job from this set)', () => {
 describe('read-aloud (kids who cannot read yet hear every line)', () => {
   it('every fixed phrase is recorded, in every language (a family\'s own words come from the narrator)', () => {
     for (const {id} of LANGS) for (const line of spokenLines(id)) expect([id, line, VOICES[id][line] !== undefined]).toEqual([id, line, true]);
-    expect(spokenLines('en')).toEqual(["Who’s here?", 'A grown-up will check.', 'Yay!', 'Wow!', 'Thank you!', 'Your jar is full, so you earned a new character!']);
+    expect(spokenLines('en')).toEqual([
+      "Who’s here?", 'A grown-up will check.', 'Yay!', 'Wow!', 'Thank you!', 'Your jar is full, so you earned a new character!',
+      // What a job gives, and why a grown-up said "not yet".
+      'One marble', 'Two marbles', 'Three marbles', 'A new character', 'and a new character', 'A thank-you',
+      'There’s a bit left to do.', 'Let’s do it together.', 'I’ll look later. Ask again.',
+      // Strict mode and puzzles.
+      'Who’s watching?', 'Puzzles', 'Yes!', 'A star',
+      '5 stars: a new character!',
+      // Asking for a new character's words: typed on the TV or in the phone app.
+      'Type it here, or ask a grown-up to type it in the phone app.',
+    ]);
+  });
+  it('the line under the character question offers typing only, here or in the phone app, in every language', () => {
+    expect(t('et', 'characterNewHint')).toBe('Kirjuta siia või palu täiskasvanul see telefonis kirja panna.');
+    for (const {id} of LANGS) expect(t(id, 'characterNewHint')).not.toMatch(/micro|mikro|Mikro|[{}]/);
   });
   it('finds a line whatever its spacing', () => {
     expect(voiceKey('Great job,\nMia!')).toBe('Great job, Mia!');
@@ -170,6 +313,9 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     const s = claimed(paired);
     expect(s.outbox).toEqual([{kind: 'claim', id: s.claims[0].id, childId: 'k1', choreId: 'c1', at: s.claims[0].at}]);
     expect(reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true}).outbox.map(o => o.kind)).toEqual(['claim', 'decide']);
+    // A "not yet" goes out with its reason; a yes never carries one.
+    expect(reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: false, reason: 'together'}).outbox[1]).toMatchObject({kind: 'decide', yes: false, reason: 'together'});
+    expect('reason' in reducer(s, {type: 'decide', claimId: s.claims[0].id, yes: true, reason: 'together'}).outbox[1]).toBe(false);
   });
 
   it('"Oops!" before the claim was sent just drops it; after, it asks the backend to take it back', () => {
@@ -177,6 +323,16 @@ describe('a paired TV (the phone app and the backend are the source of truth)', 
     expect(reducer(s, {type: 'undoClaim', kidId: 'k1', jobId: 'c1'}).outbox).toEqual([]);
     const sent = reducer(s, {type: 'sent', id: s.claims[0].id});
     expect(reducer(sent, {type: 'undoClaim', kidId: 'k1', jobId: 'c1'}).outbox).toEqual([{kind: 'undo', id: `undo-${s.claims[0].id}`, claimId: s.claims[0].id}]);
+  });
+
+  it('a character said into the phone while the TV was asking for it: the TV moves on to the collection', () => {
+    const withToken: ServerState = {...server, children: [{...server.children[0], characterTokens: 1}]};
+    const asking = reducer(applyServer(paired, withToken, now), {type: 'go', screen: {name: 'characterNew', kidId: 'k1'}});
+    expect(applyServer(asking, withToken, now).screen).toEqual({name: 'characterNew', kidId: 'k1'}); // the token is still there: keep asking
+    expect(applyServer(asking, server, now).screen).toEqual({name: 'gallery', kidId: 'k1'});
+    // Opened with no token (a test link): a sync changes nothing.
+    const noToken = reducer(applyServer(paired, server, now), {type: 'go', screen: {name: 'characterNew', kidId: 'k1'}});
+    expect(applyServer(noToken, server, now).screen).toEqual({name: 'characterNew', kidId: 'k1'});
   });
 
   it('takes in the family, the jar’s ceiling, jobs, time and settings from the backend', () => {

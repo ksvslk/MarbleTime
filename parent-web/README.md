@@ -18,6 +18,14 @@ and turns on **dev sign-in**: type a name, and every request carries `Authorizat
 lowercase a–z, 0–9 and dashes, so any name fits in a header: "Õie Mai" → `dev-oie-mai`). A different API for one run:
 `VITE_API_URL=http://localhost:8788 npm run dev`.
 
+**On a phone, with notifications:** `scripts/dev.sh` (repo root) starts the backend and this app
+over https at the Mac's current Wi-Fi address (`https://<mac>:5173`; the API is behind it at `/api`, live updates at
+`/realtime`). A phone's browser gives Web Push only to https pages, so the plain `http://<mac>:5173`
+above hides it. The certificate is made by [mkcert](https://github.com/FiloSottile/mkcert) (`brew install mkcert`);
+once per phone, install mkcert's root certificate (`"$(mkcert -CAROOT)/rootCA.pem"`) as a CA certificate (Android:
+Settings → Security → Encryption & credentials → Install a certificate → CA certificate). The script also makes the
+Web Push keys once and keeps them in `.env.local`.
+
 | `npm run …` | |
 |---|---|
 | `dev` | Vite dev server on port 5173. The port is fixed (`strictPort`): it is the origin the backend allows. |
@@ -54,9 +62,8 @@ A build without them shows "This app isn't set up yet" with the missing names.
   API Gateway checks their `client_id` claim). Managed login is asked for `lang=en|de|es` (it has no Estonian).
 - **CORS:** allow the app's origin (and `http://localhost:5173`, `http://192.168.0.100:5173` in dev), headers
   `Authorization` and `Content-Type`, methods `GET, POST, PATCH, DELETE, OPTIONS`. No cookies are used.
-- **`POST /speech-to-text`** gets a binary body (`Content-Type: audio/wav`: RIFF header, PCM, mono, 16 kHz, 16-bit,
-  at most 15 s = 480,044 bytes). API Gateway hands it to Lambda base64-encoded. Transcribe streaming takes raw PCM
-  (`MediaEncoding: pcm`), so skip the 44-byte header.
+- **`POST /speech-to-text`** is no longer called by this app (characters are typed since Oct 19, docs/08); the route
+  stays in the contract.
 - **Pairing link:** the TV's `pairUrl` is `<app URL>/pair/<code>` (dev: `http://192.168.0.100:5173/pair/<code>`).
 - **SPA hosting:** unknown paths (`/pair/…`, `/auth/callback`, `/kids/…`) must return `index.html` with status 200
   (CloudFront error responses for 403/404, or a viewer-request function). `index.html`, `sw.js`,
@@ -67,8 +74,7 @@ A build without them shows "This app isn't set up yet" with the missing names.
   "Someone already decided"; 409 `empty_jar` from `POST /children/{id}/adjust` → "Nothing earned to take away" (and
   the kid's time is fetched again); 409 from `POST /family` → the family exists, onboarding carries on; 422
   `idea_not_ok` from `POST /children/{id}/characters` → its `message` is shown as "Read this to your kid:", the words
-  stay to edit; 409 `no_tokens` → "No new character to make right now"; 413 from `POST /speech-to-text` → "That was
-  too long"; 404 from `GET /children/{id}/characters` (a server without the route yet) → no characters.
+  stay to edit; 409 `no_tokens` → "No new character to make right now"; 404 from `GET /children/{id}/characters` (a server without the route yet) → no characters.
 - **Live updates** (`x-realtime`): one WebSocket per open app, `<realtimeUrl>?token=<access token>` (a fresh token
   on every reconnect), a `{"type":"ping"}` every 5 minutes, reconnects with backoff (1 s doubling to 30 s, ±20 %).
   On `{"type":"changed"}` the app fetches the family, and what the screen shows (claims, a kid's history, hand-off
@@ -128,10 +134,8 @@ A build without them shows "This app isn't set up yet" with the missing names.
   `POST /family`; if that fails, onboarding carries on (it can be set in Settings).
 - **Characters** (docs/08, Decisions 4–5): while a kid has `characterTokens`, a card "Make Mia's new character" sits
   on Approvals and on the kid's page, and the Kids list shows a "New character" badge. It opens
-  `/kids/<id>/character`: a big mic button records up to 15 s (MediaRecorder, then the Web Audio API decodes it and
-  `lib/wav.ts` resamples it with a windowed-sinc low-pass to 16 kHz mono 16-bit PCM WAV for `POST /speech-to-text`);
-  the words land in a text box the grown-up can edit, or type into instead ("Characters understand English for
-  now"). Recording needs https (or localhost): on the LAN dev address the screen says to type. "Draw it" sends
+  `/kids/<id>/character`: the grown-up types the kid's words into a text box (no voice since Oct 19, docs/08; the kid
+  can also type them on the TV). "Draw it" sends
   `POST /children/{id}/characters`; 422 shows the server's sentence to read to the kid; 202 shows "Drawing… (about half
   a minute)" and follows the character (live updates, polling as the backup) to ready (the art, large, with its name)
   or `needs_help` ("couldn't be drawn, so the new character is back to make" and "Try other words", with the words).
@@ -169,8 +173,8 @@ src/
   api/                   schema.ts (generated from the contract), types.ts (names), client.ts (fetch + ApiError)
   auth/                  Cognito managed login (oidc-client-ts, code + PKCE) and dev sign-in, one interface
   i18n/                  the translation table and the language context
-  lib/                   pure helpers (formatting, checks, ids, the daily budget, jobs, approval results, characters,
-                         WAV), the recorder (browser-only) and hooks (polling, autosave)
+  lib/                   pure helpers (formatting, checks, ids, the daily budget, jobs, approval results, characters)
+                         and hooks (polling, autosave)
   live/                  live updates: the WebSocket client and the hook screens use to refetch
   push/                  Web Push: permission, subscribe/unsubscribe, and the shared switch state
   screens/               sign-in, onboarding, approvals + hand-off, kids + budget, characters, jobs, TVs, pairing, settings

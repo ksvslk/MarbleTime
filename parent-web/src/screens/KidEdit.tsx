@@ -63,7 +63,7 @@ function KidForm({existing}: {existing?: Child}) {
   return (
     <Page title={existing ? existing.name : t('newKid')} back={existing ? `/kids/${existing.id}` : '/kids'}>
       <form className="card form" onSubmit={save}>
-        <KidFields value={kid} amazonKids={usesAmazonKids(bundle.devices)} isNew={!existing} onChange={setKid} />
+        <KidFields value={kid} amazonKids={usesAmazonKids(bundle.devices)} isNew={!existing} levelAges={existing?.puzzles.levelAges} onChange={setKid} />
         <button className="btn btn-gold btn-block" disabled={busy || !kid.name.trim()}>
           {t('save')}
         </button>

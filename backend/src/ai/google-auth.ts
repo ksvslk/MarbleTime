@@ -1,6 +1,6 @@
 /**
  * Google credentials for Vertex AI (Gemini) and Cloud Text-to-Speech (Gemini-TTS).
- * - On a developer's machine: the gcloud sign-in (`gcloud auth login`), its access token (renewed every 45 minutes) and
+ * - On a developer's machine: the gcloud sign-in (`gcloud auth login`), its access token (asked for again every few minutes) and
  *   project (GOOGLE_CLOUD_PROJECT or `gcloud config get-value project`).
  * - In AWS: not built yet. The plan is keyless Workload Identity Federation from the Lambda's role (backend/README.md,
  *   "What the cloud needs for Google"); until then a call says so, and deploys refuse to start without the setup.
@@ -40,7 +40,9 @@ export function gcloudAuth(): GoogleAuth {
       return project;
     },
     token() {
-      if (!token || Date.now() - at > 45 * 60 * 1000) {
+      // gcloud hands out the token it already has until that one is about to run out, so one fetched late in its
+      // hour is good for minutes only: ask again often (a long run met 401s with a 45-minute wait here).
+      if (!token || Date.now() - at > 4 * 60 * 1000) {
         token = gcloud('auth', 'print-access-token');
         if (!token) throw new GoogleAuthError('Google sign-in is missing or expired on this machine: run `gcloud auth login`');
         at = Date.now();

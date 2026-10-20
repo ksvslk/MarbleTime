@@ -5,8 +5,11 @@
 import type {Api} from '../api/client';
 import type {PushSubscriptionInput} from '../api/types';
 
-/** The service worker. It caches nothing, so a new deploy reaches phones right away. */
-export const SW_URL = '/sw.js';
+/**
+ * The service worker. It caches nothing, so a new deploy reaches phones right away. It is told where the API is in
+ * its own address, so it can answer "Yes" / "Not yet" from a notification while the app is closed.
+ */
+export const swUrl = (apiBase: string) => `/sw.js?api=${encodeURIComponent(apiBase)}`;
 
 /** What this browser can do: 'ok', or why not ('ios-home-screen': an iPhone needs MarbleTime on the Home Screen). */
 export type PushSupport = 'ok' | 'ios-home-screen' | 'unsupported';
@@ -89,19 +92,28 @@ export async function currentPushState(api: Api): Promise<PushState> {
   return 'on';
 }
 
+/** A browser step that failed says which one it was (the browser's own messages don't). */
+async function step<T>(name: string, work: Promise<T>): Promise<T> {
+  try {
+    return await work;
+  } catch (error) {
+    throw new Error(`${name}: ${error instanceof Error ? `${error.name}: ${error.message}` : String(error)}`);
+  }
+}
+
 /** Asks for permission, subscribes with the server's key and sends the subscription. */
 export async function turnPushOn(api: Api): Promise<PushState> {
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') return permission === 'denied' ? 'denied' : 'off';
-  await navigator.serviceWorker.register(SW_URL, {updateViaCache: 'none'});
-  const registration = await navigator.serviceWorker.ready;
+  await step('service worker', navigator.serviceWorker.register(swUrl(api.baseUrl), {updateViaCache: 'none'}));
+  const registration = await step('service worker ready', navigator.serviceWorker.ready);
   const key = keyBytes(await api.pushKey());
   let subscription = await registration.pushManager.getSubscription();
   if (subscription && !sameKey(subscription.options.applicationServerKey, key)) {
     await subscription.unsubscribe();
     subscription = null;
   }
-  subscription ??= await registration.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: key});
+  subscription ??= await step('push subscribe', registration.pushManager.subscribe({userVisibleOnly: true, applicationServerKey: key}));
   await send(api, subscription);
   return 'on';
 }

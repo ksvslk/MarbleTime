@@ -131,6 +131,25 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
 | 9 | Bedtime window | Locked whatever the balance; parent override works |
 | 10 | Screensaver / TV off | No time counted |
 
+**Results, Oct 19, on the Android TV emulator** (Google TV image, Android 14, AVD `marbletime-tv`; a sample family on a throwaway backend; fast clock, 1 s = 1 min). The stick run on Oct 12 covered rows 1 and 3.
+
+| # | Result |
+|---|---|
+| 1 | ✅ "Who's watching?" 1.2 s after the video app opened. Google TV's home and settings stay free (added to the allowlist next to Fire TV's). |
+| 2 | ✅ "5 minutes left" and "1 minute left" over the video. Android 13+ hides them until the app may post notifications (`fire.sh grant` now grants it; Fire OS 8 is Android 11 and has no such switch; not yet seen on the stick). |
+| 3 | ✅ Locked at the right second (50 and 70 min jars). The picker showed the jar's old minutes for up to ~20 s after the lock: the TV's sync dropped a "fetch now" that came while a fetch was running. **Fixed** (`sync.tsx` runs it right after): about a second after the lock the kid shows 0 min. |
+| 4 | ✅ An approval reached the locked TV within 6 s, and the kid could watch again. **Bug found and fixed:** a kid whose jar ran out stayed ticked, so a sibling with time pressing Watch was locked out at once ("Leo's jar is empty"). Now an emptied kid drops out of the picked ones (`stillPicked`, unit-tested) and the remote starts on the first kid with time. |
+| 5 | ✅ Back ×8 on the lock screen ends on the home screen, never the video; reopening the video locks again. "Alexa, open …" can't be tried on the emulator. |
+| 6 | ✅ **Closed when the family has a PIN:** the TV's settings and the uninstall screen are grown-ups only (`Allowlist.kindOf`, unit-tested). Opening Settings brings up the PIN pad ("To open the TV's settings") in 1.2 s; the right PIN opens Settings for 10 minutes. Without a PIN they stay open (nobody could unlock them), and a force-stop still stops counting until MarbleTime opens again; no "TV stopped reporting" warning to the parent yet. |
+| 7 | ✅ The service starts by itself after a restart and locks, **if** the grants were saved: Android saves app-op changes up to 30 min later, and a restart before that lost both grants. `fire.sh grant` now runs `appops write-settings`. |
+| 8 | ✅ With the backend unreachable (a relay switched off; Wi-Fi off and airplane mode don't cut the emulator off from the Mac) the TV counted and locked on its own, and the queued time reached the backend within 5 s of reconnecting. |
+| 9 | ✅ **Built (Oct 19):** a kid's bedtime (set on the kid's page) dims them on "Who's watching?" with a moon; when it begins during a show the video locks within a second ("It's bedtime, Leo"), and only the time before it counts. "30 more minutes" with the PIN lets everyone watch again (the remote starts there when nobody can watch). |
+| 10 | ✅ Screen off ends the session: 23 s counted of 82 s watched, none of the 40 s dark. |
+
+**On the stick, Oct 19** (the family's own TV switched to strict mode for ten minutes, nobody picked, so no time was counted; then back to Amazon Kids mode): YouTube, Prime Video and Netflix were each behind "Kes vaatab?" 0.6–0.8 s after they opened (row 1). Fire TV's settings (`com.amazon.tv.settings.v2`) and the uninstall dialog (`com.android.packageinstaller`) brought up the PIN pad, "Teleri seadete avamiseks", in 1.4 and 1.1 s (row 6). "Alexa, open YouTube" said into the hardware remote (row 5): YouTube opened about 2 s after the button was let go and was behind "Kes vaatab?" a second later. Not tried there yet: the 5- and 1-minute notes (they need someone watching).
+
+**Emulator setup that worked:** `avdmanager create avd -n marbletime-tv -k "system-images;android-34;google-tv;arm64-v8a" -d tv_1080p`; build with `-PreactNativeArchitectures=armeabi-v7a,arm64-v8a` (the stick's build is 32-bit only); turn off Play Protect's check before `adb install` (`settings put global verifier_verify_adb_installs 0`), or the install waits for a tap; start apps with `am start -n` (`monkey` fails there); the Mac is `10.0.2.2`.
+
 ## 7. Recording the demo video
 
 - **Stick:** `adb shell screenrecord --time-limit 180 /sdcard/demo.mp4`, then `adb pull /sdcard/demo.mp4`. This gives a clean 1080p capture of our screens and Demo Cartoons. DRM apps record as black.
@@ -151,6 +170,7 @@ Then allow **Screen Recording** for your terminal app (System Settings → Priva
 | `unauthorized` | Accept the prompt on the TV, or turn ADB debugging off and on |
 | Developer options gone after a Fire OS update | Repeat the 7× click |
 | Strict mode stopped after reinstall or force-stop | `scripts/fire.sh grant` |
+| Speaking into the microphone on the character screen opens Alexa's search results | Voice isn't used for characters since Oct 19 (docs/08): the screen asks for typing, or a grown-up types the words in the phone app. The remote's microphone still opens Alexa (the Fire TV phone app's always does; the hardware remote's types only while the keyboard is open, in the stick's language; FRICTION_LOG, Oct 12 and 13) |
 | `vega` not found | `source ~/vega/env` (or open a new terminal) |
 | Simulator won't start | Check free disk (≥ 20 GB), Rosetta installed; `vega virtual-device start` again |
 | TV monorepo won't install | `corepack enable` (it needs Yarn 4) |

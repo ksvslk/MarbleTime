@@ -1,21 +1,30 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Animated, Easing, Platform, View} from 'react-native';
-import {api} from '../api';
+import {api, NOT_YET_REASONS, NotYetReason} from '../api';
 import {Avatar, Button, FitText, Focusable, Icon, T} from '../components';
 import {Job, Kid, textOf} from '../data';
 import {Lang, LANGS, t} from '../i18n';
 import {QrCode} from '../QrCode';
-import {checkPin, Claim, Reward, rewardFor, useStore} from '../state';
+import {checkPin, Claim, givenFor, Gives, useStore} from '../state';
 import {session} from '../sync';
 import {colors, s} from '../theme';
 import {styles} from './KidScreens';
 import {Appear, Shake} from '../motion';
+import {Strict} from '../strict';
 import {Sound} from '../sound';
+
+/** How long the TV's settings stay open after the PIN, and how much more TV it allows at bedtime. */
+const SETTINGS_OPEN_MIN = 10;
+const BEDTIME_MORE_MIN = 30;
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'back', '0', 'ok'];
 
-/** Grown-ups enter a PIN with the remote: the demo PIN 1234 until the TV is paired, then the family's own. */
-export function PinScreen() {
+/**
+ * Grown-ups enter a PIN with the remote: the demo PIN 1234 until the TV is paired, then the family's own. `purpose`:
+ * strict mode asked for it, to open the TV's settings for 10 minutes (then back to them), or to allow 30 more
+ * minutes at bedtime (then back to "Who's watching?"); otherwise the grown-ups' screen follows.
+ */
+export function PinScreen({purpose}: {purpose?: 'settings' | 'bedtime'}) {
   const {state, dispatch} = useStore();
   const lang = state.lang;
   const [pin, setPin] = useState('');
@@ -26,7 +35,14 @@ export function PinScreen() {
     if (key === 'ok') {
       if (checkPin(state, pin)) {
         session.pin = pin; // sent with any decision made on this TV
-        dispatch({type: 'go', screen: {name: 'grownups'}});
+        if (purpose === 'settings') {
+          Strict.unlockGrownups(SETTINGS_OPEN_MIN);
+          dispatch({type: 'go', screen: {name: 'who'}});
+          Strict.leave();
+        } else if (purpose === 'bedtime') {
+          Strict.allowBedtime(BEDTIME_MORE_MIN);
+          dispatch({type: 'go', screen: {name: 'watch'}});
+        } else dispatch({type: 'go', screen: {name: 'grownups'}});
       }
       else {
         Sound.play('tryAgain', 0.6);
@@ -47,6 +63,7 @@ export function PinScreen() {
         <Icon name="lock" size={s(56)} color={colors.white} />
         <T style={{fontSize: s(64), marginLeft: s(20)}}>{t(lang, 'grownups')}</T>
       </View>
+      {purpose ? <T style={{fontSize: s(40), marginTop: s(16)}}>{t(lang, purpose === 'settings' ? 'settingsPin' : 'bedtimeMore')}</T> : null}
       <T style={{fontSize: s(36), color: wrong ? colors.goldLight : colors.muted, marginTop: s(16)}}>{wrong ? t(lang, 'wrongPin') : t(lang, 'enterPin')}</T>
       <Shake trigger={tries} style={[styles.row, {marginVertical: s(36)}]}>
         {[0, 1, 2, 3].map(i => (
@@ -102,8 +119,8 @@ export function GrownupsScreen() {
               kid={kid}
               job={job}
               lang={lang}
-              gives={rewardFor(state, claim.kidId, job)}
-              onDecide={yes => dispatch({type: 'decide', claimId: claim.id, yes})}
+              gives={givenFor(state, claim)}
+              onDecide={(yes, reason) => dispatch({type: 'decide', claimId: claim.id, yes, reason})}
             />
           </>
         ) : (
@@ -240,17 +257,29 @@ export function PairScreen() {
   );
 }
 
-/** One waiting job, with what "Yes" gives now. A decision lifts it away (a marble clinks for Yes), then the next one comes in. */
-function ClaimCard({claim, kid, job, lang, gives, onDecide}: {claim: Claim; kid: Kid; job: Job; lang: Lang; gives: {reward: Reward; minutes: number}; onDecide: (yes: boolean) => void}) {
+/**
+ * One waiting job, with what "Yes" gives (what the kid's card showed). "Not yet" asks why, in one more press, so the kid
+ * is told what to do next. A decision lifts the card away (a marble clinks for Yes), then the next one comes in.
+ */
+function ClaimCard({claim, kid, job, lang, gives, onDecide}: {claim: Claim; kid: Kid; job: Job; lang: Lang; gives: Gives; onDecide: (yes: boolean, reason?: NotYetReason) => void}) {
   const out = useRef(new Animated.Value(0)).current;
   const decided = useRef(false);
+  const [asking, setAsking] = useState(false);
   const minutesAgo = Math.max(0, Math.round((Date.now() - claim.at) / 60000));
-  const decide = (yes: boolean) => {
+  const decide = (yes: boolean, reason?: NotYetReason) => {
     if (decided.current) return;
     decided.current = true;
-    if (yes && gives.reward === 'marbles') Sound.play('clink');
-    Animated.timing(out, {toValue: 1, duration: 280, easing: Easing.in(Easing.cubic), useNativeDriver: true}).start(() => onDecide(yes));
+    if (yes && gives.minutes > 0) Sound.play('clink');
+    Animated.timing(out, {toValue: 1, duration: 280, easing: Easing.in(Easing.cubic), useNativeDriver: true}).start(() => onDecide(yes, reason));
   };
+  const givesText =
+    gives.reward === 'marbles'
+      ? t(lang, 'givesMinutes', {n: gives.minutes})
+      : gives.reward === 'praise'
+        ? t(lang, 'givesPraise')
+        : gives.minutes > 0
+          ? t(lang, 'givesBoth', {n: gives.minutes})
+          : t(lang, 'givesCharacter');
   return (
     <Appear from="up" distance={s(60)}>
       <Animated.View
@@ -275,32 +304,48 @@ function ClaimCard({claim, kid, job, lang, gives, onDecide}: {claim: Claim; kid:
         <View style={{flex: 1, marginLeft: s(60)}}>
           <FitText text={textOf(job.title, lang)} width={s(760)} max={s(72)} min={s(36)} lines={2} style={{color: colors.ink}} />
           <FitText
-            text={t(lang, 'saysDone', {kid: kid.name, ago: minutesAgo, gives: gives.reward === 'marbles' ? t(lang, 'givesMinutes', {n: gives.minutes}) : t(lang, gives.reward === 'character' ? 'givesCharacter' : 'givesPraise')})}
+            text={t(lang, 'saysDone', {kid: kid.name, ago: minutesAgo, gives: givesText})}
             width={s(760)}
             max={s(38)}
             min={s(24)}
             lines={2}
             style={{color: colors.greyInk, marginTop: s(14), fontWeight: '500'}}
           />
-          <View style={[styles.row, {marginTop: s(40)}]}>
-            <Focusable
-              preferred
-              label={t(lang, 'approve')}
-              onPress={() => decide(true)}
-              focusedStyle={{borderColor: colors.ink}}
-              style={{flexDirection: 'row', alignItems: 'center', height: s(108), paddingHorizontal: s(56), borderRadius: s(54), backgroundColor: colors.gold}}>
-              <Icon name="check" size={s(48)} />
-              <FitText text={t(lang, 'approve')} width={s(220)} max={s(48)} min={s(28)} style={{color: colors.ink, marginLeft: s(16)}} />
-            </Focusable>
-            <View style={{width: s(24)}} />
-            <Focusable
-              label={t(lang, 'notYet')}
-              onPress={() => decide(false)}
-              focusedStyle={{borderColor: colors.ink}}
-              style={{height: s(108), paddingHorizontal: s(52), borderRadius: s(54), backgroundColor: colors.tileOff, justifyContent: 'center'}}>
-              <FitText text={t(lang, 'notYet')} width={s(300)} max={s(48)} min={s(28)} style={{color: colors.ink, fontWeight: '500'}} />
-            </Focusable>
-          </View>
+          {asking ? (
+            <View style={[styles.row, {marginTop: s(40)}]}>
+              {NOT_YET_REASONS.map((reason, i) => (
+                <Focusable
+                  key={reason}
+                  preferred={i === 0}
+                  label={t(lang, `reason_${reason}`)}
+                  onPress={() => decide(false, reason)}
+                  focusedStyle={{borderColor: colors.ink}}
+                  style={{height: s(108), paddingHorizontal: s(26), marginRight: s(16), borderRadius: s(54), backgroundColor: colors.tileOff, justifyContent: 'center'}}>
+                  <FitText text={t(lang, `reason_${reason}`)} width={s(196)} max={s(40)} min={s(24)} style={{color: colors.ink, fontWeight: '500'}} />
+                </Focusable>
+              ))}
+            </View>
+          ) : (
+            <View style={[styles.row, {marginTop: s(40)}]}>
+              <Focusable
+                preferred
+                label={t(lang, 'approve')}
+                onPress={() => decide(true)}
+                focusedStyle={{borderColor: colors.ink}}
+                style={{flexDirection: 'row', alignItems: 'center', height: s(108), paddingHorizontal: s(56), borderRadius: s(54), backgroundColor: colors.gold}}>
+                <Icon name="check" size={s(48)} />
+                <FitText text={t(lang, 'approve')} width={s(220)} max={s(48)} min={s(28)} style={{color: colors.ink, marginLeft: s(16)}} />
+              </Focusable>
+              <View style={{width: s(24)}} />
+              <Focusable
+                label={t(lang, 'notYet')}
+                onPress={() => setAsking(true)}
+                focusedStyle={{borderColor: colors.ink}}
+                style={{height: s(108), paddingHorizontal: s(52), borderRadius: s(54), backgroundColor: colors.tileOff, justifyContent: 'center'}}>
+                <FitText text={t(lang, 'notYet')} width={s(300)} max={s(48)} min={s(28)} style={{color: colors.ink, fontWeight: '500'}} />
+              </Focusable>
+            </View>
+          )}
         </View>
       </Animated.View>
     </Appear>

@@ -24,6 +24,8 @@ export type FamilyBundle = Schemas['FamilyBundle'];
 export type Child = Schemas['Child'];
 export type ChildInput = Schemas['ChildInput'];
 export type ChildPatch = Schemas['ChildPatch'];
+export type PuzzleRound = Schemas['PuzzleRound'];
+export type Bedtime = Schemas['Bedtime'];
 export type Repeat = Schemas['Repeat'];
 export type Chore = Schemas['Chore'];
 export type ChoreInput = Schemas['ChoreInput'];
@@ -31,6 +33,8 @@ export type ChorePatch = Schemas['ChorePatch'];
 export type Claim = Schemas['Claim'];
 /** What an approval gave: marbles in the jar, a new character (the jar was full), or praise (a routine job). */
 export type Reward = NonNullable<Claim['reward']>;
+export type NotYetReason = Schemas['NotYetReason'];
+export const NOT_YET_REASONS: NotYetReason[] = ['not_finished', 'together', 'later'];
 export type LedgerEntry = Schemas['LedgerEntry'];
 export type Balance = Schemas['Balance'];
 export type Handoff = Schemas['Handoff'];

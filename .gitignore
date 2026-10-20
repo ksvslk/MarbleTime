@@ -1,6 +1,7 @@
 # Local-only files
 .env.local
 .shots/
+.data/
 .DS_Store
 node_modules/
 

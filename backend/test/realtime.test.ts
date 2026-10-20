@@ -83,7 +83,7 @@ describe('telling a family that something changed', () => {
       f.realtime.splice(0);
       return f.mom.post(`/claims/${claim.id}/approve`);
     }],
-    ['a routine job praised', async f => {
+    ['a job once marked routine approved', async f => {
       await f.mom.patch(`/chores/${f.toys.id}`, {routine: true});
       const {body: claim} = await f.claim(f.mia.id, f.toys.id);
       f.realtime.splice(0);

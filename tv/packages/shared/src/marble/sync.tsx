@@ -22,7 +22,11 @@ function send(base: string, token: string, item: Outbox) {
     case 'undo':
       return api.undo(base, token, item.claimId);
     case 'decide':
-      return api.decide(base, token, item.claimId, item.yes, session.pin);
+      return api.decide(base, token, item.claimId, item.yes, session.pin, item.reason);
+    case 'usage':
+      return api.usage(base, token, {id: item.id, childId: item.childId, seconds: item.seconds});
+    case 'puzzle':
+      return api.puzzleResult(base, token, {id: item.id, childId: item.childId, answers: item.answers});
     case 'settings':
       return api.settings(base, token, {lang: item.lang, caps: item.caps, voice: item.voice}, session.pin);
   }
@@ -47,13 +51,21 @@ export function SyncLoop() {
     if (!token) return;
     let stopped = false;
     let running = false;
+    // A kick that comes while a round is running (the app coming to the front after strict mode's lock, a live
+    // "changed") is kept and run right after it, instead of waiting up to 30 s for the next round.
+    let again = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let etag: string | undefined;
     let lastBeat = 0;
 
     const tick = async () => {
-      if (running || stopped) return;
+      if (stopped) return;
+      if (running) {
+        again = true;
+        return;
+      }
       running = true;
+      again = false;
       clearTimeout(timer);
       const base = latest.current.apiUrl;
       try {
@@ -81,7 +93,7 @@ export function SyncLoop() {
         if (error instanceof ApiError && error.status === 401) dispatch({type: 'unlink'});
       } finally {
         running = false;
-        if (!stopped) timer = setTimeout(tick, AppState.currentState !== 'active' ? AWAY_MS : live.current ? LIVE_MS : ON_SCREEN_MS);
+        if (!stopped) timer = setTimeout(tick, again ? 0 : AppState.currentState !== 'active' ? AWAY_MS : live.current ? LIVE_MS : ON_SCREEN_MS);
       }
     };
 

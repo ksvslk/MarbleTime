@@ -5,14 +5,19 @@ import {MIN_PER_MARBLE} from '../tokens';
 import {formatMinutes} from './format';
 
 /**
- * "Mia +2 marbles"; "Jar was full: Mia earned a new character"; "Mia: routine job, praised". Minutes that
+ * "Mia +2 marbles"; "Jar was full: Mia earned a new character"; "Mia +1 marble and a new character" (a job that
+ * only partly fitted); "Mia: routine job, praised". Minutes that
  * aren't whole marbles (a jar filled up by part of a marble) are said in minutes, and so is everything from a
  * server that doesn't say what it gave.
  */
 export function rewardText(lang: Lang, claim: Claim, kid: string): string {
   switch (claim.reward) {
-    case 'character':
-      return translate(lang, 'rewardCharacter', {kid});
+    case 'character': {
+      // A job that only partly fitted: the marbles that did fit, and a character for the rest.
+      const marbles = (claim.minutesCredited ?? 0) / MIN_PER_MARBLE;
+      if (!Number.isInteger(marbles) || marbles < 1) return translate(lang, 'rewardCharacter', {kid});
+      return marbles === 1 ? translate(lang, 'rewardMarbleCharacter', {kid}) : translate(lang, 'rewardMarblesCharacter', {kid, n: marbles});
+    }
     case 'praise':
       return translate(lang, 'rewardPraise', {kid});
     case 'marbles': {

@@ -31,6 +31,8 @@
 | `getRemainingTime(profile)` | The TV shows real remaining minutes, not just earned ones |
 | `onTimeExhausted(listener)` | The app knows when the OS has locked the profile |
 | **"Allowed while locked"** (parent setting) | A parent lets one app (e.g. MarbleTime) stay open when time is up, so kids can claim chores or learn. The **system** lock screen shows *"Earn more time in MarbleTime"*. |
+| `getActiveProfile()` and `onProfileChanged(listener)` | The app knows **which kid is watching** on a shared TV, for profiles the parent shared with it. Without it an app has to ask "who's watching?" before every session, and kids can pick a sibling's time. |
+| `onTimeUsed(listener)` (about once a minute) | The app's own picture of time left (MarbleTime's jar) drains as the kid watches, instead of jumping when the app is next opened |
 
 ```mermaid
 sequenceDiagram
@@ -61,7 +63,7 @@ sequenceDiagram
 
 ## What we built to make the case
 
-- **Strict mode** (Fire OS prototype) shows the experience families would get: approve on the phone → the TV unlocks by itself.
+- **Strict mode** (Fire OS prototype) shows the experience families would get: approve on the phone → the TV unlocks by itself. Because the platform can't tell an app who is watching, the prototype has to ask ("Who's watching?") before a video app opens; the two calls above would remove that screen.
 - **`api_mock` mode** runs MarbleTime against a mock of the calls above (`POST /mock-earned-time/grant`), so the integration is ready the day an API exists.
 
 ## Open questions for Amazon
@@ -69,3 +71,4 @@ sequenceDiagram
 - Should grants be **today only** or **banked** (carried over)?
 - What's a sensible default **per-app daily cap**?
 - How can "allowed while locked" be exposed without letting any app keep kids on screen?
+- **Two kids watching together on one TV:** whose time runs? Options: a shared session where each profile in it pays, or the active profile only. Our prototype lets kids pick several watchers, and each pays from their own jar.

@@ -1,0 +1,4231 @@
+[
+ {
+  "id": "7378fe8b60f094b8",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Cuál de estos animales no vuela?",
+  "picture": [
+   "🦆",
+   "🐶",
+   "🦉"
+  ],
+  "choices": [
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🦉"
+   }
+  ],
+  "answer": 1,
+  "reason": "El perro camina con sus patas y no tiene alas para volar.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d14b8c3a33c29bb8",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Qué dibujo sigue en esta serie?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   },
+   {
+    "emoji": "🥕"
+   }
+  ],
+  "answer": 0,
+  "reason": "La serie va alternando una manzana y un plátano, así que ahora toca manzana.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8f8f579b48f5335c",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Tengo cuatro patas, bigotes y digo miau. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El gato"
+   },
+   {
+    "text": "La vaca"
+   },
+   {
+    "text": "El pato"
+   }
+  ],
+  "answer": 0,
+  "reason": "El gato tiene bigotes y maúlla diciendo miau.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c9b09b298f400806",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Qué animal es mucho más grande?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El ratón"
+   },
+   {
+    "text": "La hormiga"
+   },
+   {
+    "text": "El elefante"
+   }
+  ],
+  "answer": 2,
+  "reason": "El elefante es un animal enorme y muy pesado.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5f8c686c7225f861",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Llevo mi casita a cuestas y camino muy despacito. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El caballo"
+   },
+   {
+    "text": "El caracol"
+   },
+   {
+    "text": "El conejo"
+   }
+  ],
+  "answer": 1,
+  "reason": "El caracol tiene una concha en la espalda y va despacio.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "22fd4f265c2f7284",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Qué dibujo viene después del sol?",
+  "picture": [
+   "⭐",
+   "🌞",
+   "⭐",
+   "🌞"
+  ],
+  "choices": [
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🎈"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 0,
+  "reason": "Después del sol siempre sigue la estrella en este camino.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a7e10c662d53ce06",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Con qué te lavas los dientes?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🪥"
+   },
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 0,
+  "reason": "El cepillo sirve para dejar los dientes limpios.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2812ebc2327eb56e",
+  "lang": "es",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "¿Qué figura sigue en este tren?",
+  "picture": [
+   "🔴",
+   "🔵",
+   "🔴",
+   "🔵"
+  ],
+  "choices": [
+   {
+    "emoji": "🟡"
+   },
+   {
+    "emoji": "🟢"
+   },
+   {
+    "emoji": "🔴"
+   }
+  ],
+  "answer": 2,
+  "reason": "El círculo rojo viene después del círculo azul.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dde864047e9b93bd",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "¿Cuál de estos tres animales es el más grande en la realidad?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El ratón"
+   },
+   {
+    "text": "La mariposa"
+   },
+   {
+    "text": "El elefante"
+   }
+  ],
+  "answer": 2,
+  "reason": "El elefante es un animal mucho más grande que el ratón y la mariposa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "817934d61342ce89",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "¿Qué objeto va mejor junto con el cepillo de dientes?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "text": "La pasta dental"
+   },
+   {
+    "text": "La cuchara"
+   },
+   {
+    "text": "El zapato"
+   }
+  ],
+  "answer": 0,
+  "reason": "Usamos la pasta y el cepillo juntos para lavarnos los dientes.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "08d9ec094bf6b3a5",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Si tienes cuatro manzanas y te comes una, ¿cuántas manzanas te quedan?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 1,
+  "reason": "Cuatro menos una manzana son tres manzanas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2f702779cb2de38b",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "¿Qué dibujo completa la serie?",
+  "picture": [
+   "⭐",
+   "🌙",
+   "⭐",
+   "🌙"
+  ],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌞"
+   }
+  ],
+  "answer": 1,
+  "reason": "Después de la luna siempre vuelve a tocar la estrella.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2f8368ede349db0a",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Salgo de noche, brillo en el cielo oscuro y cambio de forma poco a poco. ¿Qué soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "La luna"
+   },
+   {
+    "text": "El fuego"
+   },
+   {
+    "text": "La nube"
+   }
+  ],
+  "answer": 0,
+  "reason": "La luna brilla en el cielo por la noche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cc6fae802cd5abc4",
+  "lang": "es",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "¿Cuál de estas cosas no sirve para comer ni beber?",
+  "picture": [
+   "🍕",
+   "🥛",
+   "📚",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "La pizza"
+   },
+   {
+    "text": "El libro"
+   },
+   {
+    "text": "La leche"
+   }
+  ],
+  "answer": 1,
+  "reason": "El libro sirve para leer y no se puede comer.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4b94a9488ffb2726",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Cuál de estos animales no pertenece al grupo?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐰",
+   "🦈"
+  ],
+  "choices": [
+   {
+    "text": "El conejo"
+   },
+   {
+    "text": "El perro"
+   },
+   {
+    "text": "El tiburón"
+   }
+  ],
+  "answer": 2,
+  "reason": "El tiburón vive en el agua y los otros tres viven en la tierra.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "be48d588972ad2ec",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "La llave abre la puerta. ¿Qué usamos para lavarnos los dientes?",
+  "picture": [
+   "🔑",
+   "🚪"
+  ],
+  "choices": [
+   {
+    "emoji": "🪥"
+   },
+   {
+    "emoji": "🧹"
+   },
+   {
+    "emoji": "🔨"
+   }
+  ],
+  "answer": 0,
+  "reason": "Nos limpiamos los dientes con el cepillo de dientes.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5e4782eede14cd77",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Cuál de estos objetos no pertenece al grupo?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "🚲",
+   "🎸"
+  ],
+  "choices": [
+   {
+    "text": "La guitarra"
+   },
+   {
+    "text": "El autobús"
+   },
+   {
+    "text": "La bicicleta"
+   }
+  ],
+  "answer": 0,
+  "reason": "La guitarra es un instrumento musical y los otros sirven para viajar.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "892ffb949fa0272d",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Qué figura sigue en este patrón?",
+  "picture": [
+   "⭐",
+   "🌙",
+   "⭐",
+   "🌙",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "emoji": "🌞"
+   },
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "⭐"
+   }
+  ],
+  "answer": 1,
+  "reason": "Después de la estrella siempre toca la luna.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "33a05f43466a2e58",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Qué usamos en los pies antes de ponernos los zapatos?",
+  "picture": [
+   "👟"
+  ],
+  "choices": [
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "🧤"
+   }
+  ],
+  "answer": 0,
+  "reason": "Los calcetines se ponen en los pies antes que las zapatillas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b2fd68519627632b",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Tengo cáscara dura, camino muy despacio y llevo mi casa a cuestas. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El perro"
+   },
+   {
+    "text": "El caballo"
+   },
+   {
+    "text": "La tortuga"
+   }
+  ],
+  "answer": 2,
+  "reason": "La tortuga camina despacio y tiene un caparazón resistente.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a3ccb5c91f8cbc90",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Cuál de estos alimentos no pertenece al grupo de las frutas?",
+  "picture": [
+   "🍓",
+   "🍊",
+   "🥕",
+   "🍇"
+  ],
+  "choices": [
+   {
+    "text": "La naranja"
+   },
+   {
+    "text": "La fresa"
+   },
+   {
+    "text": "La zanahoria"
+   }
+  ],
+  "answer": 2,
+  "reason": "La zanahoria es una verdura que crece bajo tierra.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c6cdd4702bb41365",
+  "lang": "es",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "¿Cuál de estas tres cosas es la más pequeña?",
+  "picture": [
+   "🐜",
+   "🐱",
+   "🐴"
+  ],
+  "choices": [
+   {
+    "text": "El caballo"
+   },
+   {
+    "text": "La hormiga"
+   },
+   {
+    "text": "El gato"
+   }
+  ],
+  "answer": 1,
+  "reason": "La hormiga es un insecto diminuto comparado con un gato o un caballo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7417071856404fb4",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Qué animal completa esta serie lógica?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐶",
+   "🐱",
+   "🐶"
+  ],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐭"
+   }
+  ],
+  "answer": 0,
+  "reason": "El patrón va alternando entre perro y gato.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "73172c72c122291d",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Cuál de estas cosas no pertenece al grupo?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🥕",
+   "🍇"
+  ],
+  "choices": [
+   {
+    "text": "La zanahoria"
+   },
+   {
+    "text": "La manzana"
+   },
+   {
+    "text": "El plátano"
+   }
+  ],
+  "answer": 0,
+  "reason": "La zanahoria es una verdura y los demás son frutas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "84e215414098e1dd",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Tengo copa y ramas, pero no soy sombrero. En otoño pierdo mis hojas. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El árbol"
+   },
+   {
+    "text": "La nube"
+   },
+   {
+    "text": "El paraguas"
+   }
+  ],
+  "answer": 0,
+  "reason": "Los árboles tienen copa y pierden las hojas en otoño.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ea5c40a2154880a5",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Si en cada nido hay tres pollitos y contamos cuatro nidos, ¿cuántos pollitos hay en total?",
+  "picture": [
+   "🐤",
+   "🐤",
+   "🐤"
+  ],
+  "choices": [
+   {
+    "text": "Siete"
+   },
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Doce"
+   }
+  ],
+  "answer": 2,
+  "reason": "Tres multiplicado por cuatro es igual a doce.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dc67abda0b66626a",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Tengo agujas pero no coso, doy vueltas todo el día y te digo cuándo merendar. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "La brújula"
+   },
+   {
+    "text": "El reloj"
+   },
+   {
+    "text": "La tijera"
+   }
+  ],
+  "answer": 1,
+  "reason": "El reloj tiene agujas y marca las horas del día.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "43208a4f89dbf051",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Elige el objeto que va mejor con el pie.",
+  "picture": [
+   "👣"
+  ],
+  "choices": [
+   {
+    "emoji": "🧤"
+   },
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🧢"
+   }
+  ],
+  "answer": 1,
+  "reason": "Los calcetines se ponen en los pies.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "16e096419f17cf70",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Cuál de estos tres transportes no pertenece al grupo?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "⛵"
+  ],
+  "choices": [
+   {
+    "text": "El autobús"
+   },
+   {
+    "text": "El coche"
+   },
+   {
+    "text": "El barco"
+   }
+  ],
+  "answer": 2,
+  "reason": "El barco navega por el agua y los otros van por carretera.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "67fee2feafc5dd04",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Cuál de estos animales es más grande que un caballo?",
+  "picture": [
+   "🐎"
+  ],
+  "choices": [
+   {
+    "emoji": "🐘"
+   },
+   {
+    "emoji": "🦊"
+   },
+   {
+    "emoji": "🐑"
+   }
+  ],
+  "answer": 0,
+  "reason": "El elefante es mucho más grande y pesado que un caballo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "892ffb949fa0272d",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Qué figura sigue en este patrón?",
+  "picture": [
+   "🔴",
+   "🟦",
+   "🔴",
+   "🟦"
+  ],
+  "choices": [
+   {
+    "emoji": "🔴"
+   },
+   {
+    "emoji": "🟩"
+   },
+   {
+    "emoji": "🟦"
+   }
+  ],
+  "answer": 0,
+  "reason": "La serie alterna círculo rojo y cuadrado azul.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a65fa44e6fec7476",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "¿Qué objeto se usa junto con la sopa?",
+  "picture": [
+   "🥣"
+  ],
+  "choices": [
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🔨"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 0,
+  "reason": "Tomamos la sopa con una cuchara.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "43e3d1941257ca5f",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Llevo mi casa a cuestas, camino muy despacio y dejo un caminito brillante al pasar. ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El caracol"
+   },
+   {
+    "text": "El ratón"
+   },
+   {
+    "text": "El cangrejo"
+   }
+  ],
+  "answer": 0,
+  "reason": "El caracol lleva su concha a cuestas y avanza despacio.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b671274155dfa8f8",
+  "lang": "es",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Cinco amigos compran dos pegatinas cada uno. ¿Cuántas pegatinas tienen entre todos?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Ocho"
+   },
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Doce"
+   }
+  ],
+  "answer": 1,
+  "reason": "Cinco veces dos da un total de diez.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "58c05939cfe31585",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Contamos en voz alta: uno, dos, tres, cuatro... ¿Qué número viene después?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Tres"
+   }
+  ],
+  "answer": 0,
+  "reason": "El cinco viene justo después del cuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2de7bb7ec6034d98",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "¿Cuántas manzanas ricas hay para merendar?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cuatro"
+   }
+  ],
+  "answer": 1,
+  "reason": "Hay una, dos y tres manzanas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6e8f426fa823f716",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "En el plato hay tres galletas y te comes una. ¿Cuántas galletas quedan?",
+  "picture": [
+   "🍪",
+   "🍪",
+   "🍪"
+  ],
+  "choices": [
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Una"
+   }
+  ],
+  "answer": 1,
+  "reason": "Si a tres galletas le quitas una, quedan dos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8f69e47d4ce18e55",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "¿Cuántos gatitos suaves están jugando?",
+  "picture": [
+   "🐱",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Uno"
+   },
+   {
+    "text": "Dos"
+   }
+  ],
+  "answer": 2,
+  "reason": "Vemos uno y dos gatitos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ab86a41d91754f1c",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "¿Cuántas estrellas brillan en el cielo?",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 0,
+  "reason": "Si las cuentas, hay cuatro estrellas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6ef80c96043036ae",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "¿Cuántos coches de juguete hay en la pista?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 2,
+  "reason": "Hay cinco coches de juguete en la pista.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "568c31439bb0d74e",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Sofía tiene dos plátanos y encuentra dos plátanos más. ¿Cuántos tiene en total?",
+  "picture": [
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 1,
+  "reason": "Dos plátanos y dos plátanos más son cuatro plátanos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bc6ee5945a18b966",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Contamos despacito: uno, dos... ¿Qué número viene después?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Uno"
+   }
+  ],
+  "answer": 1,
+  "reason": "Después del número dos viene el tres.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ab0cbdf8021ad803",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Tienes cuatro fresas dulces y le das una a tu amigo. ¿Cuántas fresas te quedan?",
+  "picture": [
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Una"
+   },
+   {
+    "text": "Tres"
+   }
+  ],
+  "answer": 2,
+  "reason": "Si tienes cuatro fresas y regalas una, te quedan tres.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "279e9d802bdffd0c",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "¿Cuántas manzanas deliciosas hay en la mesa?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 1,
+  "reason": "Si las cuentas una a una, hay cuatro manzanas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cecf40ac287d2cd5",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Lucas tiene dos plátanos y su abuelo le da uno más. ¿Cuántos plátanos tiene ahora?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Uno"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dos más uno son tres.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "720101432f70899f",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Contamos despacio: uno, dos, tres, cuatro... ¿Qué número viene después?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Seis"
+   }
+  ],
+  "answer": 1,
+  "reason": "El número cinco va justo después del cuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3604c96467a6bde0",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "¿Qué fila tiene menos animalitos?",
+  "picture": [
+   "🐱",
+   "🐱",
+   "🐶",
+   "🐶",
+   "🐶",
+   "🐶"
+  ],
+  "choices": [
+   {
+    "text": "Los gatos"
+   },
+   {
+    "text": "Los perros"
+   },
+   {
+    "text": "Hay iguales"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dos gatos son menos que cuatro perros.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ab86a41d91754f1c",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "¿Cuántas estrellas brillan en el cielo?",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "Seis"
+   },
+   {
+    "text": "Siete"
+   },
+   {
+    "text": "Ocho"
+   }
+  ],
+  "answer": 1,
+  "reason": "Hay siete estrellas en total.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "03271893a11eb619",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "En una rama había cuatro pajaritos, pero dos salieron volando. ¿Cuántos pajaritos quedaron?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Uno"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Dos"
+   }
+  ],
+  "answer": 2,
+  "reason": "A cuatro le quitas dos y quedan dos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4e39104c0f766cd9",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "En el parque hay tres mariposas y llega una mariposa más. ¿Cuántas mariposas vuelan?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cuatro"
+   }
+  ],
+  "answer": 2,
+  "reason": "Tres más una suman cuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f25024234e8b0905",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "¿De cuál merienda hay más cantidad?",
+  "picture": [
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍪",
+   "🍪",
+   "🍪"
+  ],
+  "choices": [
+   {
+    "text": "Fresas"
+   },
+   {
+    "text": "Galletas"
+   },
+   {
+    "text": "Hay las mismas"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cinco fresas son más que tres galletas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fc46e8b72b8d325a",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Contamos hacia atrás como un cohete: cinco, cuatro, tres... ¿Qué número sigue?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Uno"
+   },
+   {
+    "text": "Seis"
+   }
+  ],
+  "answer": 0,
+  "reason": "Al contar hacia atrás desde el tres viene el dos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b77b64072b0c9d40",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "¿Cuántos coches están aparcados en la calle?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "Cinco"
+   },
+   {
+    "text": "Seis"
+   },
+   {
+    "text": "Siete"
+   }
+  ],
+  "answer": 1,
+  "reason": "En la fila hay seis coches.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "752a01e653bb6a5d",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Contamos en voz alta: seis, siete, ocho... ¿Cuál es el siguiente número?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Siete"
+   },
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Nueve"
+   }
+  ],
+  "answer": 2,
+  "reason": "El número nueve va después del ocho.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1d94f97c46d56f8b",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Tienes cinco caramelos y le regalas uno a tu hermano. ¿Cuántos caramelos tienes ahora?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cuatro"
+   },
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Cinco"
+   }
+  ],
+  "answer": 0,
+  "reason": "Si a cinco le quitas uno, quedan cuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7be61d30b444efff",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Lucas tiene siete manzanas y su abuela le regala cuatro más. ¿Cuántas manzanas tiene en total?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "once"
+   },
+   {
+    "text": "diez"
+   },
+   {
+    "text": "doce"
+   }
+  ],
+  "answer": 0,
+  "reason": "Siete más cuatro suman once.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "92a01875239f9bb8",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "En el estanque nadaban quince patitos y se fueron cinco. ¿Cuántos patitos quedaron nadando?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "nueve"
+   },
+   {
+    "text": "diez"
+   },
+   {
+    "text": "once"
+   }
+  ],
+  "answer": 1,
+  "reason": "Quince menos cinco da diez.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f6ef03664a2322a7",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Clara horneó doce galletas y su hermano se comió tres. ¿Cuántas galletas le quedan a Clara?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "ocho"
+   },
+   {
+    "text": "diez"
+   },
+   {
+    "text": "nueve"
+   }
+  ],
+  "answer": 2,
+  "reason": "Doce menos tres son nueve.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b9abff90f5f98e9a",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Sigue la serie de números: dos, cuatro, seis, ocho... ¿Cuál viene ahora?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "nueve"
+   },
+   {
+    "text": "diez"
+   },
+   {
+    "text": "doce"
+   }
+  ],
+  "answer": 1,
+  "reason": "Contando de dos en dos después del ocho va el diez.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5ebb01d7c8bb6fbc",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "En una granja hay ocho vacas y ocho caballos. ¿Cuántos animales hay juntos?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "quince"
+   },
+   {
+    "text": "dieciséis"
+   },
+   {
+    "text": "diecisiete"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ocho más ocho son dieciséis.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9960860da7fb161a",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "¿Qué número falta en este camino: once, doce, trece, catorce...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "quince"
+   },
+   {
+    "text": "dieciséis"
+   },
+   {
+    "text": "diecisiete"
+   }
+  ],
+  "answer": 0,
+  "reason": "El número que sigue al catorce es el quince.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "35d26f092befc6b1",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Una semana completa tiene siete días. ¿Cuántos días hay en dos semanas completas?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "doce"
+   },
+   {
+    "text": "trece"
+   },
+   {
+    "text": "catorce"
+   }
+  ],
+  "answer": 2,
+  "reason": "Siete más siete son catorce.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4b807d5a0b1827fb",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Mateo tenía dieciocho globos y regaló seis a sus amigos. ¿Cuántos globos tiene ahora?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "doce"
+   },
+   {
+    "text": "once"
+   },
+   {
+    "text": "trece"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dieciocho menos seis da doce.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5ce85b6fe19c9962",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "En una mesa hay siete manzanas y el triple de fresas. ¿Cuántas fresas hay?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Veintiuna"
+   },
+   {
+    "text": "Catorce"
+   }
+  ],
+  "answer": 1,
+  "reason": "El triple de siete se calcula multiplicando siete por tres, que da veintiuno.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a9ec26191889bbc1",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Lucas tiene cuatro cajas con seis galletas en cada una. ¿Cuántas galletas tiene en total?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Veinticuatro"
+   },
+   {
+    "text": "Dieciocho"
+   }
+  ],
+  "answer": 1,
+  "reason": "Cuatro multiplicado por seis es veinticuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0f432acc0a5932a8",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "¿Cuántas ruedas suman todos estos vehículos juntos?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "Ocho"
+   },
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Doce"
+   }
+  ],
+  "answer": 1,
+  "reason": "Dos coches tienen ocho ruedas y la bicicleta suma dos más, dando diez.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "47840e1d36ed9d0a",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Pienso en un número: es par, mayor que veinte y menor que veinticuatro. ¿Qué número es?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Veintiuno"
+   },
+   {
+    "text": "Veinticinco"
+   },
+   {
+    "text": "Veintidós"
+   }
+  ],
+  "answer": 2,
+  "reason": "El único número par entre veinte y veinticuatro es veintidós.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ed3e813eb0b9a941",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Observa el patrón de saltos hacia atrás: treinta, veinticinco, veinte... ¿Cuál es el siguiente número?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Quince"
+   },
+   {
+    "text": "Diez"
+   },
+   {
+    "text": "Dieciocho"
+   }
+  ],
+  "answer": 0,
+  "reason": "La serie va restando cinco cada vez, y veinte menos cinco es quince.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6cc1ffd0f8feee05",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Un granjero tiene cinco vacas. Si cada vaca da cuatro litros de leche por la mañana, ¿cuántos litros obtiene?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Nueve"
+   },
+   {
+    "text": "Quince"
+   },
+   {
+    "text": "Veinte"
+   }
+  ],
+  "answer": 2,
+  "reason": "Cinco multiplicado por cuatro es igual a veinte.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c28be3ed5f23839f",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Mira esta fila de objetos. ¿Cuántas piezas de fruta hay más que verduras?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍌",
+   "🍌",
+   "🥕"
+  ],
+  "choices": [
+   {
+    "text": "Tres"
+   },
+   {
+    "text": "Dos"
+   },
+   {
+    "text": "Cuatro"
+   }
+  ],
+  "answer": 0,
+  "reason": "Hay cuatro frutas y una verdura, así que la diferencia es tres.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "16fac1a031c019e9",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Un libro tiene cincuenta páginas. Mateo leyó veinte páginas ayer y quince hoy. ¿Cuántas páginas le faltan?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Treinta y cinco"
+   },
+   {
+    "text": "Quince"
+   },
+   {
+    "text": "Veinte"
+   }
+  ],
+  "answer": 1,
+  "reason": "Leyó treinta y cinco páginas en total, y cincuenta menos treinta y cinco es quince.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "84366accd670137e",
+  "lang": "es",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Pienso en un número: si le sumas ocho obtienes treinta. ¿Qué número es?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Veintidós"
+   },
+   {
+    "text": "Treinta y ocho"
+   },
+   {
+    "text": "Veinticuatro"
+   }
+  ],
+  "answer": 0,
+  "reason": "Treinta menos ocho es veintidós.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "18cf483d86803bdc",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mira este dibujo. ¿Qué comida es?",
+  "picture": [
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "Plátano"
+   },
+   {
+    "text": "Queso"
+   },
+   {
+    "text": "Pan"
+   }
+  ],
+  "answer": 0,
+  "reason": "La imagen muestra un plátano.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9eada0ff1d7df505",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "El fuego está caliente. ¿Qué está muy frío?",
+  "picture": [
+   "🔥"
+  ],
+  "choices": [
+   {
+    "text": "La sopa"
+   },
+   {
+    "text": "El muñeco de nieve"
+   },
+   {
+    "text": "El sol"
+   }
+  ],
+  "answer": 1,
+  "reason": "La nieve está muy fría.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1b82c7444bbe323a",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Cuál de estos animales puede nadar en el agua?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🦁"
+   },
+   {
+    "emoji": "🦒"
+   }
+  ],
+  "answer": 0,
+  "reason": "El delfín vive y nada en el agua.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5dd10b5ce2574ec8",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Cuál de estas cosas es una fruta para comer?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 2,
+  "reason": "La manzana es una fruta deliciosa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dbe4cb26eb651517",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Cuál de estas cosas sirve para vestirnos?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "📱"
+   },
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 1,
+  "reason": "El vestido es una prenda de ropa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e083a17e36b7ea34",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "La palabra gato rima con zapato. ¿Cuál rima con ratón?",
+  "picture": [
+   "🐭"
+  ],
+  "choices": [
+   {
+    "text": "Botón"
+   },
+   {
+    "text": "Mesa"
+   },
+   {
+    "text": "Pato"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ratón y botón terminan con el mismo sonido.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "07bcb9e45fd6df59",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Cuál de estos objetos usamos para viajar por el aire?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚢"
+   },
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🚀"
+   }
+  ],
+  "answer": 2,
+  "reason": "El cohete vuela alto por el cielo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7011536cf071e4ed",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Qué palabra empieza con la letra o sonido M?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Manzana"
+   },
+   {
+    "text": "Sol"
+   },
+   {
+    "text": "Pato"
+   }
+  ],
+  "answer": 0,
+  "reason": "Manzana empieza con la letra M.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c688d800391bea7b",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mira a este pequeño amigo. ¿Qué animal es?",
+  "picture": [
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "Rana"
+   },
+   {
+    "text": "Oso"
+   },
+   {
+    "text": "Pájaro"
+   }
+  ],
+  "answer": 0,
+  "reason": "El dibujo es una rana verde.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fd45dd6e8b6346b9",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "¿Cuál de estas cosas es un instrumento musical?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥁"
+   },
+   {
+    "emoji": "🪥"
+   },
+   {
+    "emoji": "🎂"
+   }
+  ],
+  "answer": 0,
+  "reason": "El tambor se toca para hacer música.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e57de543a4310a7e",
+  "lang": "es",
+  "subject": "words",
+  "level": 1,
+  "prompt": "De día brilla el sol. ¿Qué vemos en el cielo de noche?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "La luna"
+   },
+   {
+    "text": "El arcoíris"
+   },
+   {
+    "text": "La mariposa"
+   }
+  ],
+  "answer": 0,
+  "reason": "La luna sale durante la noche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c487d1a7ec7eee7b",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál es la palabra contraria de subir?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Bajar"
+   },
+   {
+    "text": "Correr"
+   },
+   {
+    "text": "Saltar"
+   }
+  ],
+  "answer": 0,
+  "reason": "Lo contrario de subir es bajar.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3e4f4eaa0138deed",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál de estas cosas es una fruta?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 1,
+  "reason": "La manzana es una fruta deliciosa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6b9fd3f531086e38",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Qué palabra rima con la palabra gato?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Pato"
+   },
+   {
+    "text": "Sol"
+   },
+   {
+    "text": "Mesa"
+   }
+  ],
+  "answer": 0,
+  "reason": "Gato y pato terminan con el mismo sonido.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "520cfd9758a4a841",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál es la palabra contraria de frío?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Lento"
+   },
+   {
+    "text": "Bajo"
+   },
+   {
+    "text": "Caliente"
+   }
+  ],
+  "answer": 2,
+  "reason": "Lo contrario de frío es caliente.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f60207aa1d9ec55f",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Qué dibujo representa la noche?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "🌞"
+   },
+   {
+    "emoji": "🌈"
+   }
+  ],
+  "answer": 0,
+  "reason": "La luna sale por la noche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "31b57d0dba951259",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mira el dibujo. ¿Qué palabra dice lo que ves?",
+  "picture": [
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "Estrella"
+   },
+   {
+    "text": "Nube"
+   },
+   {
+    "text": "Árbol"
+   }
+  ],
+  "answer": 0,
+  "reason": "El dibujo muestra una estrella brillante.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9afc055687dab0c6",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál de estos objetos sirve para tocar música?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "📱"
+   }
+  ],
+  "answer": 0,
+  "reason": "La guitarra es un instrumento musical.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "047276ca534f4da5",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Qué palabra rima con la palabra ratón?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Botón"
+   },
+   {
+    "text": "Casa"
+   },
+   {
+    "text": "Flor"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ratón y botón riman porque suenan igual al final.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "70ed41ebdddb4a48",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál de estos vehículos viaja por el agua?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🚁"
+   },
+   {
+    "emoji": "🚢"
+   }
+  ],
+  "answer": 2,
+  "reason": "El barco navega sobre el agua.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "64e70efd723e57b9",
+  "lang": "es",
+  "subject": "words",
+  "level": 2,
+  "prompt": "¿Cuál es la palabra contraria de abierto?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Limpio"
+   },
+   {
+    "text": "Cerrado"
+   },
+   {
+    "text": "Rápido"
+   }
+  ],
+  "answer": 1,
+  "reason": "Lo contrario de abierto es cerrado.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c03754357996f015",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estas palabras rima con la palabra gato?",
+  "picture": [
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "pato"
+   },
+   {
+    "text": "perro"
+   },
+   {
+    "text": "casa"
+   }
+  ],
+  "answer": 0,
+  "reason": "Gato y pato terminan con el mismo sonido.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "07a123e5db769baa",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estos alimentos es una verdura?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍌"
+   }
+  ],
+  "answer": 1,
+  "reason": "La zanahoria es una verdura.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9afc055687dab0c6",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estos objetos sirve para tocar música?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🔨"
+   }
+  ],
+  "answer": 0,
+  "reason": "La guitarra es un instrumento musical.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9a0d216335085102",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "El sol brilla de día. ¿Qué palabra es lo contrario de día?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "tarde"
+   },
+   {
+    "text": "noche"
+   },
+   {
+    "text": "luz"
+   }
+  ],
+  "answer": 1,
+  "reason": "La noche es lo contrario del día.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0a31b21cfe131fab",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Qué palabra significa lo contrario de rápido?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "alto"
+   },
+   {
+    "text": "fuerte"
+   },
+   {
+    "text": "lento"
+   }
+  ],
+  "answer": 2,
+  "reason": "Lento es lo opuesto de rápido.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f3bef20fe2723cd1",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estas cosas pertenece al grupo de la ropa?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 1,
+  "reason": "El vestido es una prenda de vestir.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ba5779e1ff6a0d12",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estas palabras rima con la palabra ratón?",
+  "picture": [
+   "🐭"
+  ],
+  "choices": [
+   {
+    "text": "queso"
+   },
+   {
+    "text": "diente"
+   },
+   {
+    "text": "botón"
+   }
+  ],
+  "answer": 2,
+  "reason": "Ratón y botón terminan igual.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4ca140054bb32408",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Mira la imagen. ¿Con qué letra empieza?",
+  "picture": [
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "E"
+   },
+   {
+    "text": "A"
+   },
+   {
+    "text": "O"
+   }
+  ],
+  "answer": 0,
+  "reason": "Estrella empieza con la letra E.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2f0e3366fd73e32a",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estos animales vive y nada en el agua?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🦁"
+   },
+   {
+    "emoji": "🐴"
+   }
+  ],
+  "answer": 0,
+  "reason": "El delfín vive en el agua.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cd5d6e8787efc2d2",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "¿Cuál de estas palabras rima con la palabra cuna?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "luna"
+   },
+   {
+    "text": "cama"
+   },
+   {
+    "text": "sol"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cuna y luna suenan igual al final.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ecc0644f2ba49947",
+  "lang": "es",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Si una puerta no está abierta, ¿cómo está?",
+  "picture": [
+   "🚪"
+  ],
+  "choices": [
+   {
+    "text": "cerrada"
+   },
+   {
+    "text": "nueva"
+   },
+   {
+    "text": "alta"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cerrada es lo contrario de abierta.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bd8c5ca269e09fd7",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Qué palabra es el antónimo u opuesto de «oscuro»?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "apagado"
+   },
+   {
+    "text": "claro"
+   },
+   {
+    "text": "sombra"
+   }
+  ],
+  "answer": 1,
+  "reason": "Lo contrario de algo oscuro es algo claro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0991d512e0098131",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Cuál de estas palabras rima con la palabra «canción»?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "corazón"
+   },
+   {
+    "text": "campana"
+   },
+   {
+    "text": "música"
+   }
+  ],
+  "answer": 0,
+  "reason": "Canción y corazón terminan con el mismo sonido.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6a1a82c5ba2d0497",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Cuál de estos tres elementos pertenece al grupo de los instrumentos musicales?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🎨"
+   },
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "🥁"
+   }
+  ],
+  "answer": 2,
+  "reason": "El tambor es un instrumento que sirve para hacer música.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "15a01d91fae238a5",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mira el dibujo. ¿Con qué letra empieza su nombre?",
+  "picture": [
+   "🦋"
+  ],
+  "choices": [
+   {
+    "text": "M"
+   },
+   {
+    "text": "P"
+   },
+   {
+    "text": "B"
+   }
+  ],
+  "answer": 0,
+  "reason": "La palabra mariposa empieza por la letra M.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9f5fa333272b1ec9",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Cuál de estas tres opciones es una fruta?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🥦"
+   },
+   {
+    "emoji": "🍐"
+   }
+  ],
+  "answer": 2,
+  "reason": "La pera es una fruta dulce y jugosa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4a816422ee98f1d1",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Tengo ocho patas, vivo en el mar y mi nombre rima con «topo». ¿Quién soy?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🐙"
+   },
+   {
+    "emoji": "🦈"
+   }
+  ],
+  "answer": 1,
+  "reason": "El pulpo vive en el mar y su nombre rima con topo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dfea018932ca7391",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Qué palabra significa lo contrario de «comenzar»?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "terminar"
+   },
+   {
+    "text": "iniciar"
+   },
+   {
+    "text": "esperar"
+   }
+  ],
+  "answer": 0,
+  "reason": "Terminar es la acción opuesta a comenzar.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "34cc03e7996e90af",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mira los tres dibujos. ¿Cuál de ellos empieza por la letra G?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐰"
+   }
+  ],
+  "answer": 0,
+  "reason": "Gato se escribe con la letra G al principio.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8c68f3950e941dad",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Cuál de estas tres cosas no pertenece al grupo de las prendas de vestir?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "🪑"
+   },
+   {
+    "emoji": "👖"
+   }
+  ],
+  "answer": 1,
+  "reason": "La silla es un mueble y no una prenda de ropa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9fb592e1f84ac914",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Sirvo para viajar sobre dos ruedas, no tengo motor y mi nombre empieza por la letra B. ¿Qué soy?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🛴"
+   }
+  ],
+  "answer": 1,
+  "reason": "La bicicleta tiene dos ruedas y empieza con la letra B.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1d065eda4f730627",
+  "lang": "es",
+  "subject": "words",
+  "level": 4,
+  "prompt": "¿Cuál es el antónimo de «pesado»?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "duro"
+   },
+   {
+    "text": "fuerte"
+   },
+   {
+    "text": "ligero"
+   }
+  ],
+  "answer": 2,
+  "reason": "Algo que no pesa mucho es algo ligero.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1d905801c681004b",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Con qué parte de nuestro cuerpo podemos oler las flores?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "con la nariz"
+   },
+   {
+    "text": "con las orejas"
+   },
+   {
+    "text": "con los ojos"
+   }
+  ],
+  "answer": 0,
+  "reason": "Usamos la nariz para oler todo lo que nos rodea.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "37b719597cbfe819",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué animal nada en el agua y hace cuac?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐱"
+   }
+  ],
+  "answer": 1,
+  "reason": "El pato nada en el agua y dice cuac.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "33a05f43466a2e58",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué usamos en los pies antes de ponernos los zapatos?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "calcetines"
+   },
+   {
+    "text": "gorro"
+   },
+   {
+    "text": "guantes"
+   }
+  ],
+  "answer": 0,
+  "reason": "Nos ponemos los calcetines en los pies para estar cómodos y calentitos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "394dee89488c5e78",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué vemos brillar en el cielo durante la noche?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "🌞"
+   },
+   {
+    "emoji": "🌈"
+   }
+  ],
+  "answer": 0,
+  "reason": "La luna sale de noche cuando el cielo está oscuro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "49125053402b41b0",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué usamos para lavarnos los dientes después de comer?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🪥"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 1,
+  "reason": "El cepillo de dientes sirve para dejar los dientes muy limpios.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ad2cf622d931a54a",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Cuántas manzanas ricas hay aquí?",
+  "picture": [
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "cinco"
+   },
+   {
+    "text": "dos"
+   },
+   {
+    "text": "una"
+   }
+  ],
+  "answer": 1,
+  "reason": "Hay dos manzanas listas para comer.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e4c3e4fae035f37b",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué hace la vaca cuando tiene hambre o saluda?",
+  "picture": [
+   "🐮"
+  ],
+  "choices": [
+   {
+    "text": "dice mu"
+   },
+   {
+    "text": "ladra"
+   },
+   {
+    "text": "canta"
+   }
+  ],
+  "answer": 0,
+  "reason": "La vaca hace mu.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2d4bd3da74018fa6",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Quién ayuda a apagar el fuego y va en un gran camión rojo?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚒"
+   },
+   {
+    "emoji": "🚜"
+   },
+   {
+    "emoji": "🚲"
+   }
+  ],
+  "answer": 0,
+  "reason": "Los bomberos van en el camión de bomberos para apagar los fuegos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "125241b3bf334d0c",
+  "lang": "es",
+  "subject": "world",
+  "level": 1,
+  "prompt": "¿Qué usamos antes de comer para tener las manos muy limpias?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "arena"
+   },
+   {
+    "text": "agua y jabón"
+   },
+   {
+    "text": "pintura"
+   }
+  ],
+  "answer": 1,
+  "reason": "Nos lavamos las manos con agua y jabón para quitar la suciedad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "52a397df76ddf3dd",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué animal vive en el agua y sabe nadar?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🦁"
+   }
+  ],
+  "answer": 0,
+  "reason": "Los peces viven y nadan en el agua.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c7104b8bb116dfa9",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Con qué parte del cuerpo podemos escuchar la música?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👀"
+   },
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👂"
+   }
+  ],
+  "answer": 2,
+  "reason": "Usamos las orejas para oír los sonidos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e75bccbaad674c8f",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Hay tres manzanas y te comes una. ¿Cuántas quedan?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "1"
+   },
+   {
+    "text": "2"
+   },
+   {
+    "text": "4"
+   }
+  ],
+  "answer": 1,
+  "reason": "Si tienes tres manzanas y quitas una, quedan dos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7791aa603655a650",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Tienes dos flores rojas y dos amarillas. ¿Cuántas flores tienes en total?",
+  "picture": [
+   "🌹",
+   "🌹",
+   "🌻",
+   "🌻"
+  ],
+  "choices": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "5"
+   },
+   {
+    "text": "4"
+   }
+  ],
+  "answer": 2,
+  "reason": "Dos más dos son cuatro.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7e954e636b331e24",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué usamos para lavarnos las manos antes de comer?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🔑"
+   },
+   {
+    "emoji": "🧼"
+   },
+   {
+    "emoji": "🎨"
+   }
+  ],
+  "answer": 1,
+  "reason": "El jabón nos ayuda a limpiar las manos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ee7ec1e9e76e0dc3",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué solemos ver en el cielo durante la noche?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "La luna"
+   },
+   {
+    "text": "El arcoíris"
+   },
+   {
+    "text": "El sol"
+   }
+  ],
+  "answer": 0,
+  "reason": "La luna brilla en el cielo por la noche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7418caf554f0507c",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "En otoño, ¿qué cae de las ramas de los árboles?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "⛄"
+   },
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🍂"
+   }
+  ],
+  "answer": 2,
+  "reason": "Las hojas secas se caen de los árboles en otoño.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ef5b9ed40dcb61d5",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué ropa te pones en los pies antes de los zapatos?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Los guantes"
+   },
+   {
+    "text": "Los calcetines"
+   },
+   {
+    "text": "El gorro"
+   }
+  ],
+  "answer": 1,
+  "reason": "Los calcetines van en los pies dentro del zapato.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8b1bd171abb87728",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué animal hace miel dulce en su colmena?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El caracol"
+   },
+   {
+    "text": "La rana"
+   },
+   {
+    "text": "La abeja"
+   }
+  ],
+  "answer": 2,
+  "reason": "Las abejas fabrican la miel con las flores.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "12f8366f57de5e0d",
+  "lang": "es",
+  "subject": "world",
+  "level": 2,
+  "prompt": "¿Qué vehículo ayuda a apagar el fuego?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El camión de bomberos"
+   },
+   {
+    "text": "La bicicleta"
+   },
+   {
+    "text": "El autobús"
+   }
+  ],
+  "answer": 0,
+  "reason": "Los bomberos usan su camión para apagar los fuegos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c7ff885cab683736",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "¿Cuál de estos animales construye colmenas y hace miel?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐢"
+   }
+  ],
+  "answer": 0,
+  "reason": "Las abejas viven en colmenas y fabrican miel con las flores.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2f4eb9a2fa49a24a",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "¿Qué parte de nuestro cuerpo usamos para escuchar música?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Los ojos"
+   },
+   {
+    "text": "La nariz"
+   },
+   {
+    "text": "Las orejas"
+   }
+  ],
+  "answer": 2,
+  "reason": "Las orejas y el oído nos permiten percibir los sonidos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "689352ddd89e9bb1",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "En otoño, ¿qué suele caer al suelo de muchos árboles?",
+  "picture": [
+   "🌳",
+   "🍂"
+  ],
+  "choices": [
+   {
+    "text": "Las hojas"
+   },
+   {
+    "text": "Los nidos"
+   },
+   {
+    "text": "Las piedras"
+   }
+  ],
+  "answer": 0,
+  "reason": "En otoño las hojas secas caen de las ramas al suelo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2225dfa639b4eaad",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "¿Qué debemos hacer siempre antes de comer o después de jugar con tierra?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Ponernos el gorro"
+   },
+   {
+    "text": "Lavarnos las manos"
+   },
+   {
+    "text": "Dormir un rato"
+   }
+  ],
+  "answer": 1,
+  "reason": "Lavarse las manos elimina los microbios y nos mantiene sanos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "58d127f68e82b878",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Si una manzana cuesta siete monedas y una pera cuesta cinco, ¿cuántas monedas cuestan las dos juntas?",
+  "picture": [
+   "🍎",
+   "🍐"
+  ],
+  "choices": [
+   {
+    "text": "Once"
+   },
+   {
+    "text": "Doce"
+   },
+   {
+    "text": "Quince"
+   }
+  ],
+  "answer": 1,
+  "reason": "Siete más cinco suma doce.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "80a711a869691f7e",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "¿Qué objeto nos protege de la lluvia para no mojarnos?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌂"
+   },
+   {
+    "emoji": "🪑"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 0,
+  "reason": "El paraguas frena las gotas de agua de la lluvia.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ac4997e0f0236c5e",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Para proteger nuestra cabeza si montamos en bicicleta o patinete, usamos un...",
+  "picture": [
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "Gorro de lana"
+   },
+   {
+    "text": "Casco"
+   },
+   {
+    "text": "Sombrero"
+   }
+  ],
+  "answer": 1,
+  "reason": "El casco es rígido y cuida la cabeza ante cualquier caída.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5b90db5cb0592508",
+  "lang": "es",
+  "subject": "world",
+  "level": 3,
+  "prompt": "¿Qué sentido usamos cuando saboreamos una fruta deliciosa?",
+  "picture": [
+   "🍓"
+  ],
+  "choices": [
+   {
+    "text": "El gusto"
+   },
+   {
+    "text": "La vista"
+   },
+   {
+    "text": "El tacto"
+   }
+  ],
+  "answer": 0,
+  "reason": "La lengua y el sentido del gusto nos permiten reconocer los sabores.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d52d7c0a2a3b4285",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Trabajo sin parar bombeando sangre con oxígeno hacia cada rincón de tu cuerpo. ¿Qué órgano soy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "El corazón"
+   },
+   {
+    "text": "El estómago"
+   },
+   {
+    "text": "La lengua"
+   }
+  ],
+  "answer": 0,
+  "reason": "El corazón impulsa la sangre por todo el organismo.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ba1ca159d279c3c2",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Un jardinero plantó cinco macetas y colocó tres flores en cada una. ¿Cuántas flores plantó en total?",
+  "picture": [
+   "🌻",
+   "🌻",
+   "🌻",
+   "🌻",
+   "🌻"
+  ],
+  "choices": [
+   {
+    "text": "Ocho"
+   },
+   {
+    "text": "Quince"
+   },
+   {
+    "text": "Veinte"
+   }
+  ],
+  "answer": 1,
+  "reason": "Cinco veces tres es igual a quince flores.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bebefabe9562576b",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Para que una linterna encienda su bombilla en la oscuridad, ¿qué elemento necesita dentro para darle energía?",
+  "picture": [
+   "🔦"
+  ],
+  "choices": [
+   {
+    "text": "Agua fresca"
+   },
+   {
+    "text": "Pilas"
+   },
+   {
+    "text": "Aire caliente"
+   }
+  ],
+  "answer": 1,
+  "reason": "Las pilas proporcionan la electricidad necesaria para encender la linterna.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "805376bfaf02ef65",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Si el reloj marca las doce del día y el Sol está en su punto más alto en el cielo, ¿qué momento es?",
+  "picture": [
+   "🌞",
+   "⏰"
+  ],
+  "choices": [
+   {
+    "text": "El mediodía"
+   },
+   {
+    "text": "La medianoche"
+   },
+   {
+    "text": "El amanecer"
+   }
+  ],
+  "answer": 0,
+  "reason": "Las doce del día con sol radiante corresponden al mediodía.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c7db87c488488989",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "¿Qué hábito diario mantiene tus dientes sanos después de comer dulces o comida?",
+  "picture": [
+   "🦷"
+  ],
+  "choices": [
+   {
+    "text": "Lavarse el pelo"
+   },
+   {
+    "text": "Dormir la siesta"
+   },
+   {
+    "text": "Cepillarse"
+   }
+  ],
+  "answer": 2,
+  "reason": "El cepillado limpia los restos de comida y cuida el esmalte de los dientes.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8d90ed12eda2c738",
+  "lang": "es",
+  "subject": "world",
+  "level": 4,
+  "prompt": "¿Qué insecto trabajador vuela de flor en flor recogiendo néctar y produce dulce miel en su colmena?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦋"
+   },
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐞"
+   }
+  ],
+  "answer": 1,
+  "reason": "Las abejas fabrican miel dentro de sus colmenas usando el néctar de las flores.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ }
+]

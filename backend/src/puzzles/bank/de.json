@@ -1,0 +1,3949 @@
+[
+ {
+  "id": "fc5d419ffecdafe2",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Welches Ding passt hier nicht dazu?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🚗",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🍌"
+   }
+  ],
+  "answer": 1,
+  "reason": "Das Auto fährt, aber das andere kann man essen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6b6c588856f50b69",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Ich habe vier Beine, belle laut und wedle mit dem Schwanz. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Der Hund bellt und hat vier Beine.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "42059e96cab35bf7",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Was passt am besten zur Zahnbürste?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mit der Zahnbürste putzt man die Zähne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0e433ed17e1c7195",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Schau dir das Muster an. Was kommt als Nächstes?",
+  "picture": [
+   "🌞",
+   "🌙",
+   "🌞",
+   "🌙"
+  ],
+  "choices": [
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "🌞"
+   }
+  ],
+  "answer": 2,
+  "reason": "Nach dem Mond kommt wieder die Sonne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "126a62640baa527b",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Was passt hier nicht in die Reihe?",
+  "picture": [
+   "⚽",
+   "🏀",
+   "🎈",
+   "🐶"
+  ],
+  "choices": [
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🏀"
+   }
+  ],
+  "answer": 1,
+  "reason": "Der Hund ist ein Tier und die anderen sind Spielsachen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a817fcbffb2a9a76",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Welches Ding passt nicht zu den anderen?",
+  "picture": [
+   "👕",
+   "👖",
+   "👗",
+   "🍞"
+  ],
+  "choices": [
+   {
+    "emoji": "🍞"
+   },
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "👕"
+   }
+  ],
+  "answer": 0,
+  "reason": "Brot isst man und die anderen Sachen zieht man an.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "07175b9bee482919",
+  "lang": "de",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Was passt am besten zum Kochlöffel beim Essen?",
+  "picture": [
+   "🥄"
+  ],
+  "choices": [
+   {
+    "emoji": "🥣"
+   },
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 0,
+  "reason": "Aus einer Schüssel isst man Suppe mit dem Löffel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "93a36c27def17ad0",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Welches Tier passt nicht zu den anderen?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐟",
+   "🐰"
+  ],
+  "choices": [
+   {
+    "text": "Hund"
+   },
+   {
+    "text": "Fisch"
+   },
+   {
+    "text": "Katze"
+   }
+  ],
+  "answer": 1,
+  "reason": "Der Fisch schwimmt im Wasser, die anderen Tiere laufen an Land.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "98cf02690718530c",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Welches Obst kommt als nächstes in der Reihe?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍓"
+   },
+   {
+    "emoji": "🍌"
+   }
+  ],
+  "answer": 2,
+  "reason": "Nach dem Apfel folgt immer eine Banane.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c998e2f95c2fff00",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Ich habe keine Beine, trage mein Haus immer auf dem Rücken und bewege mich ganz langsam. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Schildkröte"
+   },
+   {
+    "text": "Schnecke"
+   },
+   {
+    "text": "Raupe"
+   }
+  ],
+  "answer": 1,
+  "reason": "Eine Schnecke trägt ihr Schneckenhaus auf dem Rücken und hat keine Beine.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a50c717cb47e5d79",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Was passt am besten zu Pfeil und Bogen oder Schere und Papier?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "text": "Seife"
+   },
+   {
+    "text": "Zahnpasta"
+   },
+   {
+    "text": "Buch"
+   }
+  ],
+  "answer": 1,
+  "reason": "Mit Zahnbürste und Zahnpasta putzt man die Zähne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a9e39263cdbb2635",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Schau dir das Muster an. Welches Tier kommt als nächstes?",
+  "picture": [
+   "🐸",
+   "🐸",
+   "🦆",
+   "🐸",
+   "🐸",
+   "🦆",
+   "🐸"
+  ],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 0,
+  "reason": "Im Muster folgen nach der Ente immer zwei Frösche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6a898d9a22171a2b",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Welches Tier ist in Wirklichkeit kleiner als ein Igel?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐞"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🦊"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ein Marienkäfer ist viel kleiner als ein Igel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "613db54523766a67",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Ich stehe am Himmel, spende warmes Licht und wenn ich untergehe, beginnt die Nacht. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌞"
+   }
+  ],
+  "answer": 2,
+  "reason": "Die Sonne scheint am Tag und wärmt die Erde.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6026df4f9c7b76af",
+  "lang": "de",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Welches Ding passt nicht zu den anderen dreien?",
+  "picture": [
+   "🥕",
+   "🥦",
+   "🥒",
+   "🍰"
+  ],
+  "choices": [
+   {
+    "text": "Brokkoli"
+   },
+   {
+    "text": "Kuchen"
+   },
+   {
+    "text": "Gurke"
+   }
+  ],
+  "answer": 1,
+  "reason": "Der Kuchen ist ein süßes Gebäck, die anderen drei sind Gemüse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "988bed5125cb90c4",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Schau dir das Muster an. Welches Symbol kommt als nächstes?",
+  "picture": [
+   "🔴",
+   "🟦",
+   "🔴",
+   "🟦",
+   "🔴"
+  ],
+  "choices": [
+   {
+    "emoji": "🔴"
+   },
+   {
+    "emoji": "🟦"
+   },
+   {
+    "emoji": "⭐"
+   }
+  ],
+  "answer": 1,
+  "reason": "Rot und Blau wechseln sich immer ab, darum folgt wieder Blau.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c24e384555cec187",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Ich habe keinen Motor, aber zwei Räder und zwei Pedale. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🚲"
+   }
+  ],
+  "answer": 2,
+  "reason": "Ein Fahrrad bewegt man mit Pedalen vorwärts.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d69a5d81c123ded3",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Was gehört am besten zur Zahnbürste?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "emoji": "🧼"
+   },
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "🧢"
+   }
+  ],
+  "answer": 1,
+  "reason": "Mit einer Zahnbürste putzt man die Zähne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e0a7dd2e5e901a24",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Ich lebe im Wald, schlafe am Tag und jage in der Nacht. Meine Rufe klingen geheimnisvoll. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦉"
+   },
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐔"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Eule ist in der Nacht wach und schläft am Tag.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "02333c2830d9e51a",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Drei Kinder pflücken jeweils vier Äpfel. Wie viele Äpfel haben sie zusammen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Sieben Äpfel"
+   },
+   {
+    "text": "Zwölf Äpfel"
+   },
+   {
+    "text": "Vierzehn Äpfel"
+   }
+  ],
+  "answer": 1,
+  "reason": "Drei mal vier Äpfel ergibt zusammen zwölf Äpfel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dfe792ef0a987e30",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Welches Tier ist in Wirklichkeit das größte von diesen dreien?",
+  "picture": [
+   "🐭",
+   "🦊",
+   "🐘"
+  ],
+  "choices": [
+   {
+    "text": "Die Maus"
+   },
+   {
+    "text": "Der Fuchs"
+   },
+   {
+    "text": "Der Elefant"
+   }
+  ],
+  "answer": 2,
+  "reason": "Ein Elefant ist viel größer und schwerer als ein Fuchs oder eine Maus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "05a815e6d4772ad1",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Schau dir die Reihe an. Was fehlt am Ende?",
+  "picture": [
+   "🍎",
+   "🍐",
+   "🍌",
+   "🍎",
+   "🍐"
+  ],
+  "choices": [
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍊"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Reihe wiederholt immer Apfel, Birne und Banane.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c17f89e944aa5835",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Was passt am besten zum Schlüssel?",
+  "picture": [
+   "🔑"
+  ],
+  "choices": [
+   {
+    "emoji": "🚪"
+   },
+   {
+    "emoji": "🪑"
+   },
+   {
+    "emoji": "🧺"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mit einem Schlüssel schließt man eine Tür auf oder zu.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c97b63977caad728",
+  "lang": "de",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Ich habe acht Beine, lebe im Wasser und kann Tinte spritzen. Was bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🐙"
+   },
+   {
+    "emoji": "🐊"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ein Krake hat acht Fangarme und stößt Tinte aus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c9ac28a78c255718",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Zähle laut mit: eins, zwei, drei, vier. Welche Zahl kommt als Nächstes?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 2,
+  "reason": "Nach der Zahl vier kommt die fünf.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "348480e76e430b75",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Wie viele Enten schwimmen hier im Wasser?",
+  "picture": [
+   "🦆",
+   "🦆",
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   }
+  ],
+  "answer": 1,
+  "reason": "Dort schwimmen eins, zwei, drei Enten.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d77910941379ec94",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Von welchen Tieren gibt es hier mehr? Von den Fröschen oder von den Schildkröten?",
+  "picture": [
+   "🐸",
+   "🐸",
+   "🐸",
+   "🐢"
+  ],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐢"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 0,
+  "reason": "Drei Frösche sind mehr als eine Schildkröte.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0ddb3ef13c62e789",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Auf der Wiese sitzen kleine Häschen. Wie viele siehst du?",
+  "picture": [
+   "🐰",
+   "🐰",
+   "🐰",
+   "🐰"
+  ],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "zwei"
+   }
+  ],
+  "answer": 1,
+  "reason": "Es sind vier Häschen auf der Wiese.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "615f18162308362e",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Leo hat vier bunte Luftballons. Einer platzt mit einem lauten Knall! Wie viele Ballons bleiben übrig?",
+  "picture": [
+   "🎈",
+   "🎈",
+   "🎈",
+   "🎈"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "fünf"
+   },
+   {
+    "text": "drei"
+   }
+  ],
+  "answer": 2,
+  "reason": "Wenn von vier Ballons einer wegfliegt, bleiben drei übrig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a60d5280e94a8bcf",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Guck mal, die süßen Kätzchen! Wie viele sind es?",
+  "picture": [
+   "🐱",
+   "🐱",
+   "🐱",
+   "🐱",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 2,
+  "reason": "Das sind eins, zwei, drei, vier, fünf Kätzchen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ccf62d77942a096a",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Zähle die gelben Bananen. Wie viele liegen dort?",
+  "picture": [
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "drei"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dort liegen eins und zwei Bananen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a56fcaa507f4617e",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Schau dir die leckeren Früchte an. Wovon gibt es weniger?",
+  "picture": [
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🍓"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍌"
+   }
+  ],
+  "answer": 1,
+  "reason": "Zwei Äpfel sind weniger als drei Erdbeeren.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d9cfe8f1e5284669",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Am Himmel leuchten helle Sterne. Zähle sie alle!",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "vier"
+   },
+   {
+    "text": "fünf"
+   },
+   {
+    "text": "drei"
+   }
+  ],
+  "answer": 1,
+  "reason": "Am Himmel leuchten genau fünf Sterne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "753dbc01641ee797",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Leon hat zwei Äpfel. Seine Oma schenkt ihm noch einen dazu. Wie viele Äpfel hat Leon jetzt?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "zwei"
+   }
+  ],
+  "answer": 0,
+  "reason": "Zwei plus eins ergibt zusammen drei.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c6dd37ee5d1ca673",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Zähle die Marienkäfer. Wie viele krabbeln da?",
+  "picture": [
+   "🐞",
+   "🐞",
+   "🐞",
+   "🐞",
+   "🐞",
+   "🐞"
+  ],
+  "choices": [
+   {
+    "text": "fünf"
+   },
+   {
+    "text": "acht"
+   },
+   {
+    "text": "sechs"
+   }
+  ],
+  "answer": 2,
+  "reason": "In der Reihe krabbeln sechs Marienkäfer.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d37d0a80993c5c46",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Eins, zwei, drei, vier... Welche Zahl kommt als Nächstes?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "sechs"
+   },
+   {
+    "text": "fünf"
+   },
+   {
+    "text": "drei"
+   }
+  ],
+  "answer": 1,
+  "reason": "Nach der Zahl vier kommt die Fünf.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7216d4e3aa894341",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Wie viele bunte Luftballons siehst du hier?",
+  "picture": [
+   "🎈",
+   "🎈",
+   "🎈",
+   "🎈",
+   "🎈",
+   "🎈",
+   "🎈"
+  ],
+  "choices": [
+   {
+    "text": "sieben"
+   },
+   {
+    "text": "acht"
+   },
+   {
+    "text": "neun"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dort schweben genau sieben Luftballons.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4d32021f035c8fc8",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Sechs, sieben, acht... Welche Zahl kommt danach?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "fünf"
+   },
+   {
+    "text": "neun"
+   },
+   {
+    "text": "zehn"
+   }
+  ],
+  "answer": 1,
+  "reason": "Nach der Zahl acht folgt die Neun.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9252392589b0c8f9",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Drei kleine Vögel sitzen auf einem Ast. Zwei fliegen fort. Wie viele Vögel sitzen noch da?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "einer"
+   }
+  ],
+  "answer": 2,
+  "reason": "Wenn von drei Vögeln zwei wegfliegen, bleibt einer übrig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6a78e78323f989a4",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Auf dem Teller liegen zwei Kekse. Mama legt noch zwei dazu. Wie viele Kekse sind es nun?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 1,
+  "reason": "Zwei Kekse und noch zwei dazu machen vier Kekse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a83e6f82d14f931c",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Auf der Wiese liegen Karotten und Äpfel. Wovon gibt es weniger?",
+  "picture": [
+   "🥕",
+   "🥕",
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍌"
+   }
+  ],
+  "answer": 0,
+  "reason": "Zwei Karotten sind weniger als vier Äpfel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e6043d2d16f0faec",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Wie viele Autos stehen in der Reihe?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "vier"
+   },
+   {
+    "text": "sechs"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 2,
+  "reason": "In der Reihe stehen genau fünf Autos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d3542269db3b3072",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Mia hat sieben Erdbeeren gepflückt und isst drei davon auf. Wie viele Erdbeeren bleiben übrig?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "3"
+   },
+   {
+    "text": "4"
+   },
+   {
+    "text": "5"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sieben minus drei ergibt vier.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a186d0b6369727ce",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "In einer Schale liegen dreizehn Bonbons. Fünf Bonbons werden herausgenommen. Wie viele bleiben übrig?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "8"
+   },
+   {
+    "text": "7"
+   },
+   {
+    "text": "9"
+   }
+  ],
+  "answer": 0,
+  "reason": "Dreizehn minus fünf ist acht.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "913e9bb52757afc3",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Auf der Weide stehen acht Schafe und sechs Pferde. Wie viele Tiere stehen dort zusammen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "13"
+   },
+   {
+    "text": "14"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "answer": 1,
+  "reason": "Acht plus sechs ergibt vierzehn.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a2ff0d77a926e3d8",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Zähle immer in Zweierschritten weiter: zwei, vier, sechs, acht. Welche Zahl folgt jetzt?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "9"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "12"
+   }
+  ],
+  "answer": 1,
+  "reason": "Zwei mehr als acht ist zehn.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b3dfee2596496d27",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Schau dir die Reihe an. Welches Obst ist weniger oft zu sehen?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍌",
+   "🍌",
+   "🍌",
+   "🍌",
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍊"
+   }
+  ],
+  "answer": 0,
+  "reason": "Vier Äpfel sind weniger als sechs Bananen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cfa88cdb5919c48f",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Leon hat fünfzehn Buntstifte. Er leiht seiner Schwester sieben Stifte. Wie viele Buntstifte hat Leon noch?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "8"
+   },
+   {
+    "text": "9"
+   },
+   {
+    "text": "7"
+   }
+  ],
+  "answer": 0,
+  "reason": "Fünfzehn minus sieben ist acht.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c8af746eb324f8e2",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Auf einem Ast sitzen neun Vögel. Sechs weitere Vögel fliegen dazu. Wie viele Vögel sind es nun?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "14"
+   },
+   {
+    "text": "16"
+   },
+   {
+    "text": "15"
+   }
+  ],
+  "answer": 2,
+  "reason": "Neun plus sechs ergibt fünfzehn.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "77dd833faf4f3a65",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Schau dir diese Zahlenreihe an: zwei, vier, acht, sechzehn. Welche Zahl kommt als Nächstes?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "zweiunddreißig"
+   },
+   {
+    "text": "achtzehn"
+   },
+   {
+    "text": "vierundzwanzig"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Zahl verdoppelt sich bei jedem Schritt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f0a8f2987bf3df94",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "In einem Regal stehen sieben Reihen mit jeweils sechs Büchern. Wie viele Bücher stehen dort?",
+  "picture": [
+   "📚"
+  ],
+  "choices": [
+   {
+    "text": "zweiundvierzig"
+   },
+   {
+    "text": "sechsunddreißig"
+   },
+   {
+    "text": "achtundvierzig"
+   }
+  ],
+  "answer": 0,
+  "reason": "Sieben mal sechs ergibt zweiundvierzig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "80917ea098841a2f",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Schau dir die Reihe an: drei, sechs, neun, zwölf, fünfzehn. Welche Zahl folgt danach?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "sechzehn"
+   },
+   {
+    "text": "siebzehn"
+   },
+   {
+    "text": "achtzehn"
+   }
+  ],
+  "answer": 2,
+  "reason": "Bei jedem Schritt kommen drei dazu.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4555e8e72587fbfb",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Welches Tier bellt und wedelt mit dem Schwanz?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ein Hund bellt und wedelt mit dem Schwanz.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e7cfc8b71d17a150",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Was reimt sich auf Haus?",
+  "picture": [
+   "🏠"
+  ],
+  "choices": [
+   {
+    "emoji": "🐭"
+   },
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🌳"
+   }
+  ],
+  "answer": 0,
+  "reason": "Maus reimt sich auf Haus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f169db2f05dc44e5",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Der Elefant ist groß. Wie ist die Maus?",
+  "picture": [
+   "🐭"
+  ],
+  "choices": [
+   {
+    "text": "klein"
+   },
+   {
+    "text": "schnell"
+   },
+   {
+    "text": "laut"
+   }
+  ],
+  "answer": 0,
+  "reason": "Das Gegenteil von groß ist klein.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "627445eefaa1e468",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Was davon ist leckeres Obst?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 1,
+  "reason": "Der Apfel ist ein Obst.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "703b52ea7ed2ac72",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Was ziehst du an deinen Füßen an?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "👕"
+   },
+   {
+    "emoji": "🧦"
+   }
+  ],
+  "answer": 2,
+  "reason": "Socken zieht man an die Füße.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fa57831908de3381",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Was kann hoch am Himmel fliegen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚀"
+   },
+   {
+    "emoji": "🚢"
+   }
+  ],
+  "answer": 1,
+  "reason": "Eine Rakete fliegt hoch in den Himmel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "58fae045d01e2eb8",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Feuer ist heiß. Wie ist Schnee?",
+  "picture": [
+   "⛄"
+  ],
+  "choices": [
+   {
+    "text": "kalt"
+   },
+   {
+    "text": "trocken"
+   },
+   {
+    "text": "rot"
+   }
+  ],
+  "answer": 0,
+  "reason": "Das Gegenteil von heiß ist kalt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a709cd52dded3660",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Was davon gehört zu den Fahrzeugen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🌻"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ein Bus ist ein Fahrzeug.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ed57ecae56223344",
+  "lang": "de",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Welches Tier beginnt mit dem Laut F, genau wie Fisch?",
+  "picture": [
+   "🐟"
+  ],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🦁"
+   }
+  ],
+  "answer": 0,
+  "reason": "Frosch beginnt mit dem Laut F.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "95dbb2ee14be06fe",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches Wort reimt sich auf Maus?",
+  "picture": [
+   "🐭"
+  ],
+  "choices": [
+   {
+    "text": "Baum"
+   },
+   {
+    "text": "Hund"
+   },
+   {
+    "text": "Haus"
+   }
+  ],
+  "answer": 2,
+  "reason": "Maus und Haus reimen sich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "75c19f3cd2564e4e",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches dieser Dinge ist ein leckeres Obst?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 1,
+  "reason": "Die Banane ist eine Frucht.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5b6329885a04986a",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mit welchem Buchstaben beginnt dieses Tier?",
+  "picture": [
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "F"
+   },
+   {
+    "text": "M"
+   },
+   {
+    "text": "B"
+   }
+  ],
+  "answer": 0,
+  "reason": "Das Wort Frosch beginnt mit dem Buchstaben F.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ee3686add8ebe546",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches Wort passt genau zu diesem Bild?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "Mond"
+   },
+   {
+    "text": "Sonne"
+   },
+   {
+    "text": "Stern"
+   }
+  ],
+  "answer": 1,
+  "reason": "Das Bild zeigt die Sonne.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5b220f6755f4e329",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Was passt zu den anderen beiden?",
+  "picture": [
+   "🚗",
+   "🚌"
+  ],
+  "choices": [
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🌻"
+   }
+  ],
+  "answer": 0,
+  "reason": "Das Fahrrad ist wie Auto und Bus ein Fahrzeug.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "713627ee97fef1a1",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Was ist das Gegenteil von kalt?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "warm"
+   },
+   {
+    "text": "nass"
+   },
+   {
+    "text": "hell"
+   }
+  ],
+  "answer": 0,
+  "reason": "Das Gegenteil von kalt ist warm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2f08bd007407aa62",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches Wort reimt sich auf Hund?",
+  "picture": [
+   "🐶"
+  ],
+  "choices": [
+   {
+    "text": "Katze"
+   },
+   {
+    "text": "Rund"
+   },
+   {
+    "text": "Hand"
+   }
+  ],
+  "answer": 1,
+  "reason": "Hund und rund klingen am Ende gleich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e7e47cdcfd76f12c",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches Tier kann schwimmen und lebt im Wasser?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦁"
+   },
+   {
+    "emoji": "🐴"
+   },
+   {
+    "emoji": "🐬"
+   }
+  ],
+  "answer": 2,
+  "reason": "Der Delfin lebt im Wasser und kann schwimmen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a85e0fe433f7031b",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Wenn die Sonne untergeht, wird es dunkel. Was ist das Gegenteil von dunkel?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "schwer"
+   },
+   {
+    "text": "hell"
+   },
+   {
+    "text": "kurz"
+   }
+  ],
+  "answer": 1,
+  "reason": "Das Gegenteil von dunkel ist hell.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "241851acebd63a33",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mit welchem Laut beginnt dieser Gegenstand?",
+  "picture": [
+   "⚽"
+  ],
+  "choices": [
+   {
+    "text": "S"
+   },
+   {
+    "text": "T"
+   },
+   {
+    "text": "B"
+   }
+  ],
+  "answer": 2,
+  "reason": "Das Wort Ball fängt mit B an.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5769af63d2eaa55e",
+  "lang": "de",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Welches Bild zeigt ein Kleidungsstück?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🍞"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Socke zieht man an den Fuß.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "527ad7a855aa85b3",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Was ist das Gegenteil von laut?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "schnell"
+   },
+   {
+    "text": "leise"
+   },
+   {
+    "text": "hell"
+   }
+  ],
+  "answer": 1,
+  "reason": "Wenn etwas nicht laut ist, ist es leise.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6e0158afc8dca07f",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches Wort reimt sich auf das gesuchte Tier?",
+  "picture": [
+   "🐭"
+  ],
+  "choices": [
+   {
+    "text": "Haus"
+   },
+   {
+    "text": "Baum"
+   },
+   {
+    "text": "Käse"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Wörter Maus und Haus klingen am Ende gleich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "62b179b0b2fa3570",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches dieser drei Dinge ist ein Gemüse?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🥕"
+   }
+  ],
+  "answer": 2,
+  "reason": "Die Karotte wächst im Garten als Gemüse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2cc3bfbfd078a6fd",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches Wort reimt sich auf Katze?",
+  "picture": [
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "Hund"
+   },
+   {
+    "text": "Tatze"
+   },
+   {
+    "text": "Mütze"
+   }
+  ],
+  "answer": 1,
+  "reason": "Katze und Tatze reimen sich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0acddde396d850cb",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches Wort reimt sich auf Schuh?",
+  "picture": [
+   "👟"
+  ],
+  "choices": [
+   {
+    "text": "Hut"
+   },
+   {
+    "text": "Kuh"
+   },
+   {
+    "text": "Fuß"
+   }
+  ],
+  "answer": 1,
+  "reason": "Schuh und Kuh enden mit dem gleichen Klang.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f57f43a3dd307ee3",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches dieser Dinge gehört zur Gruppe Gemüse?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Erdbeere"
+   },
+   {
+    "text": "Banane"
+   },
+   {
+    "text": "Gurke"
+   }
+  ],
+  "answer": 2,
+  "reason": "Die Gurke ist ein Gemüse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "49ae5e32dbdd90f9",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Ich habe Flügel, schwimme gern und quacke laut. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐬"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Ente hat Flügel und quakt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1bfceb21db3f4466",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches Tier passt nicht in die Reihe der Waldtiere?",
+  "picture": [
+   "🦊",
+   "🐻",
+   "🐪"
+  ],
+  "choices": [
+   {
+    "text": "Fuchs"
+   },
+   {
+    "text": "Kamel"
+   },
+   {
+    "text": "Bär"
+   }
+  ],
+  "answer": 1,
+  "reason": "Das Kamel lebt in der Wüste und nicht im Wald.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2650bd5cb21a703d",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches Wort ist das Gegenteil von mutig?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "ängstlich"
+   },
+   {
+    "text": "traurig"
+   },
+   {
+    "text": "wütend"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ängstlich ist das Gegenteil von mutig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "47f7e7a54a9d5a83",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches dieser Fahrzeuge fährt auf zwei Rädern und braucht keinen Motor?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🚌"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ein Fahrrad hat zwei Räder und fährt mit Muskelkraft.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "db34004f7e734d30",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches Wort reimt sich auf Baum?",
+  "picture": [
+   "🌳"
+  ],
+  "choices": [
+   {
+    "text": "Ast"
+   },
+   {
+    "text": "Blatt"
+   },
+   {
+    "text": "Traum"
+   }
+  ],
+  "answer": 2,
+  "reason": "Baum und Traum reimen sich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "35f0ff8efc5a0c17",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Aus welchen zwei Wörtern besteht das Wort Haustür?",
+  "picture": [
+   "🏠",
+   "🚪"
+  ],
+  "choices": [
+   {
+    "text": "Haus und Tor"
+   },
+   {
+    "text": "Heim und Tür"
+   },
+   {
+    "text": "Haus und Tür"
+   }
+  ],
+  "answer": 2,
+  "reason": "Haustür wird aus den Wörtern Haus und Tür gebildet.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5184120f5162531e",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches Fortbewegungsmittel gehört zur Gruppe der Wasserfahrzeuge?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚁"
+   },
+   {
+    "emoji": "⛵"
+   },
+   {
+    "emoji": "🚜"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ein Segelboot fährt auf dem Wasser.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "721fec355aecb070",
+  "lang": "de",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Welches Wort ist das Gegenteil von fleißig?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "müde"
+   },
+   {
+    "text": "faul"
+   },
+   {
+    "text": "schwach"
+   }
+  ],
+  "answer": 1,
+  "reason": "Faul ist das Gegenteil von fleißig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e30834dca739455e",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Was putzen wir morgens und abends mit der Zahnbürste?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "👃"
+   }
+  ],
+  "answer": 1,
+  "reason": "Mit der Zahnbürste putzen wir die Zähne sauber.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "38e90b7241076552",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Zähle die Enten im Teich. Wie viele sind es?",
+  "picture": [
+   "🦆",
+   "🦆",
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "drei"
+   }
+  ],
+  "answer": 2,
+  "reason": "In der Reihe schwimmen genau drei Enten.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0754de90208e5336",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Welches Tier summt von Blume zu Blume und macht süßen Honig?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐱"
+   }
+  ],
+  "answer": 0,
+  "reason": "Bienen fliegen zu Blumen und machen leckeren Honig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cdf554254bb8e02b",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Was ziehen wir an die Füße, bevor wir in die Schuhe schlüpfen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "🧤"
+   },
+   {
+    "emoji": "🧦"
+   }
+  ],
+  "answer": 2,
+  "reason": "Socken ziehen wir an die Füße.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1213f2eba4cf555d",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Was scheint nachts am dunklen Himmel, wenn wir schlafen gehen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🌻"
+   }
+  ],
+  "answer": 0,
+  "reason": "Der Mond leuchtet in der Nacht am Himmel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4f89957e77c9a687",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Welches Tier hat einen langen Rüssel und große Ohren?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐭"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🐘"
+   }
+  ],
+  "answer": 2,
+  "reason": "Der Elefant hat einen langen Rüssel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7e11e4189621ef12",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Womit waschen wir uns die Hände mit Wasser ganz sauber?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🔑"
+   },
+   {
+    "emoji": "🧼"
+   },
+   {
+    "emoji": "🔔"
+   }
+  ],
+  "answer": 1,
+  "reason": "Seife macht schmutzige Hände wieder sauber.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a7e37722328efe7f",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Zähle die roten Äpfel im Korb. Wie viele sind es?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 1,
+  "reason": "In der Reihe liegen genau vier Äpfel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bdd66ee8890d71fa",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Was spannen wir auf, damit wir im Regen trocken bleiben?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌂"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🎈"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ein Regenschirm schützt vor herabfallenden Regentropfen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "010ae60d3933b194",
+  "lang": "de",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Womit können wir Musik hören, Geräusche wahrnehmen und Stimmen lauschen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👣"
+   },
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👂"
+   }
+  ],
+  "answer": 2,
+  "reason": "Mit den Ohren hören wir Geräusche.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0a8061ebd9aeaa4f",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Was putzen wir jeden Tag mit der Zahnbürste?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "👃"
+   }
+  ],
+  "answer": 1,
+  "reason": "Mit der Zahnbürste putzen wir unsere Zähne sauber.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9bfeca90f3a0a18c",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Wie viele Enten schwimmen hier im Teich?",
+  "picture": [
+   "🦆",
+   "🦆",
+   "🦆",
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   },
+   {
+    "text": "fünf"
+   }
+  ],
+  "answer": 1,
+  "reason": "Es sind vier Enten.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "92d73a91984766ff",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Welches Tier kann hoch in die Luft fliegen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Der Hund"
+   },
+   {
+    "text": "Der Vogel"
+   },
+   {
+    "text": "Der Frosch"
+   }
+  ],
+  "answer": 1,
+  "reason": "Vögel haben Flügel und fliegen durch die Luft.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "18a92901c46dbac6",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Welches Tier macht leise Miau?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐮"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Katzen sagen Miau.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8aea0bdd2abeb837",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Was ziehen wir an die Füße, bevor die Schuhe kommen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Socken"
+   },
+   {
+    "text": "Handschuhe"
+   },
+   {
+    "text": "Mützen"
+   }
+  ],
+  "answer": 0,
+  "reason": "Socken wärmen die Füße in den Schuhen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "38444377ecdbb8f7",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Was machen wir, bevor wir ein leckeres Brot essen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Schuhe anziehen"
+   },
+   {
+    "text": "Hände waschen"
+   },
+   {
+    "text": "Licht ausmachen"
+   }
+  ],
+  "answer": 1,
+  "reason": "Vor dem Essen waschen wir uns die Hände.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a0a6567d3236a746",
+  "lang": "de",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Du hast drei Äpfel und isst einen auf. Wie viele bleiben übrig?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "zwei"
+   },
+   {
+    "text": "drei"
+   },
+   {
+    "text": "vier"
+   }
+  ],
+  "answer": 0,
+  "reason": "Drei minus eins ist zwei.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "801efdaa409e664c",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Welches Tier schläft den ganzen Winter lang in einem festen Winterschlaf?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦔"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🦆"
+   }
+  ],
+  "answer": 0,
+  "reason": "Igel rollen sich im Laub zusammen und halten Winterschlaf.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6233d91d86e631c0",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Welches Tier verwandelt sich im Laufe seines Lebens in einen Schmetterling?",
+  "picture": [
+   "🦋"
+  ],
+  "choices": [
+   {
+    "text": "Die Raupe"
+   },
+   {
+    "text": "Die Biene"
+   },
+   {
+    "text": "Der Frosch"
+   }
+  ],
+  "answer": 0,
+  "reason": "Aus einer kleinen Raupe wird nach dem Verpuppen ein bunter Schmetterling.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "195bdfad0b7e9916",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Was putzt man morgens und abends gründlich sauber?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "👃"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mit der Zahnbürste putzt man täglich die Zähne sauber.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d79b74b8d7e45723",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Im Wald siehst du sieben Eichen und acht Buchen. Wie viele Bäume hast du insgesamt gezählt?",
+  "picture": [
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳"
+  ],
+  "choices": [
+   {
+    "text": "13 Bäume"
+   },
+   {
+    "text": "15 Bäume"
+   },
+   {
+    "text": "16 Bäume"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sieben plus acht ergibt zusammen fünfzehn.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ce4859b238692047",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Wann geht die Sonne am Abend langsam unter und der Himmel färbt sich rot?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "Am Mittag"
+   },
+   {
+    "text": "In der Dämmerung"
+   },
+   {
+    "text": "Am Vormittag"
+   }
+  ],
+  "answer": 1,
+  "reason": "In der Abenddämmerung geht die Sonne unter und es wird dunkel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "78deb87ef7bb3ca6",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Was passiert mit Wasser draußen, wenn es im Winter kälter als null Grad wird?",
+  "picture": [
+   "💧",
+   "⛄"
+  ],
+  "choices": [
+   {
+    "text": "Es kocht"
+   },
+   {
+    "text": "Es gefriert zu Eis"
+   },
+   {
+    "text": "Es verdampft sofort"
+   }
+  ],
+  "answer": 1,
+  "reason": "Bei Kälte unter null Grad gefriert flüssiges Wasser zu festem Eis.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "256391349520eb4b",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Welches Tier baut eine Wabe aus Wachs und sammelt fleißig Nektar?",
+  "picture": [
+   "🍯"
+  ],
+  "choices": [
+   {
+    "emoji": "🐜"
+   },
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐌"
+   }
+  ],
+  "answer": 1,
+  "reason": "Bienen fliegen von Blüte zu Blüte und machen Honig.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e177cf2ed1554305",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Du hast zwanzig Cent in der Hosentasche und kaufst einen Apfel für vierzehn Cent. Wie viel Geld bleibt übrig?",
+  "picture": [
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "6 Cent"
+   },
+   {
+    "text": "7 Cent"
+   },
+   {
+    "text": "8 Cent"
+   }
+  ],
+  "answer": 0,
+  "reason": "Zwanzig minus vierzehn ergibt sechs Cent.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dd060da2d3f4cf31",
+  "lang": "de",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Was zeigt die Zeigeruhr, wenn der kleine Zeiger auf der Drei und der große Zeiger auf der Zwölf steht?",
+  "picture": [
+   "⏰"
+  ],
+  "choices": [
+   {
+    "text": "Halb vier"
+   },
+   {
+    "text": "Viertel nach drei"
+   },
+   {
+    "text": "Genau drei Uhr"
+   }
+  ],
+  "answer": 2,
+  "reason": "Wenn der große Zeiger ganz oben auf der Zwölf steht, ist es eine volle Stunde.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4edda624dd84f98c",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Welches Tier verwandelt sich im Laufe seines Lebens vollständig von einer Kaulquappe zu einem Landtier?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐢"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 0,
+  "reason": "Aus Kaulquappen wachsen Frösche heran.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "01bc8f491dc5c49c",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Auf einer Wiese stehen drei Kühe und vier Schafe. Wie viele Beine haben alle diese Tiere zusammen?",
+  "picture": [
+   "🐄",
+   "🐄",
+   "🐄",
+   "🐑",
+   "🐑",
+   "🐑",
+   "🐑"
+  ],
+  "choices": [
+   {
+    "text": "vierzehn"
+   },
+   {
+    "text": "achtundzwanzig"
+   },
+   {
+    "text": "vierundzwanzig"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sieben Tiere mit jeweils vier Beinen haben zusammen achtundzwanzig Beine.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ac2b54854e133505",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Welches nachtaktive Tier schläft tagsüber kopfüber an der Decke und orientiert sich im Flug mit seinen Ohren?",
+  "picture": [
+   "🌙"
+  ],
+  "choices": [
+   {
+    "text": "der Maulwurf"
+   },
+   {
+    "text": "die Eule"
+   },
+   {
+    "text": "die Fledermaus"
+   }
+  ],
+  "answer": 2,
+  "reason": "Fledermäuse schlafen kopfunter und nutzen Ultraschall zur Orientierung.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6bb70e3ce8651d04",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Welches dieser Tiere hat keine Knochen im Körper und trägt sein schützendes Haus immer mit sich herum?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦔"
+   },
+   {
+    "emoji": "🐌"
+   },
+   {
+    "emoji": "🐢"
+   }
+  ],
+  "answer": 1,
+  "reason": "Die Schnecke ist ein Weichtier und trägt ihr Gehäuse auf dem Rücken.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "af5f452c2c4451c6",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Ich habe vier Beine und ein weiches Fell. Ich miaue leise und mag Milch. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Die Katze miaut.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "42c774636d641f4e",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was passt am besten zu diesem Gegenstand?",
+  "picture": [
+   "🔑"
+  ],
+  "choices": [
+   {
+    "text": "Schloss"
+   },
+   {
+    "text": "Gabel"
+   },
+   {
+    "text": "Mütze"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ein Schlüssel passt in ein Schloss.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c0fba46a9397cc93",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was kommt als Nächstes in dieser Reihe?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 0,
+  "reason": "Nach dem Apfel kommt immer eine Banane.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ae88dbeb61543b64",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Welches Muster geht hier weiter?",
+  "picture": [
+   "⭐",
+   "🌙",
+   "⭐",
+   "🌙"
+  ],
+  "choices": [
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌞"
+   }
+  ],
+  "answer": 1,
+  "reason": "Nach dem Mond kommt wieder ein Stern.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3b4077722a568eeb",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was gehört hier nicht dazu?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "🚒",
+   "🍕"
+  ],
+  "choices": [
+   {
+    "text": "Das Feuerwehrauto"
+   },
+   {
+    "text": "Die Pizza"
+   },
+   {
+    "text": "Der Bus"
+   }
+  ],
+  "answer": 1,
+  "reason": "Die Pizza kann man essen, die anderen sind Fahrzeuge.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "713627ee97fef1a1",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was ist das Gegenteil von kalt?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "nass"
+   },
+   {
+    "text": "warm"
+   },
+   {
+    "text": "dunkel"
+   }
+  ],
+  "answer": 1,
+  "reason": "Das Gegenteil von kalt ist warm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8f99143eb16121fd",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was zieht man an die Füße, bevor man die Schuhe anzieht?",
+  "picture": [
+   "👟"
+  ],
+  "choices": [
+   {
+    "text": "Handschuhe"
+   },
+   {
+    "text": "Socken"
+   },
+   {
+    "text": "Mütze"
+   }
+  ],
+  "answer": 1,
+  "reason": "Socken zieht man unter die Schuhe an.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "94f75e1d268a9796",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Ich lebe im Wasser, habe Flossen und schwimme den ganzen Tag. Wer bin ich?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐵"
+   },
+   {
+    "emoji": "🐰"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ein Fisch schwimmt mit Flossen im Wasser.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fd34fa8fdbd6148f",
+  "lang": "de",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Was passt nicht zu den anderen Anziehsachen?",
+  "picture": [
+   "👕",
+   "👖",
+   "👗",
+   "🎸"
+  ],
+  "choices": [
+   {
+    "text": "Die Gitarre"
+   },
+   {
+    "text": "Das Kleid"
+   },
+   {
+    "text": "Die Hose"
+   }
+  ],
+  "answer": 0,
+  "reason": "Eine Gitarre ist ein Instrument und keine Kleidung.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c496e946293412cf",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Welche Zahl kommt als Nächstes in dieser Reihe: fünfzig, fünfundvierzig, vierzig, fünfunddreißig?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "fünfundzwanzig"
+   },
+   {
+    "text": "zwanzig"
+   },
+   {
+    "text": "dreißig"
+   }
+  ],
+  "answer": 2,
+  "reason": "Die Zahlen werden bei jedem Schritt um fünf kleiner.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b71ff359c22630f5",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "In der Bäckerei packt Ben acht Tüten mit jeweils vier Brötchen ein. Wie viele Brötchen sind das zusammen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "achtundzwanzig"
+   },
+   {
+    "text": "zweiunddreißig"
+   },
+   {
+    "text": "sechsunddreißig"
+   }
+  ],
+  "answer": 1,
+  "reason": "Acht mal vier Brötchen ergibt zweiunddreißig Brötchen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f52a84a7857bcb9d",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Schau dir die Reihe an: eins, vier, sieben, zehn. Welche Zahl folgt als Nächstes?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "zwölf"
+   },
+   {
+    "text": "dreizehn"
+   },
+   {
+    "text": "vierzehn"
+   }
+  ],
+  "answer": 1,
+  "reason": "Zu jeder Zahl werden drei dazugezählt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "db6507eff36af8af",
+  "lang": "de",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Auf einer Wiese grasen neun Schafe. Wie viele Beine haben alle diese Schafe zusammen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "sechsunddreißig"
+   },
+   {
+    "text": "zweiunddreißig"
+   },
+   {
+    "text": "vierzig"
+   }
+  ],
+  "answer": 0,
+  "reason": "Jedes der neun Schafe hat vier Beine, also sind es sechsunddreißig Beine.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "95dbb2ee14be06fe",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches Wort reimt sich auf Maus?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Brot"
+   },
+   {
+    "text": "Fisch"
+   },
+   {
+    "text": "Haus"
+   }
+  ],
+  "answer": 2,
+  "reason": "Maus und Haus klingen am Ende gleich.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "404119d2fb8343af",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Was ist das Gegenteil von schwer?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Leicht"
+   },
+   {
+    "text": "Dunkel"
+   },
+   {
+    "text": "Langsam"
+   }
+  ],
+  "answer": 0,
+  "reason": "Wenn eine Sache nicht schwer ist, dann ist sie leicht.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3b16d90148bdb960",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches Wort ist das Gegenteil von voll?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Kalt"
+   },
+   {
+    "text": "Leer"
+   },
+   {
+    "text": "Klein"
+   }
+  ],
+  "answer": 1,
+  "reason": "Wenn ein Glas nicht voll ist, ist es leer.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "16562b85923de586",
+  "lang": "de",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Welches dieser Tiere kann fliegen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦉"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐢"
+   }
+  ],
+  "answer": 0,
+  "reason": "Die Eule hat Flügel und kann fliegen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "dcdac0ad68523521",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Welches Organ in deiner Brust schlägt Tag und Nacht ohne Pause und pumpt das Blut durch deinen Körper?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Die Lunge"
+   },
+   {
+    "text": "Der Magen"
+   },
+   {
+    "text": "Das Herz"
+   }
+  ],
+  "answer": 2,
+  "reason": "Das Herz pumpt das Blut durch die Blutbahnen im ganzen Körper.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7d0562d27de35ec3",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Auf einem Teich schwimmen vier Enten und drei Frösche. Wie viele Augen schauen dich insgesamt an?",
+  "picture": [
+   "🦆",
+   "🦆",
+   "🦆",
+   "🦆",
+   "🐸",
+   "🐸",
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "12"
+   },
+   {
+    "text": "14"
+   },
+   {
+    "text": "16"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sieben Tiere mit jeweils zwei Augen haben zusammen vierzehn Augen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7adc4149f86f063d",
+  "lang": "de",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Was schützt deinen Kopf am besten, wenn du mit dem Fahrrad oder Roller im Straßenverkehr unterwegs bist?",
+  "picture": [
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "Eine Mütze"
+   },
+   {
+    "text": "Ein Fahrradhelm"
+   },
+   {
+    "text": "Eine Sonnenbrille"
+   }
+  ],
+  "answer": 1,
+  "reason": "Ein stabiler Helm dämpft Stöße ab und schützt den Kopf bei einem Sturz.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ }
+]

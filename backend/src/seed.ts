@@ -7,7 +7,7 @@ export const DEMO_PARENT = 'dev-demo';
 /** A TV token that only works on the dev server (in memory), so the TV app can skip pairing while you work on it. */
 export const DEMO_DEVICE_TOKEN = 'dev-tv';
 
-type Job = [id: string, title: string, icon: Chore['icon'], color: Chore['color'], minutes: number, childIds: string[], routine?: boolean];
+type Job = [id: string, title: string, icon: Chore['icon'], color: Chore['color'], minutes: number, childIds: string[]];
 
 export async function seedDemo(repo: Repo, now: number): Promise<void> {
   const familyId = 'demo';
@@ -31,16 +31,16 @@ export async function seedDemo(repo: Repo, now: number): Promise<void> {
   }
 
   // The sample jobs in tv/packages/shared/src/marble/data.ts, in the TV's order, in whole marbles (10–30 minutes).
-  // A job both kids do is one job; brushing teeth is routine (praised, no marble).
+  // A job both kids do is one job.
   const jobs: Job[] = [
     ['toys', 'Toys away', 'toys', 'peach', 10, ['mia']],
     ['cat', 'Feed the cat', 'cat', 'mint', 10, ['mia']],
     ['table', 'Set the table', 'table', 'peach', 20, ['leo']],
-    ['teeth', 'Brush teeth', 'tooth', 'sky', 10, ['mia', 'leo'], true],
+    ['teeth', 'Brush teeth', 'tooth', 'sky', 10, ['mia', 'leo']],
     ['pajamas', 'Pajamas on', 'moon', 'lilac', 10, ['mia', 'leo']],
   ];
-  for (const [i, [id, title, icon, color, minutes, childIds, routine = false]] of jobs.entries()) {
-    await repo.putChore(familyId, {id, title, icon, color, minutes, routine, repeat: {kind: 'daily'}, childIds, createdAt: now + i, updatedAt: now + i});
+  for (const [i, [id, title, icon, color, minutes, childIds]] of jobs.entries()) {
+    await repo.putChore(familyId, {id, title, icon, color, minutes, routine: false, repeat: {kind: 'daily'}, childIds, createdAt: now + i, updatedAt: now + i});
   }
 
   // A TV paired the normal way, except that its token is known.

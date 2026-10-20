@@ -64,6 +64,9 @@ const ICONS: Record<IconName, number> = {
   shapes: require('../assets/icons/shapes.png'),
   message: require('../assets/icons/message.png'),
   sparkle: require('../assets/icons/sparkle.png'),
+  starfull: require('../assets/icons/starfull.png'),
+  mystery: require('../assets/icons/mystery.png'),
+  tv: require('../assets/icons/tv.png'),
   home: require('../assets/icons/home.png'),
   games: require('../assets/icons/games.png'),
 };
@@ -210,10 +213,23 @@ export function Marble({size, style}: {size: number; style?: StyleProp<ViewStyle
 
 export function MarbleRow({count, size}: {count: number; size: number}) {
   return (
-    <View style={[styles.rewardPill, {paddingHorizontal: size * 0.45, paddingVertical: size * 0.3, borderRadius: size}]}>
+    <RewardPill size={size}>
       {Array.from({length: count}).map((_, i) => (
         <Marble key={i} size={size} style={{marginLeft: i ? size * 0.25 : 0}} />
       ))}
+    </RewardPill>
+  );
+}
+
+/**
+ * What a card gives, in the same white pill in the same place on every card: "+" and gold marbles for TV time, "+"
+ * and a star or a sparkle for a character. `plus`: it is something added (a thank-you's heart is not).
+ */
+export function RewardPill({size, plus = false, children}: {size: number; plus?: boolean; children: React.ReactNode}) {
+  return (
+    <View style={[styles.rewardPill, {alignItems: 'center', paddingHorizontal: size * 0.45, paddingVertical: size * 0.3, borderRadius: size}]}>
+      {plus ? <T style={{fontSize: size * 1.05, lineHeight: size * 1.1, marginRight: size * 0.2, color: colors.ink, fontWeight: '700'}}>+</T> : null}
+      {children}
     </View>
   );
 }
@@ -228,7 +244,7 @@ export function MarbleRow({count, size}: {count: number; size: number}) {
  * The jar. `size` is today's ceiling in marbles: its empty places show as faint slots, exactly where the next
  * marbles will land (the drop physics is deterministic), so a kid sees how much today's jar holds.
  */
-export function Jar({marbles, size = 0, fresh = 0, k = 1, onLand}: {marbles: number; size?: number; fresh?: number; k?: number; onLand?: (landed: number, of: number) => void}) {
+export function Jar({marbles, size = 0, fresh = 0, preview = 0, k = 1, onLand}: {marbles: number; size?: number; fresh?: number; preview?: number; k?: number; onLand?: (landed: number, of: number) => void}) {
   const d = (px: number) => s(px * k);
   // The marbles' size follows the jar's: a full jar of any size is full to the top.
   const capacity = size > 0 ? Math.min(size, JAR_CAPACITY) : JAR_CAPACITY;
@@ -311,9 +327,14 @@ export function Jar({marbles, size = 0, fresh = 0, k = 1, onLand}: {marbles: num
         }}
       />
       <View pointerEvents="none" style={{position: 'absolute', left: d(originLeft), top: d(originTop), width: d(JAR.width), height: d(JAR.height), zIndex: 2}}>
-        {slots.map((slot, i) => (
-          <View key={`slot-${i}`} style={{position: 'absolute', left: d(slot.final.x - r), top: d(slot.final.y - r), width: d(2 * r), height: d(2 * r), borderRadius: d(r), backgroundColor: colors.jarSlot}} />
-        ))}
+        {slots.map((slot, i) =>
+          // `preview`: the marbles a selected job would give show faintly in the places they would land.
+          i < preview ? (
+            <Marble key={`slot-${i}`} size={d(2 * r)} style={{position: 'absolute', left: d(slot.final.x - r), top: d(slot.final.y - r), opacity: 0.5}} />
+          ) : (
+            <View key={`slot-${i}`} style={{position: 'absolute', left: d(slot.final.x - r), top: d(slot.final.y - r), width: d(2 * r), height: d(2 * r), borderRadius: d(r), backgroundColor: colors.jarSlot}} />
+          ),
+        )}
         {drops.map((drop, i) => {
           if (i < firstFresh) {
             return <Marble key={i} size={d(2 * r)} style={{position: 'absolute', left: d(drop.final.x - r), top: d(drop.final.y - r)}} />;

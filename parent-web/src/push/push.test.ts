@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {keyBytes, pushSupport, sameKey, subscriptionPayload, type BrowserFacts} from './push';
+import {keyBytes, pushSupport, sameKey, subscriptionPayload, swUrl, type BrowserFacts} from './push';
 
 const facts = (overrides: Partial<BrowserFacts> = {}): BrowserFacts => ({
   serviceWorker: true,
@@ -9,6 +9,13 @@ const facts = (overrides: Partial<BrowserFacts> = {}): BrowserFacts => ({
   ios: false,
   standalone: false,
   ...overrides,
+});
+
+describe('the notification worker', () => {
+  it('is told where the API is in its own address, so it can answer from a notification with the app closed', () => {
+    expect(swUrl('https://api.example.com')).toBe('/sw.js?api=https%3A%2F%2Fapi.example.com');
+    expect(new URL(swUrl('https://192.168.0.102:5173/api'), 'https://192.168.0.102:5173').searchParams.get('api')).toBe('https://192.168.0.102:5173/api');
+  });
 });
 
 describe('push support', () => {

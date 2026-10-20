@@ -698,8 +698,39 @@ input::placeholder {
   gap: 16px;
 }
 .kid-hero .time-text {
-  font-size: 20px;
+  font-size: 22px;
   color: var(--white);
+  white-space: normal;
+}
+/* Beside the avatar: the time, then the stars, each on its own line; long words wrap inside this column. */
+.kid-hero-facts {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+.kid-time-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--white);
+}
+/* On a white card (the kids list) the TV picture is dark, like the words. */
+.card .kid-time-main {
+  color: var(--grey-ink);
+}
+.kid-hero-stars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  margin: 0;
+  color: var(--white);
+}
+.stars {
+  display: inline-flex;
+  gap: 2px;
 }
 
 /* Taking minutes away: smaller than giving, below it (positive first). */
@@ -750,6 +781,38 @@ input::placeholder {
   height: 36px;
   border-radius: 50%;
   background: var(--tile-off);
+}
+/* A puzzle round on the kid's page: one small mark per question (filled: right) and the count. */
+.round-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.round-marks {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.round-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--grey-ink);
+}
+.round-mark-right {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+}
+.round-missed {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  overflow-wrap: anywhere;
 }
 .history-reason {
   font-weight: 600;
@@ -1029,50 +1092,6 @@ input::placeholder {
   overflow-wrap: anywhere;
 }
 
-/* The big mic button: ink when ready, coral while it records. */
-.mic-area {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-.mic {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 96px;
-  height: 96px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--white);
-  cursor: pointer;
-  transition: transform 0.12s;
-}
-.mic:active:not(:disabled) {
-  transform: scale(0.94);
-}
-.mic:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-.mic-on {
-  background: var(--coral);
-  color: var(--ink);
-  animation: recording 1.2s ease-in-out infinite;
-}
-@keyframes recording {
-  50% {
-    transform: scale(1.06);
-  }
-}
-.mic-note {
-  min-height: 1.35em;
-  font-weight: 600;
-  text-align: center;
-}
-
 textarea {
   width: 100%;
   min-height: 96px;
@@ -1282,11 +1301,12 @@ textarea::placeholder {
   font-weight: 600;
   text-decoration: none;
 }
+/* A long label ("Kinnitamine", "Einstellungen") wraps onto a second line; it is never cut off. */
 .tab span {
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
 }
 .tab .icon {
   width: 56px;
@@ -1358,4 +1378,11 @@ textarea::placeholder {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Bedtime: "From" and "Until" side by side. */
+.bedtime-times {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }

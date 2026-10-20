@@ -8,7 +8,8 @@ import {useEffect, useRef, useState} from 'react';
 export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, delayMs = 600): boolean {
   const json = JSON.stringify(value);
   const savedJson = useRef(json);
-  const pending = useRef<T | null>(null);
+  // Wrapped, so that null is a value to save like any other (a bedtime switched off), not "nothing waiting".
+  const pending = useRef<{value: T} | null>(null);
   const latestSave = useRef(save);
   const [justSaved, setJustSaved] = useState(false);
   useEffect(() => {
@@ -19,8 +20,8 @@ export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, dela
     const next = pending.current;
     pending.current = null;
     if (next === null) return;
-    const nextJson = JSON.stringify(next);
-    latestSave.current(next).then(
+    const nextJson = JSON.stringify(next.value);
+    latestSave.current(next.value).then(
       () => {
         savedJson.current = nextJson;
         setJustSaved(true);
@@ -31,7 +32,7 @@ export function useAutosave<T>(value: T, save: (value: T) => Promise<void>, dela
 
   useEffect(() => {
     if (json === savedJson.current) return;
-    pending.current = JSON.parse(json) as T;
+    pending.current = {value: JSON.parse(json) as T};
     const timer = setTimeout(flush.current, delayMs);
     return () => clearTimeout(timer);
   }, [json, delayMs]);

@@ -4,10 +4,11 @@
  * Unknown fields are ignored, as the schemas allow.
  */
 import {JOB_ICON_NAMES} from '../icons';
+import {MAX_LEVEL} from '../puzzles/items';
 import {ApiError} from './errors';
 import {PAIRING_CODE} from './secrets';
 import {isTimezone} from './time';
-import {AVATARS, CLAIM_STATUSES, COLORS, DEVICE_MODES, type Lang, LANGS, PLATFORMS, type Repeat} from './types';
+import {AVATARS, type Bedtime, CLAIM_STATUSES, COLORS, DEVICE_MODES, type Lang, LANGS, NOT_YET_REASONS, PLATFORMS, type Repeat} from './types';
 
 export type Check<T> = (value: unknown, path: string) => T;
 
@@ -72,6 +73,8 @@ export function object<S extends Shape, R extends keyof S = never>(shape: S, req
 /** Ids are server UUIDs or the apps' client UUIDs; they go into storage keys, so only a safe alphabet. */
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
 const id = matches(ID, 'an id (letters, digits, - and _)');
+/** An id from a query string. */
+export const anId = id;
 const pin = matches(/^[0-9]{4}$/, '4 digits');
 const timezone: Check<string> = (value, path) => {
   if (typeof value !== 'string' || !isTimezone(value)) throw fail(path, 'must be an IANA time zone, e.g. Europe/Tallinn');
@@ -96,9 +99,18 @@ export const familyPatch = object({name: text(1, 40), lang: oneOf(LANGS), timezo
 
 export const meInput = object({name: text(1, 24)}, ['name']);
 
-const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), dailyBaseMin: dailyBase, dailyMaxMin: dailyMax};
+const clock = matches(/^([01][0-9]|2[0-3]):[0-5][0-9]$/, 'a time like 19:30');
+/** A kid's bedtime (openapi Bedtime); null removes it. */
+const bedtime: Check<Bedtime | null> = (value, path) => {
+  if (value === null) return null;
+  const parsed = object({from: clock, to: clock}, ['from', 'to'])(value, path);
+  if (parsed.from === parsed.to) throw fail(path, 'must end at another time than it starts');
+  return parsed;
+};
+
+const child = {name: text(1, 24), avatar: oneOf(AVATARS), color: oneOf(COLORS), age: integer(3, 12), dailyBaseMin: dailyBase, dailyMaxMin: dailyMax, puzzles: boolean, puzzleLevel: integer(0, MAX_LEVEL)};
 export const childInput = object(child, ['name', 'avatar', 'color', 'age']);
-export const childPatch = object(child);
+export const childPatch = object({...child, bedtime});
 
 const chore = {title: text(1, 60), icon: oneOf(JOB_ICON_NAMES), color: oneOf(COLORS), minutes, routine: boolean, repeat, childIds: list(id, 1, 100)};
 export const choreInput = object(chore, ['title', 'minutes', 'childIds']);
@@ -119,7 +131,14 @@ export const confirmInput = object({name: text(1, 40), mode: oneOf(DEVICE_MODES)
 export const devicePatch = object({name: text(1, 40), mode: oneOf(DEVICE_MODES)});
 
 export const claimInput = object({id, childId: id, choreId: id, at: time}, ['id', 'childId', 'choreId', 'at']);
-export const decideInput = object({yes: boolean, pin}, ['yes', 'pin']);
+/** A kid's answers in a session: which puzzle, and whether the first answer was right. */
+const puzzleAnswers = list(object({id: matches(/^[a-f0-9]{16}$/, 'a puzzle id'), right: boolean}, ['id', 'right']), 0, 30);
+export const puzzleResultInput = object({id, childId: id, answers: puzzleAnswers}, ['id', 'childId']);
+/** An answer from a notification: the pass it carried, and yes or not yet. */
+export const pushDecisionInput = object({token: matches(/^[\w-]{43}$/, 'a pass'), yes: boolean}, ['token', 'yes']);
+export const usageInput = object({id, childId: id, seconds: integer(1, 3600)}, ['id', 'childId', 'seconds']);
+export const decideInput = object({yes: boolean, pin, reason: oneOf(NOT_YET_REASONS)}, ['yes', 'pin']);
+export const notYetInput = object({reason: oneOf(NOT_YET_REASONS)});
 
 /** A grown-up changes the TV settings on the TV: the PIN and at least one setting. */
 export const tvSettingsInput: Check<{pin: string; lang?: Lang; caps?: boolean; voice?: boolean}> = (value, path) => {
@@ -173,6 +192,9 @@ export type ConfirmInput = ReturnType<typeof confirmInput>;
 export type DevicePatch = ReturnType<typeof devicePatch>;
 export type ClaimInput = ReturnType<typeof claimInput>;
 export type DecideInput = ReturnType<typeof decideInput>;
+export type UsageInput = ReturnType<typeof usageInput>;
+export type PushDecisionInput = ReturnType<typeof pushDecisionInput>;
+export type PuzzleResultInput = ReturnType<typeof puzzleResultInput>;
 export type TvSettingsInput = ReturnType<typeof tvSettingsInput>;
 export type MeInput = ReturnType<typeof meInput>;
 export type CharacterInput = ReturnType<typeof characterInput>;

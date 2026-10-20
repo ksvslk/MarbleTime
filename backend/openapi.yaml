@@ -143,6 +143,25 @@ paths:
         '422': {description: 'idea_not_ok: nothing safe and original could be made from these words; message is a kind sentence (in the family''s language) to read to the kid; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '429': {description: 'too_many: too many tries for now; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
         '503': {description: 'unavailable: the drawing models can''t be reached right now; the token is kept, try later', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /children/{childId}/puzzles:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    get:
+      summary: How a kid's puzzle rounds went, newest first (the last 30 rounds)
+      description: |
+        Each finished round as the TV reported it: when, and every question with its subject, level and whether
+        the kid got it right. The same history tells the writer how to pitch the
+        kid's next session (harder after right answers, easier after misses) when the difficulty follows the kid.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [rounds]
+                properties:
+                  rounds: {type: array, items: {$ref: '#/components/schemas/PuzzleRound'}}
+        '404': {$ref: '#/components/responses/Error'}
   /children/{childId}/characters/{characterId}:
     parameters: [{$ref: '#/components/parameters/childId'}, {$ref: '#/components/parameters/characterId'}]
     delete:
@@ -230,14 +249,17 @@ paths:
   /claims/{claimId}/approve:
     parameters: [{$ref: '#/components/parameters/claimId'}]
     post:
-      summary: Yes. Adds the job's minutes to the child (once; repeats return the same claim).
+      summary: Yes. Gives what the claim was promised (once; repeats return the same claim).
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '409': {$ref: '#/components/responses/Error'}
   /claims/{claimId}/reject:
     parameters: [{$ref: '#/components/parameters/claimId'}]
     post:
-      summary: Not yet. No minutes; the job is back on the TV board.
+      summary: Not yet. No minutes; the job is back on the TV board, with the reason if one was given.
+      requestBody:
+        required: false
+        content: {application/json: {schema: {$ref: '#/components/schemas/NotYet'}}}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '409': {$ref: '#/components/responses/Error'}
@@ -253,12 +275,37 @@ paths:
           content:
             application/json:
               schema: {type: object, required: [publicKey], properties: {publicKey: {type: string, description: base64url}}}
+  /push/decisions:
+    post:
+      summary: A grown-up answers a claim from its notification ("Yes" / "Not yet"), with the pass the notification carried
+      description: |
+        Every claim notification carries a single-use pass for the browser it was sent to (`data.token`, good for
+        a day), so the service worker can answer without the app being open or signed in. The answer counts as
+        that parent's, exactly like POST /claims/{claimId}/approve or /reject. A used, expired or unknown pass
+        is 404: the grown-up opens the app instead.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token, yes]
+              properties:
+                token: {type: string, description: 'the pass from the notification'}
+                yes: {type: boolean}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {$ref: '#/components/responses/Error'}
   /push/subscriptions:
     post:
       summary: This browser wants notifications (a kid says "I did it!"). Repeats with the same endpoint update it.
       description: |
         The server sends a Web Push to every subscribed browser of the family's parents when a claim is made:
-        title "<child>: <job> is done", body "+<minutes> min · tap to answer", data {url: "/", claimId}.
+        title "<child>: <job> is done", body what a yes gives ("+10 min", "a new character"), actions "yes" and
+        "not_yet" (answered with POST /push/decisions), data {url: "/", claimId, token}. A tap on the notification
+        itself opens `url`, the page where jobs are approved.
         Subscriptions the push service reports gone (404/410) are deleted.
       requestBody:
         required: true
@@ -408,6 +455,86 @@ paths:
         '200': {description: OK (already had it), content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '201': {description: Created, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '409': {description: 'Already done today (or a one-off job already approved)', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /device/puzzles/session:
+    get:
+      summary: A kid's next puzzle session, in the family's language
+      description: |
+        The session written for this kid if one is ready (the same until they finish it), else one from the bank,
+        while their written one is started in the background (where a model can be reached). The subjects take
+        turns, each question at the kid's level in its subject; from the bank, new questions come before ones the
+        kid has seen. `spare` is one more, a level easier, asked only after a miss on the last question, so a
+        session ends on a success. `questions` is empty where the language has no puzzles at all.
+        A kid may play more than one session a day; only the day's first earns a star, and the time spent in
+        puzzles counts as TV time (the TV reports it with POST /device/usage).
+      security: [{device: []}]
+      parameters: [{name: childId, in: query, required: true, schema: {type: string}}]
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [questions]
+                properties:
+                  questions: {type: array, items: {$ref: '#/components/schemas/Puzzle'}}
+                  spare: {$ref: '#/components/schemas/Puzzle'}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {description: 'Puzzles are turned off for this kid', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /device/puzzles/results:
+    post:
+      summary: A kid finished a puzzle session on the TV. Idempotent on `id` (the TV's outbox may resend).
+      description: |
+        The first session finished today earns one star (Puzzles in the Child schema); the kid's levels follow the
+        answers either way. The answer is the kid as of now.
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, childId]
+              properties:
+                id: {type: string, description: client UUID}
+                childId: {type: string}
+                answers:
+                  type: array
+                  maxItems: 30
+                  description: the kid's first answer to each puzzle of the session (their levels follow these)
+                  items:
+                    type: object
+                    required: [id, right]
+                    properties:
+                      id: {type: string}
+                      right: {type: boolean}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Child'}}}}
+        '404': {$ref: '#/components/responses/Error'}
+        '409': {description: 'Puzzles are turned off for this kid', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+  /device/usage:
+    post:
+      summary: The TV counted watched time for a kid. Idempotent on `id` (the TV's outbox may resend).
+      description: |
+        Takes `seconds` out of the kid's jar: today's base first, then earned time (a USAGE ledger entry). Never
+        below an empty jar: what the jar didn't hold is not counted. Every TV reports the time a kid spends in
+        MarbleTime's own screen time (puzzles, playing with their characters); a TV in strict mode also reports
+        about once a minute while a metered app is in front. So every screen shows the time left.
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id, childId, seconds]
+              properties:
+                id: {type: string, description: client UUID}
+                childId: {type: string}
+                seconds: {type: integer, minimum: 1, maximum: 3600}
+      responses:
+        '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Child'}}}}
+        '404': {$ref: '#/components/responses/Error'}
   /device/claims/{claimId}:
     parameters: [{$ref: '#/components/parameters/claimId'}]
     delete:
@@ -431,10 +558,29 @@ paths:
               properties:
                 yes: {type: boolean}
                 pin: {type: string, pattern: '^[0-9]{4}$'}
+                reason: {$ref: '#/components/schemas/NotYetReason'}
       responses:
         '200': {description: OK, content: {application/json: {schema: {$ref: '#/components/schemas/Claim'}}}}
         '403': {$ref: '#/components/responses/Error'}
         '429': {$ref: '#/components/responses/Error'}
+  /device/children/{childId}/characters:
+    parameters: [{$ref: '#/components/parameters/childId'}]
+    post:
+      summary: A kid describes their new character on the TV (uses one character token)
+      description: |
+        The same as POST /children/{childId}/characters, from the TV: the words come from the TV's keyboard, where
+        the remote's microphone button dictates (Fire TV's own keyboard) or the kid types. The token is the kid's
+        own earned reward and the art director screens every idea, so no grown-up's PIN is asked.
+      security: [{device: []}]
+      requestBody:
+        required: true
+        content: {application/json: {schema: {type: object, required: [description], properties: {description: {type: string, minLength: 1, maxLength: 200}}}}}
+      responses:
+        '202': {description: Accepted; status drawing, content: {application/json: {schema: {$ref: '#/components/schemas/Character'}}}}
+        '409': {description: 'no_tokens: the kid has no character token', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '422': {description: 'idea_not_ok: message is a kind sentence (in the family''s language) to show and read to the kid; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '429': {description: 'too_many: too many tries for now; the token is kept', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
+        '503': {description: 'unavailable: the drawing models can''t be reached right now; the token is kept, try later', content: {application/json: {schema: {$ref: '#/components/schemas/Error'}}}}
   /device/characters/{characterId}:
     parameters: [{$ref: '#/components/parameters/characterId'}]
     get:
@@ -594,7 +740,7 @@ components:
 
     Child:
       type: object
-      required: [id, name, avatar, color, age, balanceSec, dailyBaseMin, dailyMaxMin, characterTokens]
+      required: [id, name, avatar, color, age, balanceSec, dailyBaseMin, dailyMaxMin, characterTokens, usedTodaySec, leftTodaySec, puzzles]
       properties:
         id: {type: string}
         name: {type: string, maxLength: 24}
@@ -605,6 +751,87 @@ components:
         dailyBaseMin: {$ref: '#/components/schemas/DailyBase'}
         dailyMaxMin: {$ref: '#/components/schemas/DailyMax'}
         characterTokens: {type: integer, minimum: 0, description: 'new characters earned (jobs approved while the jar was full) and not yet made'}
+        usedTodaySec: {type: integer, minimum: 0, description: 'TV watched today (the family''s local day), as the TVs reported it (POST /device/usage)'}
+        puzzles: {$ref: '#/components/schemas/Puzzles'}
+        bedtime: {$ref: '#/components/schemas/Bedtime'}
+        leftTodaySec:
+          type: integer
+          minimum: 0
+          description: |
+            The jar: TV time left today = what is left of today's base + balanceSec. Watching takes today's base
+            first, then earned time. What can still be earned today is dailyMaxMin × 60 − leftTodaySec − usedTodaySec.
+    Puzzles:
+      type: object
+      required: [on, stars, starsNeeded, doneToday, levels, level, levelAges]
+      description: |
+        Puzzles on the TV: short questions written by a model, checked (format by code, the answer by blind solvers)
+        and kept as a bank per language, so playing never waits on a model; a kid's next round is also written for
+        them in the background. They never earn TV time (docs/08 §3.1): every finished round earns one star, whatever
+        the score, and starsNeeded stars earn a new character (characterTokens + 1), after which stars start again.
+      properties:
+        on: {type: boolean, description: 'a grown-up can turn puzzles off for a kid (ChildPatch.puzzles)'}
+        stars: {type: integer, minimum: 0, description: 'stars toward the next character (0 … starsNeeded − 1)'}
+        starsNeeded: {type: integer, minimum: 1}
+        doneToday: {type: boolean, description: 'a round was finished today (the family''s local day); more rounds may follow, each earns a star'}
+        levels:
+          type: object
+          additionalProperties: {type: integer, minimum: 1, maximum: 9}
+          description: 'the kid''s level per subject, as their answers placed them (a subject not listed starts from the age''s level)'
+        level: {type: integer, minimum: 0, maximum: 4, description: 'the difficulty a grown-up chose for every subject (ChildPatch.puzzleLevel, 1 easiest); 0: it follows the kid''s answers (levels)'}
+        levelAges: {type: array, items: {type: string}, description: 'the ages each level is written for, level 1 first ("4–5", "6", "7–8", "9–10")'}
+    PuzzleRound:
+      type: object
+      required: [at, right, total, answers]
+      description: One finished puzzle round.
+      properties:
+        at: {type: integer, description: when it was finished (ms since 1970)}
+        right: {type: integer, minimum: 0}
+        total: {type: integer, minimum: 0}
+        answers:
+          type: array
+          description: the questions in the order they were asked
+          items:
+            type: object
+            required: [subject, level, right, prompt]
+            properties:
+              subject: {type: string, description: 'logic, numbers, words or world'}
+              level: {type: integer, minimum: 1, maximum: 4}
+              right: {type: boolean}
+              prompt: {type: string, description: the question as it was shown}
+    Puzzle:
+      type: object
+      required: [id, subject, level, prompt, picture, choices, answer, reason]
+      description: One puzzle in the fixed shape every puzzle has (a question, an optional row of pictures, three answers).
+      properties:
+        id: {type: string}
+        subject: {type: string, description: 'logic, numbers, words, world, … (a new subject needs no client change)'}
+        level: {type: integer, minimum: 1}
+        prompt: {type: string, description: the question, shown and read aloud}
+        picture: {type: array, items: {type: string}, description: 'emoji the question is about, shown in a row (may be empty)'}
+        choices:
+          type: array
+          minItems: 3
+          maxItems: 3
+          items:
+            type: object
+            description: a word (or number, or short phrase) or one emoji; all three of a puzzle are the same kind
+            properties:
+              text: {type: string}
+              emoji: {type: string}
+        answer: {type: integer, minimum: 0, maximum: 2, description: 'the place of the right answer (the TV marks it, so a session needs no network)'}
+        reason: {type: string, description: 'one line shown and read after the kid answers: why the right answer is right'}
+    Bedtime:
+      type: object
+      required: [from, to]
+      description: |
+        When this kid's TV time ends for the night, in the family's local time ("19:30" to "07:00"; it runs past
+        midnight when `to` is earlier than `from`). On a TV in strict mode a video app closes for this kid when it
+        begins, whatever is left in the jar, and the kid can't be picked to watch until it ends; a grown-up can
+        allow 30 more minutes with the PIN on the TV. In Amazon Kids mode the TV can't enforce it (Amazon Kids has
+        its own bedtime). `from` and `to` differ. Absent: no bedtime.
+      properties:
+        from: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
+        to: {type: string, pattern: '^([01][0-9]|2[0-3]):[0-5][0-9]$'}
     DailyBase:
       type: integer
       minimum: 0
@@ -630,6 +857,8 @@ components:
       type: object
       required: [name, avatar, color, age]
       properties:
+        puzzles: {type: boolean, description: 'puzzles on the TV for this kid (default on)'}
+        puzzleLevel: {type: integer, minimum: 0, maximum: 4, description: 'the puzzles'' difficulty for every subject, chosen by a grown-up (1 easiest; Puzzles.levelAges says who each is written for). 0, the default: it follows the kid''s answers. A change takes effect with the kid''s next session.'}
         name: {type: string, minLength: 1, maxLength: 24}
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
@@ -639,6 +868,9 @@ components:
     ChildPatch:
       type: object
       properties:
+        bedtime: {oneOf: [{$ref: '#/components/schemas/Bedtime'}, {type: 'null'}], description: 'null removes it'}
+        puzzles: {type: boolean, description: 'puzzles on the TV for this kid (default on)'}
+        puzzleLevel: {type: integer, minimum: 0, maximum: 4, description: 'the puzzles'' difficulty for every subject, chosen by a grown-up (1 easiest; Puzzles.levelAges says who each is written for). 0, the default: it follows the kid''s answers. A change takes effect with the kid''s next session.'}
         name: {type: string, minLength: 1, maxLength: 24}
         avatar: {$ref: '#/components/schemas/Avatar'}
         color: {$ref: '#/components/schemas/Color'}
@@ -661,7 +893,7 @@ components:
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
         minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
-        routine: {type: boolean, default: false, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4)'}
+        routine: {type: boolean, default: false, description: 'no effect since Oct 13 2026: every job gives its minutes (docs/08, Decisions). Always false in answers; accepted and ignored in requests.'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
         createdAt: {type: integer}
@@ -673,7 +905,7 @@ components:
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
         minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
-        routine: {type: boolean, default: false, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4)'}
+        routine: {type: boolean, description: 'no effect since Oct 13 2026: every job gives its minutes (docs/08, Decisions); accepted and ignored'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
     ChorePatch:
@@ -683,7 +915,7 @@ components:
         icon: {$ref: '#/components/schemas/JobIcon'}
         color: {$ref: '#/components/schemas/Color'}
         minutes: {type: integer, minimum: 10, maximum: 30, multipleOf: 10, description: '1–3 marbles: small, frequent payoffs (docs/08 §2)'}
-        routine: {type: boolean, description: 'a job the kid already does regularly: praised, no marble (docs/08 §2.4); left out = unchanged'}
+        routine: {type: boolean, description: 'no effect since Oct 13 2026: every job gives its minutes; accepted and ignored'}
         repeat: {$ref: '#/components/schemas/Repeat'}
         childIds: {type: array, items: {type: string}, minItems: 1}
 
@@ -701,14 +933,37 @@ components:
         decidedAt: {type: integer}
         decidedBy: {type: string, enum: [parent, tv]}
         approverName: {type: string, description: 'the approving parent''s name as kids see it ("– Dad"); absent when approved on the TV or unset'}
-        reward:
-          type: string
-          enum: [marbles, character, praise]
+        promised:
+          type: object
+          required: [reward, minutes]
           description: |
-            Set on approval: marbles = minutesCredited went into the jar (as much as fitted under dailyMaxMin);
-            character = the jar was full, so the kid earned a new character (characterTokens + 1);
-            praise = a routine job, praised without a marble.
-        minutesCredited: {type: integer, minimum: 0, description: 'minutes that went into the jar (≤ minutes; 0 for character and praise)'}
+            What the job card showed when the kid said "I did it!", and so what a yes gives: worked out at claim
+            time from the room left in today's jar, less what the kid's other waiting claims were promised.
+            Absent on claims made before promises existed (their reward is worked out at approval).
+          properties:
+            reward: {$ref: '#/components/schemas/RewardKind'}
+            minutes: {type: integer, minimum: 0, description: 'minutes into the jar (see RewardKind)'}
+        reward: {$ref: '#/components/schemas/RewardKind'}
+        minutesCredited: {type: integer, minimum: 0, description: 'set on approval: minutes that went into the jar (≤ minutes; 0 for praise, and for a character earned with a full jar)'}
+        notYetReason: {$ref: '#/components/schemas/NotYetReason'}
+    RewardKind:
+      type: string
+      enum: [marbles, character, praise]
+      description: |
+        marbles = the job's minutes go into the jar (they all fit under dailyMaxMin);
+        character = the job didn't fit: whatever part fitted goes into the jar (0 when it was already full), and
+        the kid earns a new character for the rest (characterTokens + 1), so no marble is dropped unseen;
+        praise = a thank-you without a marble: only on claims from before Oct 13 2026, when a job could be marked routine.
+    NotYetReason:
+      type: string
+      enum: [not_finished, together, later]
+      description: |
+        Why a grown-up said "not yet", so the kid knows what to do next (the TV shows and reads it):
+        not_finished = there's a bit left to do; together = let's do it together; later = I'll look later, ask again.
+    NotYet:
+      type: object
+      properties:
+        reason: {$ref: '#/components/schemas/NotYetReason'}
 
     LedgerEntry:
       type: object
@@ -723,6 +978,7 @@ components:
         createdBy: {type: string, description: '"parent:<id>", "tv:<deviceId>" or "system"'}
         createdAt: {type: integer}
         handoff: {type: string, enum: [PENDING, DONE, SKIPPED], description: 'Amazon Kids hand-off, positive entries only'}
+        baseSec: {type: integer, minimum: 0, description: 'USAGE only: watched seconds that came out of the day''s base (deltaSec is the part that came out of earned time)'}
     Balance:
       type: object
       required: [balanceSec, entry]

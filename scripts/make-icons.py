@@ -78,12 +78,18 @@ LUCIDE = {
 
 # Interface icons from Lucide (same licence): the two groups on the kid's board.
 LUCIDE_UI = {
+    # On the jar's time chip: what the minutes are for.
+    "tv": ("tv", '<path d="m17 2-5 5-5-5"/><rect width="20" height="15" x="2" y="7" rx="2"/>'),
     "home": ("house", '<path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'),
     "games": ("gamepad-2", '<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>'),
 }
 
 FILLED = {
+    # The next character, not made yet: a creature's shape with nothing in it (ours). The app sets a "?" on it.
+    "mystery": '<g fill="#FFFFFF"><path d="M18.4 16.8c2.8.4 4-1.2 4.4-2.8-1.6.8-2.8.4-4 0z"/><ellipse cx="12.4" cy="16" rx="6.8" ry="5.2"/><rect x="8.4" y="19.6" width="2.4" height="2.8" rx="1"/><rect x="14" y="19.6" width="2.4" height="2.8" rx="1"/><path d="M6 4.8l1.2-2.8 1.6 2.4zM12 4.4l2-2.4.4 3z"/><circle cx="10" cy="8.8" r="4.8"/></g>',
     "sparkle": '<path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4z" fill="#FFFFFF"/>',
+    # An earned star: the outlined star (Lucide's, above) filled in, so it reads as lit next to the ones still to earn.
+    "starfull": '<path fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/>',
 }
 
 # Multi-colour art, viewBox 0 0 200 200 (avatars) or 0 0 100 100 (apple) or 24 (logo).
@@ -107,7 +113,7 @@ def main() -> None:
         render(name, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" '
                      f'stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">{body}</svg>', 192)
     for name, body in FILLED.items():
-        render(name, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">{body}</svg>', 96)
+        render(name, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">{body}</svg>', 192)
     for name, (view_box, body) in ART.items():
         render(name, f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{view_box}">{body}</svg>', 384)
     print(f"wrote {len(STROKE) + len(LUCIDE) + len(LUCIDE_UI) + len(FILLED) + len(ART)} icons to {OUT}")

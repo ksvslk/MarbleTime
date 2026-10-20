@@ -469,6 +469,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/children/{childId}/puzzles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: components["parameters"]["childId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * How a kid's puzzle rounds went, newest first (the last 30 rounds)
+         * @description Each finished round as the TV reported it: when, and every question with its subject, level and whether
+         *     the kid got it right. The same history tells the writer how to pitch the
+         *     kid's next session (harder after right answers, easier after misses) when the difficulty follows the kid.
+         */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    childId: components["parameters"]["childId"];
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            rounds: components["schemas"]["PuzzleRound"][];
+                        };
+                    };
+                };
+                404: components["responses"]["Error"];
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/children/{childId}/characters/{characterId}": {
         parameters: {
             query?: never;
@@ -814,7 +862,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Yes. Adds the job's minutes to the child (once; repeats return the same claim). */
+        /** Yes. Gives what the claim was promised (once; repeats return the same claim). */
         post: {
             parameters: {
                 query?: never;
@@ -855,7 +903,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Not yet. No minutes; the job is back on the TV board. */
+        /** Not yet. No minutes; the job is back on the TV board, with the reason if one was given. */
         post: {
             parameters: {
                 query?: never;
@@ -865,7 +913,11 @@ export interface paths {
                 };
                 cookie?: never;
             };
-            requestBody?: never;
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["NotYet"];
+                };
+            };
             responses: {
                 /** @description OK */
                 200: {
@@ -924,6 +976,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/push/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A grown-up answers a claim from its notification ("Yes" / "Not yet"), with the pass the notification carried
+         * @description Every claim notification carries a single-use pass for the browser it was sent to (`data.token`, good for
+         *     a day), so the service worker can answer without the app being open or signed in. The answer counts as
+         *     that parent's, exactly like POST /claims/{claimId}/approve or /reject. A used, expired or unknown pass
+         *     is 404: the grown-up opens the app instead.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description the pass from the notification */
+                        token: string;
+                        yes: boolean;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Claim"];
+                    };
+                };
+                404: components["responses"]["Error"];
+                409: components["responses"]["Error"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/push/subscriptions": {
         parameters: {
             query?: never;
@@ -936,7 +1040,9 @@ export interface paths {
         /**
          * This browser wants notifications (a kid says "I did it!"). Repeats with the same endpoint update it.
          * @description The server sends a Web Push to every subscribed browser of the family's parents when a claim is made:
-         *     title "<child>: <job> is done", body "+<minutes> min · tap to answer", data {url: "/", claimId}.
+         *     title "<child>: <job> is done", body what a yes gives ("+10 min", "a new character"), actions "yes" and
+         *     "not_yet" (answered with POST /push/decisions), data {url: "/", claimId, token}. A tap on the notification
+         *     itself opens `url`, the page where jobs are approved.
          *     Subscriptions the push service reports gone (404/410) are deleted.
          */
         post: {
@@ -1360,6 +1466,181 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/device/puzzles/session": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A kid's next puzzle session, in the family's language
+         * @description The session written for this kid if one is ready (the same until they finish it), else one from the bank,
+         *     while their written one is started in the background (where a model can be reached). The subjects take
+         *     turns, each question at the kid's level in its subject; from the bank, new questions come before ones the
+         *     kid has seen. `spare` is one more, a level easier, asked only after a miss on the last question, so a
+         *     session ends on a success. `questions` is empty where the language has no puzzles at all.
+         *     A kid may play more than one session a day; only the day's first earns a star, and the time spent in
+         *     puzzles counts as TV time (the TV reports it with POST /device/usage).
+         */
+        get: {
+            parameters: {
+                query: {
+                    childId: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": {
+                            questions: components["schemas"]["Puzzle"][];
+                            spare?: components["schemas"]["Puzzle"];
+                        };
+                    };
+                };
+                404: components["responses"]["Error"];
+                /** @description Puzzles are turned off for this kid */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/device/puzzles/results": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A kid finished a puzzle session on the TV. Idempotent on `id` (the TV's outbox may resend).
+         * @description The first session finished today earns one star (Puzzles in the Child schema); the kid's levels follow the
+         *     answers either way. The answer is the kid as of now.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description client UUID */
+                        id: string;
+                        childId: string;
+                        /** @description the kid's first answer to each puzzle of the session (their levels follow these) */
+                        answers?: {
+                            id: string;
+                            right: boolean;
+                        }[];
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Child"];
+                    };
+                };
+                404: components["responses"]["Error"];
+                /** @description Puzzles are turned off for this kid */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/device/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * The TV counted watched time for a kid. Idempotent on `id` (the TV's outbox may resend).
+         * @description Takes `seconds` out of the kid's jar: today's base first, then earned time (a USAGE ledger entry). Never
+         *     below an empty jar: what the jar didn't hold is not counted. Every TV reports the time a kid spends in
+         *     MarbleTime's own screen time (puzzles, playing with their characters); a TV in strict mode also reports
+         *     about once a minute while a metered app is in front. So every screen shows the time left.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        /** @description client UUID */
+                        id: string;
+                        childId: string;
+                        seconds: number;
+                    };
+                };
+            };
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Child"];
+                    };
+                };
+                404: components["responses"]["Error"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/device/claims/{claimId}": {
         parameters: {
             query?: never;
@@ -1425,6 +1706,7 @@ export interface paths {
                     "application/json": {
                         yes: boolean;
                         pin: string;
+                        reason?: components["schemas"]["NotYetReason"];
                     };
                 };
             };
@@ -1440,6 +1722,93 @@ export interface paths {
                 };
                 403: components["responses"]["Error"];
                 429: components["responses"]["Error"];
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/device/children/{childId}/characters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                childId: components["parameters"]["childId"];
+            };
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * A kid describes their new character on the TV (uses one character token)
+         * @description The same as POST /children/{childId}/characters, from the TV: the words come from the TV's keyboard, where
+         *     the remote's microphone button dictates (Fire TV's own keyboard) or the kid types. The token is the kid's
+         *     own earned reward and the art director screens every idea, so no grown-up's PIN is asked.
+         */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    childId: components["parameters"]["childId"];
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": {
+                        description: string;
+                    };
+                };
+            };
+            responses: {
+                /** @description Accepted; status drawing */
+                202: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Character"];
+                    };
+                };
+                /** @description no_tokens: the kid has no character token */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description idea_not_ok: message is a kind sentence (in the family's language) to show and read to the kid; the token is kept */
+                422: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description too_many: too many tries for now; the token is kept */
+                429: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
+                /** @description unavailable: the drawing models can't be reached right now; the token is kept, try later */
+                503: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Error"];
+                    };
+                };
             };
         };
         delete?: never;
@@ -1755,6 +2124,84 @@ export interface components {
             dailyMaxMin: components["schemas"]["DailyMax"];
             /** @description new characters earned (jobs approved while the jar was full) and not yet made */
             characterTokens: number;
+            /** @description TV watched today (the family's local day), as the TVs reported it (POST /device/usage) */
+            usedTodaySec: number;
+            puzzles: components["schemas"]["Puzzles"];
+            bedtime?: components["schemas"]["Bedtime"];
+            /**
+             * @description The jar: TV time left today = what is left of today's base + balanceSec. Watching takes today's base
+             *     first, then earned time. What can still be earned today is dailyMaxMin × 60 − leftTodaySec − usedTodaySec.
+             */
+            leftTodaySec: number;
+        };
+        /**
+         * @description Puzzles on the TV: short questions written by a model, checked (format by code, the answer by blind solvers)
+         *     and kept as a bank per language, so playing never waits on a model; a kid's next round is also written for
+         *     them in the background. They never earn TV time (docs/08 §3.1): every finished round earns one star, whatever
+         *     the score, and starsNeeded stars earn a new character (characterTokens + 1), after which stars start again.
+         */
+        Puzzles: {
+            /** @description a grown-up can turn puzzles off for a kid (ChildPatch.puzzles) */
+            on: boolean;
+            /** @description stars toward the next character (0 … starsNeeded − 1) */
+            stars: number;
+            starsNeeded: number;
+            /** @description a round was finished today (the family's local day); more rounds may follow, each earns a star */
+            doneToday: boolean;
+            /** @description the kid's level per subject, as their answers placed them (a subject not listed starts from the age's level) */
+            levels: {
+                [key: string]: number;
+            };
+            /** @description the difficulty a grown-up chose for every subject (ChildPatch.puzzleLevel, 1 easiest); 0: it follows the kid's answers (levels) */
+            level: number;
+            /** @description the ages each level is written for, level 1 first ("4–5", "6", "7–8", "9–10") */
+            levelAges: string[];
+        };
+        /** @description One finished puzzle round. */
+        PuzzleRound: {
+            /** @description when it was finished (ms since 1970) */
+            at: number;
+            right: number;
+            total: number;
+            /** @description the questions in the order they were asked */
+            answers: {
+                /** @description logic, numbers, words or world */
+                subject: string;
+                level: number;
+                right: boolean;
+                /** @description the question as it was shown */
+                prompt: string;
+            }[];
+        };
+        /** @description One puzzle in the fixed shape every puzzle has (a question, an optional row of pictures, three answers). */
+        Puzzle: {
+            id: string;
+            /** @description logic, numbers, words, world, … (a new subject needs no client change) */
+            subject: string;
+            level: number;
+            /** @description the question */
+            prompt: string;
+            /** @description emoji the question is about, shown in a row (may be empty) */
+            picture: string[];
+            choices: {
+                text?: string;
+                emoji?: string;
+            }[];
+            /** @description the place of the right answer (the TV marks it, so a session needs no network) */
+            answer: number;
+            /** @description one line shown and read after the kid answers: why the right answer is right */
+            reason: string;
+        };
+        /**
+         * @description When this kid's TV time ends for the night, in the family's local time ("19:30" to "07:00"; it runs past
+         *     midnight when `to` is earlier than `from`). On a TV in strict mode a video app closes for this kid when it
+         *     begins, whatever is left in the jar, and the kid can't be picked to watch until it ends; a grown-up can
+         *     allow 30 more minutes with the PIN on the TV. In Amazon Kids mode the TV can't enforce it (Amazon Kids has
+         *     its own bedtime). `from` and `to` differ. Absent: no bedtime.
+         */
+        Bedtime: {
+            from: string;
+            to: string;
         };
         /**
          * @description Screen time every day, before anything is earned, so TV isn't only a prize: an allowance, the parenting
@@ -1772,6 +2219,10 @@ export interface components {
          */
         DailyMax: number;
         ChildInput: {
+            /** @description puzzles on the TV for this kid (default on) */
+            puzzles?: boolean;
+            /** @description the puzzles' difficulty for every subject, chosen by a grown-up (1 easiest; Puzzles.levelAges says who each is written for). 0, the default: it follows the kid's answers. A change takes effect with the kid's next session. */
+            puzzleLevel?: number;
             name: string;
             avatar: components["schemas"]["Avatar"];
             color: components["schemas"]["Color"];
@@ -1780,6 +2231,12 @@ export interface components {
             dailyMaxMin?: components["schemas"]["DailyMax"];
         };
         ChildPatch: {
+            /** @description null removes it */
+            bedtime?: components["schemas"]["Bedtime"] | null;
+            /** @description puzzles on the TV for this kid (default on) */
+            puzzles?: boolean;
+            /** @description the puzzles' difficulty for every subject, chosen by a grown-up (1 easiest; Puzzles.levelAges says who each is written for). 0, the default: it follows the kid's answers. A change takes effect with the kid's next session. */
+            puzzleLevel?: number;
             name?: string;
             avatar?: components["schemas"]["Avatar"];
             color?: components["schemas"]["Color"];
@@ -1808,7 +2265,7 @@ export interface components {
             /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes: number;
             /**
-             * @description a job the kid already does regularly: praised, no marble (docs/08 §2.4)
+             * @description no effect since Oct 13 2026: every job gives its minutes (docs/08, Decisions). Always false in answers; accepted and ignored in requests.
              * @default false
              */
             routine: boolean;
@@ -1822,11 +2279,8 @@ export interface components {
             color?: components["schemas"]["Color"];
             /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes: number;
-            /**
-             * @description a job the kid already does regularly: praised, no marble (docs/08 §2.4)
-             * @default false
-             */
-            routine: boolean;
+            /** @description no effect since Oct 13 2026: every job gives its minutes (docs/08, Decisions); accepted and ignored */
+            routine?: boolean;
             repeat?: components["schemas"]["Repeat"];
             childIds: string[];
         };
@@ -1836,7 +2290,7 @@ export interface components {
             color?: components["schemas"]["Color"];
             /** @description 1–3 marbles: small, frequent payoffs (docs/08 §2) */
             minutes?: number;
-            /** @description a job the kid already does regularly: praised, no marble (docs/08 §2.4); left out = unchanged */
+            /** @description no effect since Oct 13 2026: every job gives its minutes; accepted and ignored */
             routine?: boolean;
             repeat?: components["schemas"]["Repeat"];
             childIds?: string[];
@@ -1857,14 +2311,36 @@ export interface components {
             /** @description the approving parent's name as kids see it ("– Dad"); absent when approved on the TV or unset */
             approverName?: string;
             /**
-             * @description Set on approval: marbles = minutesCredited went into the jar (as much as fitted under dailyMaxMin);
-             *     character = the jar was full, so the kid earned a new character (characterTokens + 1);
-             *     praise = a routine job, praised without a marble.
-             * @enum {string}
+             * @description What the job card showed when the kid said "I did it!", and so what a yes gives: worked out at claim
+             *     time from the room left in today's jar, less what the kid's other waiting claims were promised.
+             *     Absent on claims made before promises existed (their reward is worked out at approval).
              */
-            reward?: "marbles" | "character" | "praise";
-            /** @description minutes that went into the jar (≤ minutes; 0 for character and praise) */
+            promised?: {
+                reward: components["schemas"]["RewardKind"];
+                /** @description minutes into the jar (see RewardKind) */
+                minutes: number;
+            };
+            reward?: components["schemas"]["RewardKind"];
+            /** @description set on approval: minutes that went into the jar (≤ minutes; 0 for praise, and for a character earned with a full jar) */
             minutesCredited?: number;
+            notYetReason?: components["schemas"]["NotYetReason"];
+        };
+        /**
+         * @description marbles = the job's minutes go into the jar (they all fit under dailyMaxMin);
+         *     character = the job didn't fit: whatever part fitted goes into the jar (0 when it was already full), and
+         *     the kid earns a new character for the rest (characterTokens + 1), so no marble is dropped unseen;
+         *     praise = a thank-you without a marble: only on claims from before Oct 13 2026, when a job could be marked routine.
+         * @enum {string}
+         */
+        RewardKind: "marbles" | "character" | "praise";
+        /**
+         * @description Why a grown-up said "not yet", so the kid knows what to do next (the TV shows and reads it):
+         *     not_finished = there's a bit left to do; together = let's do it together; later = I'll look later, ask again.
+         * @enum {string}
+         */
+        NotYetReason: "not_finished" | "together" | "later";
+        NotYet: {
+            reason?: components["schemas"]["NotYetReason"];
         };
         LedgerEntry: {
             id: string;
@@ -1886,6 +2362,8 @@ export interface components {
              * @enum {string}
              */
             handoff?: "PENDING" | "DONE" | "SKIPPED";
+            /** @description USAGE only: watched seconds that came out of the day's base (deltaSec is the part that came out of earned time) */
+            baseSec?: number;
         };
         Balance: {
             balanceSec: number;
@@ -2081,7 +2559,8 @@ export const deviceModeValues: ReadonlyArray<FlattenedDeepRequired<components>["
 export const claimStatusValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["ClaimStatus"]> = ["waiting", "approved", "rejected"];
 export const jobIconValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["JobIcon"]> = ["toys", "cat", "tooth", "moon", "broom", "bed", "shirt", "laundry", "trash", "recycle", "table", "cook", "wash", "shower", "bath", "dog", "fish", "bird", "rabbit", "plant", "leaf", "snow", "book", "pencil", "backpack", "music", "paint", "puzzle", "bike", "shoes", "car", "shopping", "spray", "sofa", "lamp", "baby", "heart", "water", "fruit", "veggie", "sun", "mail", "star"];
 export const claimDecidedByValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Claim"]["decidedBy"]> = ["parent", "tv"];
-export const claimRewardValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["Claim"]["reward"]> = ["marbles", "character", "praise"];
+export const rewardKindValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["RewardKind"]> = ["marbles", "character", "praise"];
+export const notYetReasonValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["NotYetReason"]> = ["not_finished", "together", "later"];
 export const ledgerEntryTypeValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["LedgerEntry"]["type"]> = ["ALLOWANCE", "CHORE", "GAME", "BONUS", "PENALTY", "USAGE", "ADJUST", "HANDOFF"];
 export const ledgerEntryHandoffValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["LedgerEntry"]["handoff"]> = ["PENDING", "DONE", "SKIPPED"];
 export const characterVoiceValues: ReadonlyArray<FlattenedDeepRequired<components>["schemas"]["CharacterVoice"]> = ["Puck", "Zephyr", "Fenrir", "Leda", "Aoede", "Laomedeia", "Achird", "Sadachbia", "Autonoe", "Algenib", "Achernar", "Vindemiatrix"];

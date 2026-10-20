@@ -4,6 +4,7 @@ import {useFamily} from '../family';
 import {useI18n} from '../i18n/I18n';
 import {Avatar} from '../ui/Avatar';
 import {Icon} from '../ui/Icon';
+import {usesAmazonKids} from '../lib/handoff';
 import {KidTime} from '../ui/Marbles';
 import {Empty, Page} from '../ui/Page';
 
@@ -33,7 +34,7 @@ export function Kids() {
                 <Avatar avatar={child.avatar} color={child.color} size={56} />
                 <span className="grow">
                   <span className="row-title">{child.name}</span>
-                  <KidTime child={child} max={4} />
+                  <KidTime child={child} max={6} jar={!usesAmazonKids(bundle.devices) || child.usedTodaySec > 0} />
                   {(child.characterTokens ?? 0) > 0 ? (
                     <span className="badge badge-new">
                       <Icon name="sparkle" size={14} />

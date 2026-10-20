@@ -14,6 +14,8 @@ import {announce, connect} from '../src/domain/realtime';
 import type {Repo} from '../src/domain/repo';
 import type {Line, LineAudio, ListenBack, SpeechServices, SpokenLine, Synthesis, Synthesizer} from '../src/domain/speech';
 import type {Lang} from '../src/domain/types';
+import type {PuzzleJob} from '../src/puzzles/daily';
+import type {PuzzleItem} from '../src/puzzles/items';
 import {fakeVoices} from '../src/speech/gemini-tts';
 import {matchIcon} from '../src/icons';
 import {DynamoRepo} from '../src/repo/dynamo';
@@ -153,7 +155,7 @@ export async function setup(start = MONDAY_NOON) {
     return true;
   };
   /** Pushes sent (payload parsed); a test sets what a push service answers per endpoint. */
-  const pushes: {endpoint: string; payload: {title: string; body: string; data: {url: string; claimId: string}}}[] = [];
+  const pushes: {endpoint: string; payload: {title: string; body: string; actions: {action: string; title: string}[]; data: {url: string; claimId: string; token: string}}}[] = [];
   const pushAnswers = new Map<string, PushResult>();
   const push = {
     publicKey: async () => 'test-vapid-public-key',
@@ -163,10 +165,14 @@ export async function setup(start = MONDAY_NOON) {
       return pushAnswers.get(subscription.endpoint) ?? 'sent';
     },
   };
+  /** Written puzzle sessions asked for and not yet made (a test runs them with makePuzzleSet). */
+  const puzzleJobs: PuzzleJob[] = [];
   const speech = fakeSpeech();
   const api = createApi({
     repo, now: () => clock.now, pwaUrl: 'https://pwa.test', pickIcon: async title => matchIcon(title), director, startDrawing,
     speech: speech.services, sendRealtime, realtimeUrl: 'wss://realtime.test/dev', push,
+    puzzles: lang => testBank(lang),
+    startPuzzles: async job => void puzzleJobs.push(job),
   });
   /** Runs (and clears) the started drawing jobs, as the worker would, telling the family's connections. */
   const runDrawing = async (options: {rasterize?: Rasterize} = {}): Promise<DrawingReport[]> => {
@@ -216,6 +222,7 @@ export async function setup(start = MONDAY_NOON) {
     artist,
     checker,
     drawingJobs,
+    puzzleJobs,
     runDrawing,
     speech,
     realtime,
@@ -292,4 +299,17 @@ export async function family(start = MONDAY_NOON) {
   };
 
   return {...t, familyId, mom, tv, deviceId, mia, leo, toys, teeth, claim, balance, child, giveTokens, noUsage: NO_USAGE};
+}
+
+/**
+ * A small fixed puzzle bank: six puzzles per subject and level, in every language (ids are 16 hex characters, as the
+ * writer makes them; the right answer is always place 1).
+ */
+export function testBank(lang: Lang): PuzzleItem[] {
+  const subjects = ['logic', 'numbers', 'words', 'world'] as const;
+  return subjects.flatMap((subject, s) => [1, 2, 3, 4].flatMap(level => Array.from({length: 6}, (_, n): PuzzleItem => ({
+    id: `${s}${level}${n}`.padEnd(16, 'a'), lang, subject, level, prompt: `${subject} ${level}.${n}?`, picture: [],
+    choices: [{text: 'a'}, {text: 'b'}, {text: 'c'}], answer: 1, reason: 'because',
+    source: {by: 'ai', model: 'test', solvers: 'test', at: '2026-10-12'},
+  }))));
 }

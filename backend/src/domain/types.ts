@@ -54,6 +54,9 @@ export interface Family {
   createdAt: number;
 }
 
+/** A kid's bedtime, in the family's local time: "19:30" to "07:00" (past midnight when `to` is earlier). */
+export type Bedtime = {from: string; to: string};
+
 export interface Child {
   id: string;
   name: string;
@@ -79,6 +82,28 @@ export interface Child {
    */
   handoffDueSec?: number;
   handoffDueDay?: string;
+  /**
+   * TV watched on `usedDay` (the family's local date), as the TVs counted it: how much of that day's base, and how
+   * much earned time (which left balanceSec). On any other day both read as 0 (ledger.ts currentChild).
+   */
+  usedDay?: string;
+  usedBaseSec?: number;
+  usedEarnedSec?: number;
+  /**
+   * Puzzles (puzzles.ts): stars toward the next character, the family-local day of the last session that earned one
+   * (read on another day it is cleared: ledger.ts currentChild), and the kid's level per subject.
+   */
+  puzzlesOff?: boolean;
+  puzzleStars?: number;
+  puzzleDay?: string;
+  puzzleLevels?: Record<string, number>;
+  /** The level a grown-up chose for every subject (1–4); absent or 0: the levels follow the kid's answers. */
+  puzzleLevel?: number;
+  /** When TV time ends for the night (openapi Bedtime); null or absent: none. */
+  bedtime?: Bedtime | null;
+  /** Right answers in a row per subject, and the puzzles already seen (newest last): puzzles/pick.ts. */
+  puzzleStreaks?: Record<string, number>;
+  puzzleSeen?: string[];
 }
 
 export type Repeat = {kind: 'daily'} | {kind: 'weekdays'; days: number[]} | {kind: 'once'};
@@ -90,7 +115,7 @@ export interface Chore {
   color: Color;
   /** As stored; older jobs may hold 5–120 in steps of 5, read by jobMinutes() (budget.ts). */
   minutes: number;
-  /** Praised, no marble (docs/08 §2.4). Missing on older jobs (= false). */
+  /** Stored by versions before Oct 13 2026, when a routine job was praised without a marble. Ignored: every job gives its minutes. A later "no TV time" switch gets a new field. */
   routine?: boolean;
   repeat: Repeat;
   childIds: string[];
@@ -100,6 +125,9 @@ export interface Chore {
 }
 
 export type RewardKind = 'marbles' | 'character' | 'praise';
+/** Why a grown-up said "not yet", so the kid knows what to do next. */
+export const NOT_YET_REASONS = ['not_finished', 'together', 'later'] as const;
+export type NotYetReason = (typeof NOT_YET_REASONS)[number];
 
 export interface Claim {
   /** The TV's client UUID: a resend finds the same claim. */
@@ -109,7 +137,7 @@ export interface Claim {
   /** Copied at claim time, so history and approvals survive edits. */
   choreTitle: string;
   minutes: number;
-  /** The job was routine at claim time (missing on claims made before routine jobs existed). */
+  /** On claims made before Oct 13 2026: the job was routine at claim time. Not written any more, not read. */
   routine?: boolean;
   status: ClaimStatus;
   createdAt: number;
@@ -117,11 +145,26 @@ export interface Claim {
   decidedBy?: 'parent' | 'tv';
   /** Approved by a parent who has set a name ("– Dad"). */
   approverName?: string;
+  /** What the job card showed at claim time, and so what a yes gives (missing on claims made before promises). */
+  promised?: {reward: RewardKind; minutes: number};
   /** Set on approval (budget.ts rewardFor). */
   reward?: RewardKind;
   minutesCredited?: number;
+  /** Set on a "not yet" that came with a reason. */
+  notYetReason?: NotYetReason;
   /** The "at most once per day" slot the claim holds: the family's local day, or "once" for a one-off job. */
   slot: string;
+}
+
+/**
+ * A pass to answer one claim straight from its notification ("Yes" / "Not yet" on the lock screen): the claim, and
+ * the parent whose browser was sent it. Kept under the hash of its token, used once, gone after a day.
+ */
+export interface PushPass {
+  familyId: string;
+  claimId: string;
+  sub: string;
+  expiresAt: number;
 }
 
 export interface LedgerEntry {
@@ -137,13 +180,15 @@ export interface LedgerEntry {
   createdAt: number;
   /** Amazon Kids hand-off, positive entries only. */
   handoff?: HandoffStatus;
+  /** USAGE only: watched seconds that came out of the day's base (deltaSec is the earned part). */
+  baseSec?: number;
 }
 
 /**
  * What a request with a client UUID produced, so a repeat gets the same answer and changes nothing.
  * "game" refs are old brain-game results, still in storage for up to 30 days.
  */
-export type Ref = {kind: 'adjust'; entry: LedgerEntry} | {kind: 'game'; marbles: number};
+export type Ref = {kind: 'adjust'; entry: LedgerEntry} | {kind: 'game'; marbles: number} | {kind: 'usage'} | {kind: 'puzzle'};
 
 export interface Device {
   id: string;

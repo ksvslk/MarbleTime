@@ -36,11 +36,12 @@ import {
   BatchWriteCommand, DeleteCommand, DynamoDBDocumentClient, GetCommand, PutCommand, QueryCommand, type QueryCommandInput, TransactWriteCommand,
   type TransactWriteCommandInput, UpdateCommand,
 } from '@aws-sdk/lib-dynamodb';
-import type {ChildProfile, Decision, FamilyFields, Repo} from '../domain/repo';
+import type {ChildProfile, Decision, FamilyFields, Repo, Used} from '../domain/repo';
+import type {PuzzleProgress, PuzzleRound, PuzzleSet} from '../puzzles/pick';
 import {sha256Hex} from '../domain/secrets';
 import {DAY, HOUR} from '../domain/time';
 import type {
-  Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushSubscription, Ref,
+  Character, CharacterArt, Chore, Child, Claim, Connection, Device, Family, HandoffStatus, LedgerEntry, Pairing, Parent, PushPass, PushSubscription, Ref,
 } from '../domain/types';
 
 type Item = Record<string, unknown>;
@@ -55,9 +56,12 @@ const choreKey = (familyId: string, choreId: string) => key(fam(familyId), `CHOR
 const claimKey = (familyId: string, claimId: string) => key(fam(familyId), `CLAIM#${claimId}`);
 const slotKey = (familyId: string, c: Claim) => key(fam(familyId), `SLOT#${c.childId}#${c.choreId}#${c.slot}`);
 const entryKey = (familyId: string, e: LedgerEntry) => key(fam(familyId), `LEDGER#${e.childId}#${pad(e.createdAt)}#${e.id}`);
+const puzzleSetKey = (familyId: string, childId: string) => key(fam(familyId), `PUZZLESET#${childId}`);
+const puzzleRoundsKey = (familyId: string, childId: string) => key(fam(familyId), `PUZZLEROUNDS#${childId}`);
 const refKey = (familyId: string, childId: string, id: string) => key(fam(familyId), `REF#${childId}#${id}`);
 const deviceKey = (familyId: string, deviceId: string) => key(fam(familyId), `DEV#${deviceId}`);
 const pairingKey = (code: string) => key(`PAIR#${code}`, 'META');
+const pushPassKey = (hash: string) => key(`PUSHPASS#${hash}`, 'META');
 const connectionKey = (c: Pick<Connection, 'id' | 'familyId'>) => key(`CONN#${c.familyId}`, c.id);
 const connectionIdKey = (connectionId: string) => key(`CONNID#${connectionId}`, 'META');
 const pushKey = (familyId: string, endpoint: string) => key(fam(familyId), `PUSH#${sha256Hex(endpoint)}`);
@@ -192,9 +196,14 @@ export class DynamoRepo implements Repo {
    * The ledger entry and the child's balance (and penalty debt) in one go. With `minBalanceSec`, only if the balance is
    * that high; with `balanceSec`, only if the balance is exactly that (nobody changed the jar since it was read).
    */
-  private credit(familyId: string, entry: LedgerEntry, options: {debtSec?: number; minBalanceSec?: number; balanceSec?: number} = {}): TransactItem[] {
-    const {debtSec = 0, minBalanceSec, balanceSec} = options;
-    const conditions = ['attribute_exists(PK)', ...(minBalanceSec === undefined ? [] : ['balanceSec >= :min']), ...(balanceSec === undefined ? [] : ['balanceSec = :read'])];
+  private credit(familyId: string, entry: LedgerEntry, options: {debtSec?: number; minBalanceSec?: number; balanceSec?: number; token?: boolean; used?: Used} = {}): TransactItem[] {
+    const {debtSec = 0, minBalanceSec, balanceSec, token = false, used} = options;
+    const conditions = [
+      'attribute_exists(PK)', ...(minBalanceSec === undefined ? [] : ['balanceSec >= :min']), ...(balanceSec === undefined ? [] : ['balanceSec = :read']),
+      // Watched time is written on top of what was read: the same day and base part, or no day yet.
+      ...(used ? [used.prevDay === undefined ? 'attribute_not_exists(usedDay)' : 'usedDay = :prevDay'] : []),
+      ...(used && used.prevDay === used.day ? ['usedBaseSec = :prevBase'] : []),
+    ];
     return [
       {Put: {
         TableName: this.table,
@@ -204,11 +213,14 @@ export class DynamoRepo implements Repo {
       {Update: {
         TableName: this.table,
         Key: childKey(familyId, entry.childId),
-        UpdateExpression: debtSec > 0 ? 'ADD balanceSec :delta, debtSec :debt' : 'ADD balanceSec :delta',
+        // One update for everything the kid gets: a transaction may touch an item only once.
+        UpdateExpression: `${used ? 'SET usedDay = :day, usedBaseSec = :base, usedEarnedSec = :earned ' : ''}ADD balanceSec :delta${debtSec > 0 ? ', debtSec :debt' : ''}${token ? ', characterTokens :one' : ''}`,
         ConditionExpression: conditions.join(' AND '),
         ExpressionAttributeValues: {
           ':delta': entry.deltaSec, ...(debtSec > 0 && {':debt': debtSec}), ...(minBalanceSec !== undefined && {':min': minBalanceSec}),
-          ...(balanceSec !== undefined && {':read': balanceSec}),
+          ...(balanceSec !== undefined && {':read': balanceSec}), ...(token && {':one': 1}),
+          ...(used && {':day': used.day, ':base': used.baseSec, ':earned': used.earnedSec}),
+          ...(used && used.prevDay !== undefined && {':prevDay': used.prevDay}), ...(used && used.prevDay === used.day && {':prevBase': used.prevBaseSec}),
         },
       }},
     ];
@@ -277,7 +289,7 @@ export class DynamoRepo implements Repo {
       this.keysWithPrefix(familyId, 'CHAR#', {expression: 'childId = :child', values: {':child': childId}}),
       this.keysWithPrefix(familyId, 'ART#', {expression: 'childId = :child', values: {':child': childId}}),
     ]);
-    await this.deleteAll([...groups.flat(), childKey(familyId, childId)]);
+    await this.deleteAll([...groups.flat(), puzzleSetKey(familyId, childId), puzzleRoundsKey(familyId, childId), childKey(familyId, childId)]);
   }
 
   // ---------- chores ----------
@@ -349,7 +361,7 @@ export class DynamoRepo implements Repo {
     // What a decision sets on the claim; fields it doesn't have stay unset.
     const fields = {
       status: claim.status, decidedAt: claim.decidedAt, decidedBy: claim.decidedBy, approverName: claim.approverName, reward: claim.reward,
-      minutesCredited: claim.minutesCredited, GSI1SK: claimIndexKey(claim),
+      minutesCredited: claim.minutesCredited, notYetReason: claim.notYetReason, GSI1SK: claimIndexKey(claim),
     };
     const names = Object.keys(fields).filter(name => fields[name as keyof typeof fields] !== undefined);
     const items: TransactItem[] = [{Update: {
@@ -362,8 +374,9 @@ export class DynamoRepo implements Repo {
     }}];
     if (releaseSlot) items.push({Delete: {TableName: this.table, Key: slotKey(familyId, claim)}});
     const childAt = entry ? items.length + 1 : items.length;
-    if (entry) items.push(...this.credit(familyId, entry, {balanceSec}));
-    if (token) {
+    // Marbles and a character together (a job that only partly fitted) are one update of the kid.
+    if (entry) items.push(...this.credit(familyId, entry, {balanceSec, token}));
+    else if (token) {
       items.push({Update: {
         TableName: this.table,
         Key: childKey(familyId, claim.childId),
@@ -408,8 +421,8 @@ export class DynamoRepo implements Repo {
 
   // ---------- ledger ----------
 
-  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number} = {}) {
-    const items = this.credit(familyId, entry, {debtSec: options.debtSec, minBalanceSec: options.minBalanceSec});
+  async addEntry(familyId: string, entry: LedgerEntry, options: {ref?: {id: string; value: Ref}; debtSec?: number; minBalanceSec?: number; used?: Used} = {}) {
+    const items = this.credit(familyId, entry, {debtSec: options.debtSec, minBalanceSec: options.minBalanceSec, used: options.used});
     if (options.ref) {
       items.push({Put: {
         TableName: this.table,
@@ -419,6 +432,44 @@ export class DynamoRepo implements Repo {
     }
     const failed = await this.transact(items);
     return !failed.length ? 'ok' : failed.includes(2) ? 'duplicate' : 'changed';
+  }
+
+  async getPuzzleSet(familyId: string, childId: string) {
+    return this.get<PuzzleSet>(puzzleSetKey(familyId, childId));
+  }
+
+  async putPuzzleSet(familyId: string, childId: string, set: PuzzleSet) {
+    await this.db.send(new PutCommand({TableName: this.table, Item: {...puzzleSetKey(familyId, childId), ...set}}));
+  }
+
+  async getPuzzleRounds(familyId: string, childId: string) {
+    return (await this.get<{rounds: PuzzleRound[]}>(puzzleRoundsKey(familyId, childId)))?.rounds ?? [];
+  }
+
+  async putPuzzleRounds(familyId: string, childId: string, rounds: PuzzleRound[]) {
+    await this.db.send(new PutCommand({TableName: this.table, Item: {...puzzleRoundsKey(familyId, childId), rounds}}));
+  }
+
+  async finishPuzzles(familyId: string, childId: string, done: {refId: string; day: string; stars: number; token: boolean; progress: PuzzleProgress; prevStars: number}) {
+    const failed = await this.transact([
+      {Update: {
+        TableName: this.table,
+        Key: childKey(familyId, childId),
+        UpdateExpression: `SET puzzleStars = :stars, puzzleDay = :day, puzzleLevels = :levels, puzzleStreaks = :streaks, puzzleSeen = :seen${done.token ? ' ADD characterTokens :one' : ''}`,
+        // Kids from before puzzles have no stars yet.
+        ConditionExpression: `attribute_exists(PK) AND ${done.prevStars === 0 ? '(attribute_not_exists(puzzleStars) OR puzzleStars = :prev)' : 'puzzleStars = :prev'}`,
+        ExpressionAttributeValues: {
+          ':stars': done.stars, ':day': done.day, ':levels': done.progress.levels, ':streaks': done.progress.streaks, ':seen': done.progress.seen,
+          ':prev': done.prevStars, ...(done.token && {':one': 1}),
+        },
+      }},
+      {Put: {
+        TableName: this.table,
+        Item: {...refKey(familyId, childId, done.refId), kind: 'puzzle', ttl: seconds(Date.now() + 30 * DAY)},
+        ConditionExpression: 'attribute_not_exists(PK)',
+      }},
+    ]);
+    return !failed.length ? 'ok' : failed.includes(1) ? 'duplicate' : 'changed';
   }
 
   async getRef(familyId: string, childId: string, id: string) {
@@ -632,6 +683,15 @@ export class DynamoRepo implements Repo {
       Item: {...pairingKey(pairing.code), ...pairing, ttl: seconds(pairing.expiresAt + DAY)},
       ConditionExpression: 'attribute_not_exists(PK)',
     })));
+  }
+
+  async putPushPass(hash: string, pass: PushPass) {
+    await this.db.send(new PutCommand({TableName: this.table, Item: {...pushPassKey(hash), ...pass, ttl: seconds(pass.expiresAt)}}));
+  }
+
+  async takePushPass(hash: string) {
+    const {Attributes} = await this.db.send(new DeleteCommand({TableName: this.table, Key: pushPassKey(hash), ReturnValues: 'ALL_OLD'}));
+    return Attributes && record<PushPass>(Attributes);
   }
 
   async getPairing(code: string) {

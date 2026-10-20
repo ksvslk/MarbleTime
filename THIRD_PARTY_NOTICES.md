@@ -4,7 +4,7 @@ MarbleTime includes the following third-party material.
 
 ## Lucide icons
 
-Most job icons (`scripts/make-icons.py`, `LUCIDE`) and the hourglass, thumbs-up and message icons come from [Lucide](https://lucide.dev) 1.52.0, recoloured and rendered to PNG.
+Most job icons (`scripts/make-icons.py`, `LUCIDE`), the interface icons in `LUCIDE_UI` (home, games, tv) and the hourglass, thumbs-up and message icons come from [Lucide](https://lucide.dev) 1.52.0, recoloured and rendered to PNG.
 
 ```
 ISC License
@@ -77,7 +77,8 @@ Beyond React Native, Expo and the Vega SDK: [qrcode-generator](https://github.co
 on Vega the same API comes from the Vega SDK's `@amazon-devices/react-native-svg` (Amazon Program Materials
 License, like the SDK's other packages). The TV's typeface is [Fredoka](https://github.com/google/fonts/tree/main/ofl/fredoka) (© 2016 The Fredoka
 Project Authors, SIL Open Font License 1.1; static weights instanced from the variable font with fontTools, licence
-in `tv/packages/expotv/assets/fonts/Fredoka-OFL.txt`).
+in `tv/packages/expotv/assets/fonts/Fredoka-OFL.txt`; the Vega build carries the same files and licence in
+`tv/packages/vega/assets/fonts/`).
 
 ## Libraries added to the backend for characters and speech
 

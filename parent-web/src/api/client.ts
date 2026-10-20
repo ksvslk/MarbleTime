@@ -11,6 +11,7 @@ import type {
   ChoreInput,
   ChorePatch,
   Claim,
+  NotYetReason,
   ClaimStatus,
   Device,
   DevicePatch,
@@ -21,6 +22,7 @@ import type {
   Handoff,
   HandoffMark,
   LedgerEntry,
+  PuzzleRound,
   Me,
   MePatch,
   PairingConfirm,
@@ -130,13 +132,14 @@ export function createApi(options: ApiOptions) {
     adjust: (childId: string, body: AdjustInput) => call<Balance>('POST', `/children/${id(childId)}/adjust`, body),
     ledger: async (childId: string, limit = 50) =>
       (await call<{entries: LedgerEntry[]}>('GET', `/children/${id(childId)}/ledger?limit=${limit}`)).entries,
+    /** How the kid's puzzle rounds went, newest first. */
+    puzzleRounds: async (childId: string) => (await call<{rounds: PuzzleRound[]}>('GET', `/children/${id(childId)}/puzzles`)).rounds,
     /** The kid's characters, newest first (drawing, ready or needs_help). */
     characters: async (childId: string) => (await call<{characters: Character[]}>('GET', `/children/${id(childId)}/characters`)).characters,
     /** 202 with the character drawing; 422 `idea_not_ok` (a kind sentence to read to the kid), 409 `no_tokens`. */
     addCharacter: (childId: string, body: CharacterInput) => call<Character>('POST', `/children/${id(childId)}/characters`, body),
     removeCharacter: (childId: string, characterId: string) => call<void>('DELETE', `/children/${id(childId)}/characters/${id(characterId)}`),
     /** The kid's words from a recording: 16 kHz mono 16-bit PCM WAV, at most 15 s (lib/wav.ts). "" when nothing was heard. */
-    speechToText: async (wav: Blob) => (await call<{text: string}>('POST', '/speech-to-text', new RawBody(wav, 'audio/wav'))).text,
     handoff: (childId: string) => call<Handoff>('GET', `/children/${id(childId)}/handoff`),
     markHandoff: (childId: string, body: HandoffMark) => call<Handoff>('POST', `/children/${id(childId)}/handoff`, body),
 
@@ -146,8 +149,22 @@ export function createApi(options: ApiOptions) {
 
     claims: async (status?: ClaimStatus) =>
       (await call<{claims: Claim[]}>('GET', status ? `/claims?status=${status}` : '/claims')).claims,
+    /** Where this API is (the notification worker is told, so it can answer from a notification). */
+    baseUrl: base,
+    /** The dev server's certificate authority, for a phone that doesn't trust the Wi-Fi address yet (the dev server only). */
+    certificateUrl: `${base}/dev/ca.crt`,
+    /**
+     * Dev builds only: tells the dev server what failed on this phone (its console can't be read from the Mac).
+     * Never throws, and a production build sends nothing.
+     */
+    devLog: (what: string, error: unknown) => {
+      if (!import.meta.env.DEV) return;
+      const detail = error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+      void fetch(`${base}/dev/log`, {method: 'POST', body: `${what}: ${detail} (${navigator.userAgent})`}).catch(() => undefined);
+    },
     approve: (claimId: string) => call<Claim>('POST', `/claims/${id(claimId)}/approve`),
-    reject: (claimId: string) => call<Claim>('POST', `/claims/${id(claimId)}/reject`),
+    /** Not yet, with the reason the kid is told, if the grown-up picked one. */
+    reject: (claimId: string, reason?: NotYetReason) => call<Claim>('POST', `/claims/${id(claimId)}/reject`, reason ? {reason} : undefined),
 
     confirmPairing: (code: string, body: PairingConfirm) => call<Device>('POST', `/pairings/${id(code)}/confirm`, body),
     devices: async () => (await call<{devices: Device[]}>('GET', '/devices')).devices,

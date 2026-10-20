@@ -65,6 +65,12 @@
   ```
   This adds a user-scope MCP server, installs about 19 skills into `~/.claude/skills/` and merges a block into `./CLAUDE.md`. The alternative is a project `.mcp.json` with `{"mcpServers":{"amazon-devices-buildertools-mcp":{"command":"npx","args":["-y","@amazon-devices/amazon-devices-buildertools-mcp@latest"]}}}`.
 - **Don't pin a default platform** in `.adbt-config.json`, because we target both.
+- **Installed Oct 20** (1.0.17) in agent mode: `init-context -a claude-code-cli --install-agent -f`, run outside the
+  repo. The default steering document would go into `CLAUDE.md`, but it is Amazon's (the package is UNLICENSED) and
+  asks for a six-step setup before the first answer of every session. The skills load at once, the MCP server from
+  the next session. Until then a tool runs with `npx -y @amazon-devices/amazon-devices-buildertools-mcp@latest exec
+  <tool> --args '<json>' > file` (into a file: piped output stops at 64 KB). `.adbt-config.json` maps each package to
+  its platform.
 - **Node:** 18–24 (your 22 is fine; 26 breaks it).
 
 **Other references:**

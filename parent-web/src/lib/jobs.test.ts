@@ -12,6 +12,9 @@ const kid = (id: string): Child => ({
   dailyBaseMin: 30,
   dailyMaxMin: 60,
   characterTokens: 0,
+  usedTodaySec: 0,
+  leftTodaySec: 1800,
+  puzzles: {on: true, stars: 0, starsNeeded: 5, doneToday: false, levels: {}, level: 0, levelAges: ['4–5', '6', '7–8', '9–10']},
 });
 
 const chore = (overrides: Partial<Chore> = {}): Chore => ({
@@ -43,36 +46,30 @@ describe('what a job is worth', () => {
 });
 
 describe('the job form', () => {
-  it('starts a new job at one marble, not routine, every day, for every kid, colours in turn', () => {
+  it('starts a new job at one marble, every day, for every kid, colours in turn', () => {
     const draft = newJobDraft([kid('k1'), kid('k2')], 5);
-    expect(draft).toMatchObject({title: '', minutes: 10, routine: false, childIds: ['k1', 'k2'], repeat: 'daily', color: 'mint'});
+    expect(draft).toMatchObject({title: '', minutes: 10, childIds: ['k1', 'k2'], repeat: 'daily', color: 'mint'});
+    expect(draft).not.toHaveProperty('routine');
     expect(draft.icon).toBeUndefined();
   });
 
-  it('opens a saved job as it is, with routine off when the server leaves it out', () => {
-    expect(draftFrom(chore({routine: true}))).toMatchObject({minutes: 20, routine: true, icon: 'dog'});
-    const {routine: _, ...withoutRoutine} = chore();
-    expect(draftFrom(withoutRoutine as Chore).routine).toBe(false);
+  it('opens a saved job as it is; a job once marked routine is a job like any other', () => {
+    expect(draftFrom(chore({routine: true}))).toMatchObject({minutes: 20, icon: 'dog'});
+    expect(draftFrom(chore({routine: true}))).not.toHaveProperty('routine');
     expect(draftFrom(chore({minutes: 45})).minutes).toBe(30);
     expect(draftFrom(chore({repeat: {kind: 'weekdays', days: [6, 7]}})).days).toEqual([6, 7]);
   });
 
-  it('sends the marbles and the routine switch, for new jobs and edits alike', () => {
+  it('sends the marbles, for new jobs and edits alike, and no routine switch', () => {
     expect(toInput({...draftFrom(chore()), title: '  Feed Rex  '})).toEqual({
       title: 'Feed Rex',
       minutes: 20,
-      routine: false,
       childIds: ['k1'],
       repeat: {kind: 'daily'},
       color: 'mint',
       icon: 'dog',
     });
-    expect(toInput({...draftFrom(chore()), routine: true, minutes: 30})).toMatchObject({minutes: 30, routine: true});
-  });
-
-  it('keeps a routine job’s marbles, for when it stops being routine', () => {
-    const routine = toInput({...draftFrom(chore({minutes: 30})), routine: true});
-    expect(routine.minutes).toBe(30);
+    expect(toInput({...draftFrom(chore()), minutes: 30})).toMatchObject({minutes: 30});
   });
 
   it('sends days in order for "some days", and no icon for a new job (the server picks one)', () => {

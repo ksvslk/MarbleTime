@@ -9,7 +9,7 @@ import {draftFrom, JOB_MARBLES, newJobDraft, toInput, type JobDraft} from '../li
 import {Avatar} from '../ui/Avatar';
 import {ColorPicker} from '../ui/ColorPicker';
 import {Confirm} from '../ui/Confirm';
-import {Chip, Field, Group, Switch} from '../ui/controls';
+import {Chip, Field, Group} from '../ui/controls';
 import {Icon} from '../ui/Icon';
 import {JobCardPreview, JobTile} from '../ui/JobTile';
 import {Marbles} from '../ui/Marbles';
@@ -17,7 +17,7 @@ import {NotFound, Page} from '../ui/Page';
 import {useShowError} from '../ui/Toast';
 import {MIN_PER_MARBLE} from '../tokens';
 
-/** /jobs/new and /jobs/:id: what to do, how many marbles (or routine), for whom, how often, picture and colour. */
+/** /jobs/new and /jobs/:id: what to do, how many marbles, for whom, how often, picture and colour. */
 export function JobEdit() {
   const {id} = useParams();
   const {bundle} = useFamily();
@@ -81,22 +81,14 @@ function JobForm({existing}: {existing?: Chore}) {
 
   return (
     <Page title={existing ? existing.title : t('newJob')} back="/jobs">
-      <JobCardPreview icon={job.icon ?? 'sparkle'} color={job.color} title={job.title.trim()} minutes={job.minutes} routine={job.routine} />
+      <JobCardPreview icon={job.icon ?? 'sparkle'} color={job.color} title={job.title.trim()} minutes={job.minutes} />
       <form className="card form" onSubmit={save} noValidate>
         <Field label={t('jobTitle')} counter={`${job.title.length}/60`}>
           <input value={job.title} onChange={e => set({title: e.target.value})} placeholder={t('jobTitlePlaceholder')} maxLength={60} required />
         </Field>
 
-        <div className="setting-row">
-          <span className="grow">
-            <span className="row-title">{t('routine')}</span>
-            <span className="hint">{t('routineHint')}</span>
-          </span>
-          <Switch checked={job.routine} label={t('routine')} onChange={routine => set({routine})} />
-        </div>
-
-        {job.routine ? null : (
-          <Group label={t('tvTime')}>
+        {/* Every job gives TV time (the founder, Oct 13). */}
+        <Group label={t('tvTime')}>
             <div className="chips marble-chips">
               {JOB_MARBLES.map(marbles => {
                 const minutes = marbles * MIN_PER_MARBLE;
@@ -109,7 +101,6 @@ function JobForm({existing}: {existing?: Chore}) {
               })}
             </div>
           </Group>
-        )}
 
         <Group label={t('forKids')} error={tried && noKids ? t('pickKid') : undefined}>
           <div className="chips">

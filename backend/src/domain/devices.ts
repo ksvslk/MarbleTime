@@ -1,6 +1,7 @@
 /** TVs: pairing by QR code (docs/03 §4.3), device tokens, the state the TV polls, heartbeats. */
 import {deviceCharacters} from './characters';
 import {recentClaims} from './claims';
+import {wantNextSession} from './puzzle-results';
 import type {Deps} from './deps';
 import {ApiError, busy, conflict, notFound} from './errors';
 import {currentChildren} from './ledger';
@@ -103,6 +104,14 @@ export async function heartbeat(deps: Deps, family: Family, device: Device, appV
   await deps.repo.updateDevice(family.id, device.id, {lastSeen: deps.now(), ...(appVersion !== undefined && {appVersion})});
 }
 
+/** Kids already asked about a written session recently (in this process), so a TV that syncs every few seconds costs nothing. */
+const lastAsked = new Map<string, number>();
+function asked(childId: string, now: number): boolean {
+  if (now - (lastAsked.get(childId) ?? -Infinity) < 5 * MINUTE) return false;
+  lastAsked.set(childId, now);
+  return true;
+}
+
 /**
  * Everything the calling TV shows (DeviceState). The ETag covers everything except `serverTime`, which changes on
  * every call: an unchanged board answers If-None-Match with 304.
@@ -115,6 +124,8 @@ export async function deviceState(deps: Deps, family: Family, device: Device) {
     deviceCharacters(deps, family),
   ]);
   children.sort(byCreated);
+  // The TV is on: a kid with no written puzzle session waiting gets one started (cheap to ask again: once per kid per while).
+  if (deps.startPuzzles) for (const child of children) if (asked(child.id, now)) void wantNextSession(deps, family, child);
   const state = {
     family: {
       id: family.id, name: family.name, lang: family.lang, caps: family.caps, voice: family.voice,

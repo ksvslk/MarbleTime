@@ -1,14 +1,10 @@
-import {useCallback, useEffect, useRef, useState, type FormEvent} from 'react';
+import {useEffect, useState, type FormEvent} from 'react';
 import {Link, useLocation, useParams} from 'react-router';
 import {useApi} from '../api/ApiContext';
-import {ApiError} from '../api/client';
 import type {Child} from '../api/types';
 import {useFamily} from '../family';
-import type {Key} from '../i18n/strings';
 import {useI18n} from '../i18n/I18n';
 import {follow, IDEA_MAX, sendIdea, type Flow} from '../lib/characters';
-import {canRecord, startRecording, type Recording} from '../lib/recorder';
-import {MAX_SPEECH_SEC} from '../lib/wav';
 import {Avatar} from '../ui/Avatar';
 import {Field} from '../ui/controls';
 import {Icon} from '../ui/Icon';
@@ -17,7 +13,8 @@ import {useShowError} from '../ui/Toast';
 import {CharacterArt, useCharacters} from './Characters';
 
 /**
- * /kids/:id/character: the kid says what their new character should be (recorded on this phone, or typed),
+ * /kids/:id/character: the kid says what their new character should be and a grown-up types it here (or the kid
+ * types it on the TV; no voice since Oct 19),
  * the server's art director reads it, and the drawing shows up here when it's ready. A list item's "Try other
  * words" brings the earlier words along (router state).
  */
@@ -114,7 +111,7 @@ function CharacterMaker({child}: {child: Child}) {
   );
 }
 
-/** Who it's for, the mic, the words (editable, or typed), and "Draw it". After a 422, the sentence to read to the kid. */
+/** Who it's for, the words, and "Draw it". After a 422, the sentence to read to the kid. */
 function IdeaForm({child, flow, onWords, onSubmit}: {
   child: Child;
   flow: Extract<Flow, {step: 'idea' | 'sending'}>;
@@ -140,7 +137,6 @@ function IdeaForm({child, flow, onWords, onSubmit}: {
       ) : (
         <p className="hint">{t('characterAsk')}</p>
       )}
-      <SpeechInput disabled={sending} onText={onWords} />
       <Field label={t('idea')} hint={t('ideaHint')} counter={`${flow.words.length}/${IDEA_MAX}`}>
         <textarea
           value={flow.words}
@@ -157,101 +153,5 @@ function IdeaForm({child, flow, onWords, onSubmit}: {
         {t(sending ? 'readingIdea' : 'drawIt')}
       </button>
     </form>
-  );
-}
-
-type MicProblem = Extract<Key, 'micNothing' | 'micDenied' | 'micTooLong' | 'micUnavailable'>;
-
-/**
- * Recording on this phone: tap to start, tap to stop (or it stops at 15 s), then the words come back from
- * POST /speech-to-text into the text box, where the grown-up can fix them.
- */
-function useSpeech(onText: (text: string) => void) {
-  const api = useApi();
-  const showError = useShowError();
-  const [state, setState] = useState<'idle' | 'recording' | 'working'>('idle');
-  const [problem, setProblem] = useState<MicProblem | null>(null);
-  const [clock, setClock] = useState({start: 0, now: 0});
-  const recording = useRef<Recording | null>(null);
-  const latestOnText = useRef(onText);
-  useEffect(() => {
-    latestOnText.current = onText;
-  });
-
-  const stop = useCallback(async () => {
-    const current = recording.current;
-    if (!current) return;
-    recording.current = null;
-    setState('working');
-    try {
-      const text = (await api.speechToText(await current.stop())).trim();
-      if (text) latestOnText.current(text);
-      else setProblem('micNothing');
-    } catch (error) {
-      if (!(error instanceof ApiError)) setProblem('micNothing'); // nothing could be decoded: nothing was recorded
-      else if (error.status === 413) setProblem('micTooLong');
-      else showError(error);
-    } finally {
-      setState('idle');
-    }
-  }, [api, showError]);
-
-  const start = useCallback(async () => {
-    setProblem(null);
-    try {
-      recording.current = await startRecording();
-      const now = Date.now();
-      setClock({start: now, now});
-      setState('recording');
-    } catch (error) {
-      const name = error instanceof Error ? error.name : '';
-      setProblem(name === 'NotAllowedError' || name === 'SecurityError' ? 'micDenied' : 'micUnavailable');
-    }
-  }, []);
-
-  // While recording: a countdown, and a stop at 15 seconds (the API takes no more).
-  useEffect(() => {
-    if (state !== 'recording') return;
-    const tick = setInterval(() => setClock(current => ({...current, now: Date.now()})), 250);
-    const limit = setTimeout(() => void stop(), MAX_SPEECH_SEC * 1000);
-    return () => {
-      clearInterval(tick);
-      clearTimeout(limit);
-    };
-  }, [state, stop]);
-
-  // Leaving the screen lets go of the microphone.
-  useEffect(() => () => recording.current?.cancel(), []);
-
-  const secondsLeft = Math.max(0, Math.ceil(MAX_SPEECH_SEC - (clock.now - clock.start) / 1000));
-  return {state, problem, secondsLeft, start, stop};
-}
-
-/** The big mic button, with what it's doing underneath. Where recording can't work (plain http), just a note. */
-function SpeechInput({disabled, onText}: {disabled: boolean; onText: (text: string) => void}) {
-  const {t} = useI18n();
-  const [supported] = useState(canRecord);
-  const speech = useSpeech(onText);
-  if (!supported) return <p className="hint mic-note">{t('micUnavailable')}</p>;
-  const recording = speech.state === 'recording';
-  const note = recording
-    ? t('micListening', {n: speech.secondsLeft})
-    : speech.state === 'working'
-      ? t('micWorking')
-      : t(speech.problem ?? 'micIdle');
-  return (
-    <div className="mic-area">
-      <button
-        type="button"
-        className={`mic${recording ? ' mic-on' : ''}`}
-        aria-label={t(recording ? 'micStop' : 'micStart')}
-        disabled={disabled || speech.state === 'working'}
-        onClick={() => void (recording ? speech.stop() : speech.start())}>
-        <Icon name={recording ? 'stop' : 'mic'} size={40} />
-      </button>
-      <p className="mic-note" role="status">
-        {note}
-      </p>
-    </div>
   );
 }

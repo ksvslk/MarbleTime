@@ -71,6 +71,9 @@ describe('a kid’s budget from the server', () => {
     dailyBaseMin: 30,
     dailyMaxMin: 60,
     characterTokens: 0,
+    usedTodaySec: 0,
+    leftTodaySec: 1800,
+    puzzles: {on: true, stars: 0, starsNeeded: 5, doneToday: false, levels: {}, level: 0, levelAges: ['4–5', '6', '7–8', '9–10']},
     ...overrides,
   });
 

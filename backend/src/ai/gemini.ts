@@ -77,6 +77,9 @@ function read(response: GeminiResponse): {text: string; stop: Stop; usage: Usage
   return {text, stop, usage};
 }
 
+/** Thinking is "low" for everything, as measured; Gemini 2.x models don't take the setting (they solve puzzles as a second opinion: puzzles/writer.ts). */
+const thinking = (modelId: string) => (modelId.startsWith('gemini-2') ? {} : {thinkingConfig: {thinkingLevel: 'low'}});
+
 export class GeminiModel implements AiModel {
   private readonly send: Send;
   private url?: string;
@@ -99,7 +102,7 @@ export class GeminiModel implements AiModel {
         responseMimeType: 'application/json',
         responseJsonSchema: ask.schema,
         maxOutputTokens: ask.maxTokens ?? 4096,
-        thinkingConfig: {thinkingLevel: 'low'},
+        ...thinking(this.id),
       },
     }, ask.signal));
     if (stop !== 'done') return {stop, usage};
@@ -111,7 +114,7 @@ export class GeminiModel implements AiModel {
     return read(await this.send(this.endpoint(), {
       ...(ask.system !== undefined && {systemInstruction: {parts: [{text: ask.system}]}}),
       contents: [{role: 'user', parts: parts(ask.user, ask.images, ask.audio)}],
-      generationConfig: {maxOutputTokens: ask.maxTokens ?? 16000, thinkingConfig: {thinkingLevel: 'low'}},
+      generationConfig: {maxOutputTokens: ask.maxTokens ?? 16000, ...thinking(this.id)},
     }, ask.signal));
   }
 }

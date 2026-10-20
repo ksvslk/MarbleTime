@@ -1,0 +1,4055 @@
+[
+ {
+  "id": "b07d34b31f283188",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which fruit comes next in the pattern?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   },
+   {
+    "emoji": "🥕"
+   }
+  ],
+  "answer": 0,
+  "reason": "The pattern goes apple, banana, apple, banana, then apple again.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1c9b1f34fe9e4afb",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "I swim in the cold sea and waddle on the ice. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A penguin"
+   },
+   {
+    "text": "A monkey"
+   },
+   {
+    "text": "A horse"
+   }
+  ],
+  "answer": 0,
+  "reason": "Penguins waddle on ice and swim in the cold water.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0fb1f5ff1a3daaf7",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these animals. Which one cannot fly?",
+  "picture": [
+   "🦆",
+   "🐶",
+   "🦉"
+  ],
+  "choices": [
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🦉"
+   }
+  ],
+  "answer": 1,
+  "reason": "A dog runs on the ground and has no wings to fly.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "33e04d2c31d3531e",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which thing goes with your feet?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A hat"
+   },
+   {
+    "text": "A glove"
+   },
+   {
+    "text": "A shoe"
+   }
+  ],
+  "answer": 2,
+  "reason": "You put shoes on your feet before you go outside.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2257867936fcc314",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which animal is bigger than a mouse?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "An ant"
+   },
+   {
+    "text": "An elephant"
+   },
+   {
+    "text": "A bee"
+   }
+  ],
+  "answer": 1,
+  "reason": "An elephant is giant and much bigger than a little mouse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a9b8176f939082ec",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these snacks. Which one does not belong?",
+  "picture": [
+   "🥛",
+   "🍓",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "The milk"
+   },
+   {
+    "text": "The strawberry"
+   },
+   {
+    "text": "The apple"
+   }
+  ],
+  "answer": 0,
+  "reason": "Milk is a drink, but strawberries and apples are fruits to eat.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d0ba3c021e996918",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which animal comes next in the pattern?",
+  "picture": [
+   "🐸",
+   "🐱",
+   "🐸",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐮"
+   }
+  ],
+  "answer": 1,
+  "reason": "The pattern goes frog, cat, frog, cat, then frog.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9f19f8025c35d18a",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which thing goes with a cereal bowl?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A spoon"
+   },
+   {
+    "text": "A toothbrush"
+   },
+   {
+    "text": "A key"
+   }
+  ],
+  "answer": 0,
+  "reason": "You use a spoon to eat yummy cereal from a bowl.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "20cf686fd17b8c40",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "I shine up in the sky all day and keep you warm. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "The moon"
+   },
+   {
+    "text": "A cloud"
+   },
+   {
+    "text": "The sun"
+   }
+  ],
+  "answer": 2,
+  "reason": "The sun shines bright and gives us warm daylight.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3f3c7f97fe0f493d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which thing is smaller than a house?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "An apple"
+   },
+   {
+    "text": "A mountain"
+   },
+   {
+    "text": "A big castle"
+   }
+  ],
+  "answer": 0,
+  "reason": "An apple can fit right inside your hand.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "eeb4acb429e530a2",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these vehicles. Which one does not belong?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "⛵"
+  ],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "⛵"
+   }
+  ],
+  "answer": 2,
+  "reason": "A boat sails on water, but cars and buses drive on roads.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c3de065c81c3bb28",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "I have four wheels, a siren, and I help put out big fires. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A bicycle"
+   },
+   {
+    "text": "A fire engine"
+   },
+   {
+    "text": "A school bus"
+   }
+  ],
+  "answer": 1,
+  "reason": "Firefighters ride in a fire engine to put out fires.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "56d7a4dc6e23f041",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "I can fly high in the sky and I love to sing. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "bird"
+   },
+   {
+    "text": "frog"
+   },
+   {
+    "text": "cat"
+   }
+  ],
+  "answer": 0,
+  "reason": "A bird has wings to fly and sing.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "53b989901aede137",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "What comes next in the pattern?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐶",
+   "🐱",
+   "🐶"
+  ],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐭"
+   }
+  ],
+  "answer": 1,
+  "reason": "A cat comes after every dog in this pattern.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "aaf373e40c3628ab",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which one does not belong with the others?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🥕",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "text": "apple"
+   },
+   {
+    "text": "carrot"
+   },
+   {
+    "text": "banana"
+   }
+  ],
+  "answer": 1,
+  "reason": "A carrot is a vegetable, but the others are fruits.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ebf76098bf6b0cbf",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "What goes best with shoes?",
+  "picture": [
+   "👟"
+  ],
+  "choices": [
+   {
+    "text": "socks"
+   },
+   {
+    "text": "hats"
+   },
+   {
+    "text": "gloves"
+   }
+  ],
+  "answer": 0,
+  "reason": "Socks go on your feet inside your shoes.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "18ed81af12541f39",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which of these animals is the biggest?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "mouse"
+   },
+   {
+    "text": "rabbit"
+   },
+   {
+    "text": "elephant"
+   }
+  ],
+  "answer": 2,
+  "reason": "An elephant is much bigger than a mouse and a rabbit.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9a933f77d96b69db",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which thing does not belong with the toys?",
+  "picture": [
+   "🧸",
+   "🧩",
+   "🥦",
+   "🎈"
+  ],
+  "choices": [
+   {
+    "text": "broccoli"
+   },
+   {
+    "text": "balloon"
+   },
+   {
+    "text": "puzzle"
+   }
+  ],
+  "answer": 0,
+  "reason": "Broccoli is food to eat, not a toy to play with.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4a448e423c1b9f61",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "I am very cold and fall from the sky in winter. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "fire"
+   },
+   {
+    "text": "snow"
+   },
+   {
+    "text": "sun"
+   }
+  ],
+  "answer": 1,
+  "reason": "Snow is cold and falls in winter.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5bfc913dde1dd2f9",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which animal is smaller than a dog?",
+  "picture": [
+   "🐕"
+  ],
+  "choices": [
+   {
+    "text": "horse"
+   },
+   {
+    "text": "cow"
+   },
+   {
+    "text": "ant"
+   }
+  ],
+  "answer": 2,
+  "reason": "An ant is tiny and much smaller than a dog.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8af72c1d656ee7b9",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "What goes best with a toothbrush?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "text": "soap"
+   },
+   {
+    "text": "teeth"
+   },
+   {
+    "text": "hair"
+   }
+  ],
+  "answer": 1,
+  "reason": "You use a toothbrush to clean your teeth.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3bbbc1867530a58d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "I buzz around flowers and make sweet honey. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐱"
+   }
+  ],
+  "answer": 1,
+  "reason": "A bee buzzes and makes sweet honey.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ade15de5ce93561d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these clothes. Which one does not belong?",
+  "picture": [
+   "👕",
+   "👗",
+   "🍎",
+   "👖"
+  ],
+  "choices": [
+   {
+    "emoji": "👕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "👖"
+   }
+  ],
+  "answer": 1,
+  "reason": "An apple is food to eat, not clothes to wear.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bd5cab05dadfee97",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which animal is much bigger than a dog?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐜"
+   },
+   {
+    "emoji": "🐭"
+   },
+   {
+    "emoji": "🐘"
+   }
+  ],
+  "answer": 2,
+  "reason": "An elephant is huge and much bigger than a dog.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ed95c3203623f3e6",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at this toothbrush. What goes together with it?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "text": "Toothpaste bubbles"
+   },
+   {
+    "text": "A paintbrush"
+   },
+   {
+    "text": "A football"
+   }
+  ],
+  "answer": 0,
+  "reason": "You use bubbles from toothpaste when you brush your teeth.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "88f0ac2a0503913a",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these animals. Which one does not swim in water?",
+  "picture": [
+   "🐠",
+   "🐬",
+   "🐵",
+   "🦈"
+  ],
+  "choices": [
+   {
+    "emoji": "🐠"
+   },
+   {
+    "emoji": "🐵"
+   },
+   {
+    "emoji": "🐬"
+   }
+  ],
+  "answer": 1,
+  "reason": "A monkey climbs trees and does not live in the sea.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "317553f8d85a418d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Which thing is much smaller than a car?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🏠"
+   },
+   {
+    "emoji": "🐞"
+   }
+  ],
+  "answer": 2,
+  "reason": "A tiny ladybird is much smaller than a car.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b92f60b3ae76d964",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Look at these pictures. Which one does not belong?",
+  "picture": [
+   "🥕",
+   "🥦",
+   "🌽",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "emoji": "🥦"
+   },
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🥕"
+   }
+  ],
+  "answer": 1,
+  "reason": "A car is a vehicle to drive, not a vegetable to eat.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0732e29fd67d545d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "I have two wheels, pedals, and handlebars to steer. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🚀"
+   },
+   {
+    "emoji": "⛵"
+   }
+  ],
+  "answer": 0,
+  "reason": "A bicycle has two wheels and pedals to push.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1c9b1f34fe9e4afb",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "I swim in the cold sea and waddle on the ice. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "penguin"
+   },
+   {
+    "text": "monkey"
+   },
+   {
+    "text": "camel"
+   }
+  ],
+  "answer": 0,
+  "reason": "A penguin waddles on the ice and swims in the sea.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5320013a459f747d",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which of these things does not belong with the food?",
+  "picture": [
+   "🍞",
+   "🧀",
+   "👟",
+   "🍕"
+  ],
+  "choices": [
+   {
+    "emoji": "🍞"
+   },
+   {
+    "emoji": "🍕"
+   },
+   {
+    "emoji": "👟"
+   }
+  ],
+  "answer": 2,
+  "reason": "A shoe is for wearing, not for eating.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "12ff3cf57df356fa",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Look at the pattern. Which picture should be next?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 1,
+  "reason": "A banana comes after an apple in this pattern.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "05eaa40ebd5d7825",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which thing goes best with a key?",
+  "picture": [
+   "🔑"
+  ],
+  "choices": [
+   {
+    "text": "a door"
+   },
+   {
+    "text": "a tree"
+   },
+   {
+    "text": "a cloud"
+   }
+  ],
+  "answer": 0,
+  "reason": "A key opens a door.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6aacc0a7fc986873",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which animal is bigger than a rabbit?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐜"
+   },
+   {
+    "emoji": "🐴"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "A horse is much bigger than a rabbit.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0b0d9959cb7d38b2",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "I make sweet honey and buzz around flowers. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "a frog"
+   },
+   {
+    "text": "a bee"
+   },
+   {
+    "text": "a pig"
+   }
+  ],
+  "answer": 1,
+  "reason": "A bee buzzes and makes sweet honey.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a3518a8cdba19b43",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Which one does not belong with the things you wear?",
+  "picture": [
+   "👕",
+   "👖",
+   "🧢",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "👕"
+   },
+   {
+    "emoji": "🧢"
+   }
+  ],
+  "answer": 0,
+  "reason": "A car is something you ride in, not clothes you wear.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b1782855a9919fce",
+  "lang": "en",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Look at the animals. Which animal comes next in line?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐶",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "emoji": "🐮"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   }
+  ],
+  "answer": 2,
+  "reason": "A puppy comes after a kitten in this pattern.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "afea773abbad4ec7",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Look at the pattern. Which picture comes next?",
+  "picture": [
+   "🐸",
+   "🦆",
+   "🐸",
+   "🦆",
+   "🐸"
+  ],
+  "choices": [
+   {
+    "emoji": "🦆"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 0,
+  "reason": "The pattern goes frog, duck, frog, duck, so a duck comes next.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3552dbf4f566d64e",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Which of these does not belong with the others?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🥕",
+   "🍇"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 1,
+  "reason": "A carrot is a vegetable, but the others are all fruits.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6410885d3b8f0a75",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "I shine up in the sky only at night, and sometimes I look like a banana. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🌞"
+   },
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "⭐"
+   }
+  ],
+  "answer": 1,
+  "reason": "The crescent moon looks like a curved banana in the night sky.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7c5a1fc6b3c1112e",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "I have wings and buzz around flowers, making sweet honey. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦋"
+   },
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐞"
+   }
+  ],
+  "answer": 1,
+  "reason": "Bees buzz around flowers and make honey.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "931f4e37f0092b85",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Which animal is the biggest in real life?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A mouse"
+   },
+   {
+    "text": "A horse"
+   },
+   {
+    "text": "An elephant"
+   }
+  ],
+  "answer": 2,
+  "reason": "An elephant is much bigger and heavier than a horse or a mouse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3238f7ba187c4e6c",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "You put socks on your feet first. What goes together with socks?",
+  "picture": [
+   "🧦"
+  ],
+  "choices": [
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "👟"
+   },
+   {
+    "emoji": "🧤"
+   }
+  ],
+  "answer": 1,
+  "reason": "Shoes go over your socks on your feet.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d902a20eb0ad4409",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "I have hands and a face, but no arms or legs. I tell you when it is time for school. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "⏰"
+   },
+   {
+    "emoji": "📱"
+   },
+   {
+    "emoji": "💡"
+   }
+  ],
+  "answer": 0,
+  "reason": "A clock has hands and a face to tell the time.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a4fdabcabc004e68",
+  "lang": "en",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Which number is greater than fourteen and smaller than seventeen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Twelve"
+   },
+   {
+    "text": "Fifteen"
+   },
+   {
+    "text": "Eighteen"
+   }
+  ],
+  "answer": 1,
+  "reason": "Fifteen comes between fourteen and seventeen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "aaf373e40c3628ab",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Which one does not belong with the others?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🥕",
+   "🍇"
+  ],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 0,
+  "reason": "A carrot is a vegetable, while apples, bananas, and grapes are fruits.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c225150dbbefb930",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Look at this repeating pattern. What comes next?",
+  "picture": [
+   "⭐",
+   "🌙",
+   "🌙",
+   "⭐",
+   "🌙",
+   "🌙",
+   "⭐",
+   "🌙"
+  ],
+  "choices": [
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌙"
+   },
+   {
+    "emoji": "🌞"
+   }
+  ],
+  "answer": 1,
+  "reason": "The pattern has one star followed by two moons.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7bdba607408cc933",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Which animal is usually the biggest in real life?",
+  "picture": [
+   "🐘",
+   "🐎",
+   "🐕"
+  ],
+  "choices": [
+   {
+    "emoji": "🐎"
+   },
+   {
+    "emoji": "🐘"
+   },
+   {
+    "emoji": "🐕"
+   }
+  ],
+  "answer": 1,
+  "reason": "An elephant is much bigger and heavier than a horse or a dog.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d5da88bdb9d19e98",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Four baskets each hold six apples. How many apples are there in all?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "twenty"
+   },
+   {
+    "text": "twenty-four"
+   },
+   {
+    "text": "eighteen"
+   }
+  ],
+  "answer": 1,
+  "reason": "Four multiplied by six equals twenty-four.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "473b725b603f7c70",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "I have hands and numbers on my face, and I tell you what time it is. What am I?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "📱"
+   },
+   {
+    "emoji": "⏰"
+   },
+   {
+    "emoji": "🔔"
+   }
+  ],
+  "answer": 1,
+  "reason": "A clock has hands and numbers to show the time.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5bfd309868d8d334",
+  "lang": "en",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Which item goes together with a lock?",
+  "picture": [
+   "🚪"
+  ],
+  "choices": [
+   {
+    "emoji": "🔑"
+   },
+   {
+    "emoji": "🔔"
+   },
+   {
+    "emoji": "🔦"
+   }
+  ],
+  "answer": 0,
+  "reason": "A key is used to open a lock.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8f7943477ead01f8",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Count with me: one, two, three. What comes next?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "4"
+   },
+   {
+    "text": "1"
+   }
+  ],
+  "answer": 1,
+  "reason": "Four comes right after three.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "cea984b297bc9a09",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "How many red apples can you count?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "three"
+   },
+   {
+    "text": "four"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 1,
+  "reason": "There are four apples in a row.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e3b59bfd63afeeb6",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "How many green trees are in the park?",
+  "picture": [
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳",
+   "🌳"
+  ],
+  "choices": [
+   {
+    "text": "four"
+   },
+   {
+    "text": "six"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 2,
+  "reason": "Counting each tree gives five trees.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3c27cc8c571de6fb",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Count the buzzing bees. How many do you see?",
+  "picture": [
+   "🐝",
+   "🐝",
+   "🐝"
+  ],
+  "choices": [
+   {
+    "text": "two"
+   },
+   {
+    "text": "four"
+   },
+   {
+    "text": "three"
+   }
+  ],
+  "answer": 2,
+  "reason": "There are three bees on the screen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4b02ebbbf98843ef",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "How many bright soccer balls are on the grass?",
+  "picture": [
+   "⚽",
+   "⚽"
+  ],
+  "choices": [
+   {
+    "text": "one"
+   },
+   {
+    "text": "two"
+   },
+   {
+    "text": "three"
+   }
+  ],
+  "answer": 1,
+  "reason": "There are two soccer balls to count.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9a1dd219ca43487a",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Five frogs sat on a log, but two hopped away. How many frogs stayed?",
+  "picture": [
+   "🐸",
+   "🐸",
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "four"
+   },
+   {
+    "text": "one"
+   },
+   {
+    "text": "three"
+   }
+  ],
+  "answer": 2,
+  "reason": "Five take away two leaves three.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d96b4fc6970b3f2f",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "What number comes next when counting backwards: twenty, eighteen, sixteen, fourteen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "13"
+   },
+   {
+    "text": "10"
+   },
+   {
+    "text": "12"
+   }
+  ],
+  "answer": 2,
+  "reason": "Counting backwards by twos from fourteen gives twelve.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "14f709015ed3999c",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Which number comes next in this pattern: two, six, ten, fourteen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "16"
+   },
+   {
+    "text": "20"
+   },
+   {
+    "text": "18"
+   }
+  ],
+  "answer": 2,
+  "reason": "The numbers count up by four, and fourteen plus four is eighteen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "40a74cc73d16cce0",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "There are seventeen books on the shelf. Oliver borrows six of them to read. How many books stay on the shelf?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "11"
+   },
+   {
+    "text": "12"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "answer": 0,
+  "reason": "Seventeen minus six is eleven.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b005a4468eed746f",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "A farmer has seven cows. Each cow has four legs. How many legs do the cows have altogether?",
+  "picture": [
+   "🐄",
+   "🐄",
+   "🐄",
+   "🐄",
+   "🐄",
+   "🐄",
+   "🐄"
+  ],
+  "choices": [
+   {
+    "text": "twenty-four"
+   },
+   {
+    "text": "twenty-six"
+   },
+   {
+    "text": "twenty-eight"
+   }
+  ],
+  "answer": 2,
+  "reason": "Seven multiplied by four is twenty-eight.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b192680f2db38279",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Which of these animals can swim underwater?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐴"
+   },
+   {
+    "emoji": "🐬"
+   }
+  ],
+  "answer": 2,
+  "reason": "A dolphin swims in the sea.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f47caa0b4863d243",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "What starts with the b sound, like baby and ball?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 0,
+  "reason": "Banana starts with the letter B.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "71c97c36fb537ca7",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Listen closely: dog, log. Which word rhymes with dog?",
+  "picture": [
+   "🐶"
+  ],
+  "choices": [
+   {
+    "text": "Frog"
+   },
+   {
+    "text": "Fish"
+   },
+   {
+    "text": "Pig"
+   }
+  ],
+  "answer": 0,
+  "reason": "Frog and dog rhyme because they end with the same sound.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0734495d76d5f5b7",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Which word is the opposite of hot?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cold"
+   },
+   {
+    "text": "Fast"
+   },
+   {
+    "text": "Loud"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cold is the opposite of hot.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8592730225f78571",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "What letter does the word for this animal start with?",
+  "picture": [
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "F"
+   },
+   {
+    "text": "B"
+   },
+   {
+    "text": "M"
+   }
+  ],
+  "answer": 0,
+  "reason": "Frog starts with the letter F.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "49f4cc656ecbb587",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Which one belongs to the clothes we wear?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🪑"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🧦"
+   }
+  ],
+  "answer": 2,
+  "reason": "A sock is something you wear on your foot.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b8faf95041ba8669",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "If the door is not open, what is it?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "High"
+   },
+   {
+    "text": "Soft"
+   },
+   {
+    "text": "Closed"
+   }
+  ],
+  "answer": 2,
+  "reason": "Closed is the opposite of open.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e0c52b86e5ccf53a",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Which word rhymes with tree?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Bee"
+   },
+   {
+    "text": "Car"
+   },
+   {
+    "text": "Cup"
+   }
+  ],
+  "answer": 0,
+  "reason": "Tree and bee rhyme.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "960290b41e379523",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "What letter does the word for this food start with?",
+  "picture": [
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "S"
+   },
+   {
+    "text": "A"
+   },
+   {
+    "text": "T"
+   }
+  ],
+  "answer": 1,
+  "reason": "Apple begins with the letter A.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f8d98435422c90c3",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Which word rhymes with dog?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Pen"
+   },
+   {
+    "text": "Frog"
+   },
+   {
+    "text": "Star"
+   }
+  ],
+  "answer": 1,
+  "reason": "Dog and frog rhyme.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "99622a9632fb95c1",
+  "lang": "en",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Which of these is a vehicle that takes people places?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🌻"
+   },
+   {
+    "emoji": "🎈"
+   }
+  ],
+  "answer": 0,
+  "reason": "A bus is a vehicle that drives on the road.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "021b05a75d3fe251",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which of these things belongs to the group called fruit?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥦"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥔"
+   }
+  ],
+  "answer": 1,
+  "reason": "An apple is a sweet fruit that grows on trees.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b0918be8edfbda4c",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which word rhymes with duck?",
+  "picture": [
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "Bark"
+   },
+   {
+    "text": "Luck"
+   },
+   {
+    "text": "Dock"
+   }
+  ],
+  "answer": 1,
+  "reason": "Duck and luck have the same ending sound.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3a9f212496f13098",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "What is the opposite of noisy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Loud"
+   },
+   {
+    "text": "Bright"
+   },
+   {
+    "text": "Quiet"
+   }
+  ],
+  "answer": 2,
+  "reason": "Quiet means making very little sound, the opposite of noisy.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bbeabe1e86c39218",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which of these belongs in the clothing group?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "🛴"
+   }
+  ],
+  "answer": 1,
+  "reason": "A dress is a piece of clothing you can wear.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "541c8057848d16e3",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which word rhymes with star?",
+  "picture": [
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "Car"
+   },
+   {
+    "text": "Sun"
+   },
+   {
+    "text": "Stir"
+   }
+  ],
+  "answer": 0,
+  "reason": "Star and car rhyme with each other.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "38081c0be2b89640",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which of these words means the opposite of 'ancient'?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Modern"
+   },
+   {
+    "text": "Huge"
+   },
+   {
+    "text": "Heavy"
+   }
+  ],
+  "answer": 0,
+  "reason": "Ancient means very old, and modern means from the present time.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7884cf7d8eed6c7a",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which word describes an animal that lives in water and has scales?",
+  "picture": [
+   "🐟"
+  ],
+  "choices": [
+   {
+    "text": "Mammal"
+   },
+   {
+    "text": "Fish"
+   },
+   {
+    "text": "Insect"
+   }
+  ],
+  "answer": 1,
+  "reason": "Fish are aquatic animals that breathe with gills and have scales.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ddb97e9b11af4be4",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which of these words is a synonym for 'gigantic'?",
+  "picture": [
+   "🐘"
+  ],
+  "choices": [
+   {
+    "text": "Tiny"
+   },
+   {
+    "text": "Speedy"
+   },
+   {
+    "text": "Enormous"
+   }
+  ],
+  "answer": 2,
+  "reason": "Both gigantic and enormous mean extremely large.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4e2c5c6affeead62",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which animal shown here rhymes with 'log'?",
+  "picture": [
+   "🐱",
+   "🐶",
+   "🐴"
+  ],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐴"
+   }
+  ],
+  "answer": 1,
+  "reason": "The word dog rhymes with log.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7eaf256e3b3953de",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which word is an antonym for 'generous'?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Selfish"
+   },
+   {
+    "text": "Helpful"
+   },
+   {
+    "text": "Brave"
+   }
+  ],
+  "answer": 0,
+  "reason": "Selfish means not generous with others.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9f5b50b75d8190ee",
+  "lang": "en",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Which of these items is classified as a dairy food?",
+  "picture": [
+   "🧀",
+   "🍞",
+   "🥔"
+  ],
+  "choices": [
+   {
+    "emoji": "🧀"
+   },
+   {
+    "emoji": "🍞"
+   },
+   {
+    "emoji": "🥔"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cheese is made from milk, making it a dairy food.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "52d2831fea7ca2df",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Count the apples on the screen. How many do you see?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "Two"
+   },
+   {
+    "text": "Four"
+   },
+   {
+    "text": "Three"
+   }
+  ],
+  "answer": 2,
+  "reason": "There are three apples in a row.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3fd819e5c43b8108",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Which animal can fly high in the sky?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐦"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Birds have wings to fly high in the air.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f5d98560bcfc2fd2",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Who says quack and loves to swim in a pond?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A horse"
+   },
+   {
+    "text": "A pig"
+   },
+   {
+    "text": "A duck"
+   }
+  ],
+  "answer": 2,
+  "reason": "Ducks say quack and paddle on the water.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b0106ec02e11a2b6",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "When night comes and you feel sleepy, where do you rest?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "In bed"
+   },
+   {
+    "text": "On a tree"
+   },
+   {
+    "text": "In a car"
+   }
+  ],
+  "answer": 0,
+  "reason": "You sleep in your cozy bed at night.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fc7eab1ae7997df0",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "What makes sweet, golden honey?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐜"
+   },
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐌"
+   }
+  ],
+  "answer": 1,
+  "reason": "Bees visit flowers and make honey.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "27c7301db7d93b7d",
+  "lang": "en",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Which animal hops on green lily pads?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐮"
+   },
+   {
+    "emoji": "🦁"
+   }
+  ],
+  "answer": 0,
+  "reason": "Frogs like to hop around the pond.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "03069711ab09d2d2",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Which animal buzzes from flower to flower to make honey?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐶"
+   }
+  ],
+  "answer": 0,
+  "reason": "Bees visit flowers to make sweet honey.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "335a73b76db2fd68",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "What do we use to listen to music and hear stories?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👄"
+   }
+  ],
+  "answer": 0,
+  "reason": "We use our ears to hear sounds.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "01ec4060b8b68821",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "The sun is going down and the stars are out. What time of day is it?",
+  "picture": [
+   "🌙",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "morning"
+   },
+   {
+    "text": "night"
+   },
+   {
+    "text": "afternoon"
+   }
+  ],
+  "answer": 1,
+  "reason": "The stars and the moon shine at night.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c96e430aa251188d",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "What should you put on your toothbrush to clean your teeth?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "text": "honey"
+   },
+   {
+    "text": "toothpaste"
+   },
+   {
+    "text": "paint"
+   }
+  ],
+  "answer": 1,
+  "reason": "Toothpaste helps clean our teeth.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0b9588c1755b84f1",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Look at the pattern: car, bus, car, bus. What comes next?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "🚗",
+   "🚌"
+  ],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🚲"
+   },
+   {
+    "emoji": "🚀"
+   }
+  ],
+  "answer": 0,
+  "reason": "A car comes next after the bus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fcce0bf2949534d5",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Leaves turn gold, red, and brown before falling from the trees. Which season is it?",
+  "picture": [
+   "🍁",
+   "🍂",
+   "🍁"
+  ],
+  "choices": [
+   {
+    "text": "Spring"
+   },
+   {
+    "text": "Autumn"
+   },
+   {
+    "text": "Summer"
+   }
+  ],
+  "answer": 1,
+  "reason": "Tree leaves change colour and fall during autumn.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2a5df71c059605dd",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Which of these animals spins a web from silk to catch its food?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A frog"
+   },
+   {
+    "text": "A spider"
+   },
+   {
+    "text": "A rabbit"
+   }
+  ],
+  "answer": 1,
+  "reason": "Spiders make webs out of sticky silk.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8d74a46a9453e2aa",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Which of these animals lives in the sea and breathes air through a blowhole?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐳"
+   },
+   {
+    "emoji": "🐠"
+   },
+   {
+    "emoji": "🐙"
+   }
+  ],
+  "answer": 0,
+  "reason": "Whales swim up to the surface of the sea to breathe air.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "08785d26b814f351",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "You wake up, eat breakfast, and get ready for school. What time of day is it?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "Morning"
+   },
+   {
+    "text": "Afternoon"
+   },
+   {
+    "text": "Midnight"
+   }
+  ],
+  "answer": 0,
+  "reason": "Breakfast is the first meal eaten in the morning.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fae62f6aedcf45e3",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "A caterpillar nibbles green leaves and grows big. What does it turn into?",
+  "picture": [
+   "🐛"
+  ],
+  "choices": [
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🐌"
+   },
+   {
+    "emoji": "🦋"
+   }
+  ],
+  "answer": 2,
+  "reason": "A caterpillar grows inside a chrysalis and turns into a butterfly.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1c0d897aaa0665d9",
+  "lang": "en",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Why do plants need green leaves facing the sunlight?",
+  "picture": [
+   "🌻"
+  ],
+  "choices": [
+   {
+    "text": "To make their food"
+   },
+   {
+    "text": "To sleep at night"
+   },
+   {
+    "text": "To hide from birds"
+   }
+  ],
+  "answer": 0,
+  "reason": "Plants catch sunlight with their leaves to make food.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "74676591267a15de",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "You are going for a ride on your bicycle along the pavement. What should you always strap on your head first?",
+  "picture": [
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "A woolly cap"
+   },
+   {
+    "text": "A helmet"
+   },
+   {
+    "text": "A sun hat"
+   }
+  ],
+  "answer": 1,
+  "reason": "A helmet protects your head while riding a bicycle.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "27677c2e14e51306",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Which of these ocean animals breathes air at the surface and feeds its calves milk?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦈"
+   },
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐳"
+   }
+  ],
+  "answer": 2,
+  "reason": "Whales are mammals that breathe air and nurse their young.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "43bce4f5bb26fd00",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Look at the insects on the log. If every ladybug has six legs, how many legs is that in total?",
+  "picture": [
+   "🐞",
+   "🐞",
+   "🐞",
+   "🐞"
+  ],
+  "choices": [
+   {
+    "text": "Twenty-four"
+   },
+   {
+    "text": "Eighteen"
+   },
+   {
+    "text": "Twenty"
+   }
+  ],
+  "answer": 0,
+  "reason": "Four ladybugs with six legs each have twenty-four legs in total.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "09beef7fbd8a806a",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Which organ sits inside your chest and beats like a pump to send blood around your body?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "The stomach"
+   },
+   {
+    "text": "The heart"
+   },
+   {
+    "text": "The lungs"
+   }
+  ],
+  "answer": 1,
+  "reason": "The heart pumps blood through your blood vessels.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e43ef2dddeedb76d",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "The stars are out, the house is quiet, and the clock says midnight. What time of day is it?",
+  "picture": [
+   "🌙",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "Night"
+   },
+   {
+    "text": "Noon"
+   },
+   {
+    "text": "Dusk"
+   }
+  ],
+  "answer": 0,
+  "reason": "Midnight happens in the middle of the night.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c9b47f769a7c9952",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "How many little ducks are swimming in the pond?",
+  "picture": [
+   "🦆",
+   "🦆",
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "two"
+   },
+   {
+    "text": "three"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 1,
+  "reason": "There are three ducks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b46d5cca2207ffbb",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Let's count our steps: one, two, three, four. What number comes next?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "two"
+   },
+   {
+    "text": "three"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 2,
+  "reason": "Five comes after four.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "00205c072c3e15c6",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "How many red balloons can you see floating in the sky?",
+  "picture": [
+   "🎈",
+   "🎈"
+  ],
+  "choices": [
+   {
+    "text": "two"
+   },
+   {
+    "text": "three"
+   },
+   {
+    "text": "one"
+   }
+  ],
+  "answer": 0,
+  "reason": "There are two balloons.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2530bfd047461338",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "We are counting our fingers: one, two. What number comes next?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "three"
+   },
+   {
+    "text": "four"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 0,
+  "reason": "Three comes right after two.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4c47ed4dc309e0cb",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Leo had three bananas. He ate one banana for lunch. How many bananas are left?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "one"
+   },
+   {
+    "text": "two"
+   },
+   {
+    "text": "four"
+   }
+  ],
+  "answer": 1,
+  "reason": "Taking one away from three leaves two.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2323fe2ddd93a372",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Count the shiny stars in the sky. How many are there?",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "six"
+   },
+   {
+    "text": "eight"
+   },
+   {
+    "text": "seven"
+   }
+  ],
+  "answer": 2,
+  "reason": "There are seven stars shining in the row.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6ce4034f8e9b1e68",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Count out loud: four, five, six. What number comes next?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "seven"
+   },
+   {
+    "text": "three"
+   },
+   {
+    "text": "eight"
+   }
+  ],
+  "answer": 0,
+  "reason": "Seven comes right after six.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "04913d9e1f80ebb8",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Count backwards with me: five, four, three. What number comes next?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "six"
+   },
+   {
+    "text": "one"
+   },
+   {
+    "text": "two"
+   }
+  ],
+  "answer": 2,
+  "reason": "Two comes right before three when counting down.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7cde68931b921253",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "How many sailing boats can you spot on the water?",
+  "picture": [
+   "⛵",
+   "⛵",
+   "⛵"
+  ],
+  "choices": [
+   {
+    "text": "three"
+   },
+   {
+    "text": "two"
+   },
+   {
+    "text": "four"
+   }
+  ],
+  "answer": 0,
+  "reason": "There are three sailing boats on the water.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e5e37971c6460b61",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Ben had four toy cars. He gave one toy car to his sister. How many does he have left?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "three"
+   },
+   {
+    "text": "two"
+   },
+   {
+    "text": "five"
+   }
+  ],
+  "answer": 0,
+  "reason": "Four minus one is three.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "601d6dacb65a461e",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Which number comes next in this pattern: three, six, nine, twelve?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Thirteen"
+   },
+   {
+    "text": "Fourteen"
+   },
+   {
+    "text": "Fifteen"
+   }
+  ],
+  "answer": 2,
+  "reason": "The pattern adds three each time, and twelve plus three is fifteen.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e6850a022fd21dce",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "There are fifteen birds sitting in a tree. Five of them fly away. How many birds are left in the tree?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Eleven"
+   },
+   {
+    "text": "Ten"
+   },
+   {
+    "text": "Nine"
+   }
+  ],
+  "answer": 1,
+  "reason": "Fifteen take away five is ten.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4e4a173e97007fbf",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "What number comes next when counting backwards by fives: twenty, fifteen, ten?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Five"
+   },
+   {
+    "text": "Zero"
+   },
+   {
+    "text": "Six"
+   }
+  ],
+  "answer": 0,
+  "reason": "Counting backwards by fives from ten lands on five.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "37e0c0feda749e8e",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Mia bakes four batches of cookies. Each batch has six cookies. How many cookies does Mia bake altogether?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "twenty-four"
+   },
+   {
+    "text": "twenty"
+   },
+   {
+    "text": "ten"
+   }
+  ],
+  "answer": 0,
+  "reason": "Four groups of six make twenty-four.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "07eea392f5f737fe",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "A spider has eight legs. How many legs do five spiders have in all?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "thirty-five"
+   },
+   {
+    "text": "forty-five"
+   },
+   {
+    "text": "forty"
+   }
+  ],
+  "answer": 2,
+  "reason": "Five times eight equals forty.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2a5d20269820b10d",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Leo has eighteen toy cars. He shares them equally into three boxes. How many cars go into each box?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "six"
+   },
+   {
+    "text": "five"
+   },
+   {
+    "text": "four"
+   }
+  ],
+  "answer": 0,
+  "reason": "Eighteen divided into three equal groups makes six in each group.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0ec0dc6fb8a50fa1",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Which number comes next in this backwards jump: forty, thirty-two, twenty-four, sixteen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "twelve"
+   },
+   {
+    "text": "ten"
+   },
+   {
+    "text": "eight"
+   }
+  ],
+  "answer": 2,
+  "reason": "The pattern counts down by eights, and sixteen minus eight is eight.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9edce868a2f7f09c",
+  "lang": "en",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "I am an even number between twenty and thirty. The sum of my two digits is six. What number am I?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "twenty-four"
+   },
+   {
+    "text": "twenty-three"
+   },
+   {
+    "text": "twenty-six"
+   }
+  ],
+  "answer": 0,
+  "reason": "Twenty-four is an even number, and two plus four equals six.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7622333a8eab81f8",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Which of these is a yummy fruit?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥔"
+   }
+  ],
+  "answer": 1,
+  "reason": "An apple is a sweet fruit that grows on a tree.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "62978a470032f2c9",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "What starts with the sss sound, like sun and soap?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Sock starts with the letter S.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9ad5734374ab9e04",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "What is the opposite of hot?",
+  "picture": [
+   "🔥"
+  ],
+  "choices": [
+   {
+    "text": "Cold"
+   },
+   {
+    "text": "Tall"
+   },
+   {
+    "text": "Fast"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cold is the opposite of hot.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "84b126fb7f4e55d7",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Look at the door. What is the opposite of open?",
+  "picture": [
+   "🚪"
+  ],
+  "choices": [
+   {
+    "text": "Big"
+   },
+   {
+    "text": "Happy"
+   },
+   {
+    "text": "Closed"
+   }
+  ],
+  "answer": 2,
+  "reason": "Closed is the opposite of open.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c74e04bf54749147",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Listen closely: hat, bat. Which of these words rhymes with hat?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Cat"
+   },
+   {
+    "text": "Cup"
+   },
+   {
+    "text": "Dog"
+   }
+  ],
+  "answer": 0,
+  "reason": "Cat ends with the same sound as hat.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5affc3f861386702",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Which of these things can you wear on your feet?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "👟"
+   },
+   {
+    "emoji": "👕"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sneakers are shoes you put on your feet.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "309087fa3be7ac50",
+  "lang": "en",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Listen closely: frog. Which word rhymes with frog?",
+  "picture": [
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "Star"
+   },
+   {
+    "text": "Sun"
+   },
+   {
+    "text": "Log"
+   }
+  ],
+  "answer": 2,
+  "reason": "Log rhymes with frog.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f7e09d955d57fd1f",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which of these animals begins with the letter F?",
+  "picture": [
+   "🐸",
+   "🐻",
+   "🐵"
+  ],
+  "choices": [
+   {
+    "text": "Frog"
+   },
+   {
+    "text": "Bear"
+   },
+   {
+    "text": "Monkey"
+   }
+  ],
+  "answer": 0,
+  "reason": "Frog begins with the letter F.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "139fcec290cae7fb",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "What is the opposite of heavy?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Big"
+   },
+   {
+    "text": "Hard"
+   },
+   {
+    "text": "Light"
+   }
+  ],
+  "answer": 2,
+  "reason": "Something that is not heavy is light.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e0c52b86e5ccf53a",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which word rhymes with tree?",
+  "picture": [
+   "🌳"
+  ],
+  "choices": [
+   {
+    "text": "Bee"
+   },
+   {
+    "text": "Toe"
+   },
+   {
+    "text": "Top"
+   }
+  ],
+  "answer": 0,
+  "reason": "Bee rhymes with tree.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "437ca5c55f68a4db",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which of these things belongs to the group called vehicles?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚌"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🌻"
+   }
+  ],
+  "answer": 0,
+  "reason": "A bus is a vehicle that carries people on roads.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bc66e2fb51074e35",
+  "lang": "en",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Which letter does the name of this fruit start with?",
+  "picture": [
+   "🍋"
+  ],
+  "choices": [
+   {
+    "text": "M"
+   },
+   {
+    "text": "P"
+   },
+   {
+    "text": "L"
+   }
+  ],
+  "answer": 2,
+  "reason": "The word lemon starts with the letter L.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a34abc08702fd818",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Which season is cold and has snow for making a snowman?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Summer"
+   },
+   {
+    "text": "Winter"
+   },
+   {
+    "text": "Spring"
+   }
+  ],
+  "answer": 1,
+  "reason": "Winter brings cold weather and snow.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ec9ce64f481dc766",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Which little animal carries its own hard shell on its back?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🐌"
+   }
+  ],
+  "answer": 2,
+  "reason": "A snail carries a shell on its back.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6de2e44c7818fee0",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "What do you put on your head to stay safe when you ride a scooter?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "A helmet"
+   },
+   {
+    "text": "A soft pillow"
+   },
+   {
+    "text": "A party hat"
+   }
+  ],
+  "answer": 0,
+  "reason": "A helmet protects your head when riding.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "49d2b1c43c303bd0",
+  "lang": "en",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Which part of your body bends right in the middle of your leg?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Knee"
+   },
+   {
+    "text": "Elbow"
+   },
+   {
+    "text": "Nose"
+   }
+  ],
+  "answer": 0,
+  "reason": "Your knee bends in the middle of your leg.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e96633071bf4259b",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "These hard white parts in your mouth crush and chew your food before you swallow. What are they?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "🦷"
+   }
+  ],
+  "answer": 2,
+  "reason": "Teeth chop and chew food into small pieces.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7c097914c9e7be6f",
+  "lang": "en",
+  "subject": "world",
+  "level": 4,
+  "prompt": "When darkness falls and you flick a switch on the wall, what invisible flow of energy lights up the bulb?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Electricity"
+   },
+   {
+    "text": "Water"
+   },
+   {
+    "text": "Wind"
+   }
+  ],
+  "answer": 0,
+  "reason": "Electricity flows through wires to power lamps and bulbs.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ }
+]

@@ -4,6 +4,7 @@ import type {Deps} from './deps';
 import {ApiError, busy, conflict, invalid, notFound} from './errors';
 import {currentChildren, settleDue} from './ledger';
 import {checkTvPin} from './pin';
+import {wantNextSession} from './puzzle-results';
 import {hashPin, newId} from './secrets';
 import type {Chore, Child, Color, Device, Family, Parent} from './types';
 import type {ChildInput, ChildPatch, ChoreInput, ChorePatch, FamilyCreate, FamilyPatch, MeInput, TvSettingsInput} from './validate';
@@ -88,24 +89,36 @@ export async function addChild(deps: Deps, family: Family, input: ChildInput) {
   const child: Child = {
     id: newId(), name: input.name, avatar: input.avatar, color: input.color, age: input.age,
     ...changedBudget(undefined, input.age, input),
-    characterTokens: 0, createdAt: deps.now(), balanceSec: 0, debtSec: 0,
+    characterTokens: 0, createdAt: deps.now(), balanceSec: 0, debtSec: 0, ...(input.puzzles === false && {puzzlesOff: true}),
+    ...(input.puzzleLevel && {puzzleLevel: input.puzzleLevel}),
   };
   await deps.repo.putChild(family.id, child);
   deps.changed(family.id);
   return childView(child);
 }
 
-/** Changes only what's given; a new age or maximum clamps the budget (budget.ts changedBudget). */
+/**
+ * Changes only what's given; a new age or maximum clamps the budget (budget.ts changedBudget). A new puzzle level
+ * counts from the kid's next session: one already written for them at the old level is dropped and a new one started.
+ */
 export async function patchChild(deps: Deps, family: Family, childId: string, input: ChildPatch) {
-  const {dailyMaxMin, dailyBaseMin, ...profile} = input;
+  const {dailyMaxMin, dailyBaseMin, puzzles, ...rest} = input;
+  const profile = {...rest, ...(puzzles !== undefined && {puzzlesOff: !puzzles})};
   let budget = {};
-  if (input.age !== undefined || dailyMaxMin !== undefined || dailyBaseMin !== undefined) {
+  let levelChanged = false;
+  if (input.age !== undefined || dailyMaxMin !== undefined || dailyBaseMin !== undefined || input.puzzleLevel !== undefined) {
     const current = await deps.repo.getChild(family.id, childId);
     if (!current) throw notFound('child');
-    budget = changedBudget(budgetOf(current), input.age ?? current.age, {dailyMaxMin, dailyBaseMin});
+    if (input.age !== undefined || dailyMaxMin !== undefined || dailyBaseMin !== undefined) budget = changedBudget(budgetOf(current), input.age ?? current.age, {dailyMaxMin, dailyBaseMin});
+    levelChanged = input.puzzleLevel !== undefined && input.puzzleLevel !== (current.puzzleLevel ?? 0);
   }
   const updated = await deps.repo.updateChildProfile(family.id, childId, {...profile, ...budget});
   if (!updated) throw notFound('child');
+  if (levelChanged) {
+    const waiting = await deps.repo.getPuzzleSet(family.id, childId);
+    if (waiting?.questions.length) await deps.repo.putPuzzleSet(family.id, childId, {questions: [], madeAt: waiting.madeAt, recent: waiting.recent});
+    await wantNextSession(deps, family, updated);
+  }
   deps.changed(family.id);
   return childView((await settleDue(deps, family, updated)).child);
 }
@@ -161,7 +174,7 @@ export async function addChore(deps: Deps, family: Family, input: ChoreInput) {
     icon: input.icon ?? (await deps.pickIcon(input.title)),
     color: input.color ?? CARD_COLORS[count % CARD_COLORS.length],
     minutes: input.minutes,
-    routine: input.routine ?? false,
+    routine: false,
     repeat: input.repeat ?? {kind: 'daily'},
     childIds,
     createdAt: now,
@@ -176,7 +189,8 @@ export async function addChore(deps: Deps, family: Family, input: ChoreInput) {
 export async function patchChore(deps: Deps, family: Family, choreId: string, input: ChorePatch) {
   const childIds = input.childIds && [...new Set(input.childIds)];
   if (childIds) await checkChildren(deps, family.id, childIds);
-  const chore = await changeChore(deps, family.id, choreId, k => ({...k, ...input, ...(childIds && {childIds})}));
+  // `routine` is accepted and ignored (every job gives its minutes); a job saved again loses an old flag.
+  const chore = await changeChore(deps, family.id, choreId, k => ({...k, ...input, routine: false, ...(childIds && {childIds})}));
   if (!chore) throw notFound('job');
   deps.changed(family.id);
   return choreView(chore);

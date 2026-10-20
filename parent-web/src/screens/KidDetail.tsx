@@ -2,7 +2,7 @@ import {useCallback, useEffect, useRef, useState, type FormEvent} from 'react';
 import {Link, useParams} from 'react-router';
 import {useApi} from '../api/ApiContext';
 import {ApiError} from '../api/client';
-import type {Child, ChildPatch, LedgerEntry} from '../api/types';
+import type {Bedtime, Child, ChildPatch, LedgerEntry, PuzzleRound} from '../api/types';
 import {useFamily} from '../family';
 import type {IconName} from '../icons';
 import type {Key} from '../i18n/strings';
@@ -15,17 +15,18 @@ import {clampStep, MAX_CHANGE_MIN, maxTakeMin} from '../lib/time';
 import {useAutosave} from '../lib/useAutosave';
 import {useOnChanged} from '../live/LiveContext';
 import {Avatar} from '../ui/Avatar';
-import {Field, SavedNote, Stepper} from '../ui/controls';
+import {Field, SavedNote, Stepper, Switch} from '../ui/controls';
 import {Icon} from '../ui/Icon';
-import {KidTime, TimeLabel} from '../ui/Marbles';
+import {KidTime, Stars, TimeLabel} from '../ui/Marbles';
 import {NotFound, Page} from '../ui/Page';
 import {useShowError, useToast} from '../ui/Toast';
 import {MIN_PER_MARBLE} from '../tokens';
 import {BudgetFields} from './Budget';
 import {CharacterPrompt, CharactersCard} from './Characters';
 import {HandoffCard, useHandoffs} from './Handoff';
+import {PuzzleFields, type PuzzleSettings} from './KidFields';
 
-/** One kid: their time, a new character to make, the Amazon Kids hand-off, giving (or taking) minutes, the daily budget, characters, history. */
+/** One kid: their time, a new character to make, the Amazon Kids hand-off, giving (or taking) minutes, the daily budget, puzzles, characters, history. */
 export function KidDetail() {
   const {id = ''} = useParams();
   const {bundle} = useFamily();
@@ -52,14 +53,25 @@ function KidPage({child, amazonKids}: {child: Child; amazonKids: boolean}) {
           <Icon name="pencil" />
         </Link>
       }>
+      {/* Who, the TV time (one number: what the jar shows, or what Amazon Kids is given), and the stars toward the next character. */}
       <div className="kid-hero">
         <Avatar avatar={child.avatar} color={child.color} size={88} />
-        <KidTime child={child} max={10} />
+        <div className="kid-hero-facts">
+          <KidTime child={child} max={12} jar={!amazonKids || child.usedTodaySec > 0} />
+          {child.puzzles.on ? (
+            <p className="kid-hero-stars" aria-label={t('puzzleStars', {n: child.puzzles.stars, max: child.puzzles.starsNeeded})}>
+              <Stars count={child.puzzles.stars} max={child.puzzles.starsNeeded} />
+              <span className="meta">{t('starsRule', {max: child.puzzles.starsNeeded})}</span>
+            </p>
+          ) : null}
+        </div>
       </div>
       <CharacterPrompt child={child} />
       {amazonKids ? <KidHandoff child={child} version={version} onChange={changed} /> : null}
       <TimeCard child={child} onDone={changed} />
       <BudgetCard child={child} amazonKids={amazonKids} />
+      <BedtimeCard child={child} amazonKids={amazonKids} />
+      <PuzzlesCard child={child} version={version} />
       <CharactersCard child={child} />
       <HistoryCard child={child} version={version} amazonKids={amazonKids} />
     </Page>
@@ -251,6 +263,129 @@ function BudgetCard({child, amazonKids}: {child: Child; amazonKids: boolean}) {
         {saved ? <SavedNote /> : null}
       </h2>
       <BudgetFields age={child.age} value={budget} amazonKids={amazonKids} onChange={setBudget} />
+    </section>
+  );
+}
+
+/** The subjects a puzzle can be about, by the backend's ids (a new one shows by its id until it has a name here). */
+/** Turning bedtime on starts from screens off at 19:00 and back at 07:00 [A] (docs/08, Oct 19). */
+const BEDTIME_DEFAULT: Bedtime = {from: '19:00', to: '07:00'};
+
+/**
+ * Bedtime: when TV time ends for the night. A TV in strict mode closes video apps for this kid then, whatever is in
+ * the jar, and a grown-up can allow 30 more minutes with the PIN on the TV; Amazon Kids has its own bedtime, set
+ * there. Saved a moment after a change, like the budget.
+ */
+function BedtimeCard({child, amazonKids}: {child: Child; amazonKids: boolean}) {
+  const {t} = useI18n();
+  const patch = usePatchChild(child.id);
+  const [bedtime, setBedtime] = useState<Bedtime | null>(() => child.bedtime ?? null);
+  // A bedtime that ends when it starts is half typed: nothing is saved until it is a real one.
+  const saved = useAutosave(bedtime, value => (value && value.from === value.to ? Promise.resolve() : patch({bedtime: value})));
+  const set = (end: keyof Bedtime) => (value: string) => {
+    if (bedtime && /^\d\d:\d\d/.test(value)) setBedtime({...bedtime, [end]: value.slice(0, 5)});
+  };
+  return (
+    <section className="card form">
+      <h2 className="card-title">
+        <Icon name="moon" />
+        {t('bedtimeTitle')}
+        {saved ? <SavedNote /> : null}
+      </h2>
+      <div className="setting-row">
+        <span className="grow">
+          <span className="row-title">{t('bedtimeSetting')}</span>
+          <span className="hint">{t(amazonKids ? 'bedtimeHintAmazonKids' : 'bedtimeHint')}</span>
+        </span>
+        <Switch checked={bedtime !== null} label={t('bedtimeSetting')} onChange={on => setBedtime(on ? (child.bedtime ?? BEDTIME_DEFAULT) : null)} />
+      </div>
+      {bedtime ? (
+        <div className="bedtime-times">
+          <Field label={t('bedtimeFrom')}>
+            <input type="time" value={bedtime.from} onChange={e => set('from')(e.target.value)} />
+          </Field>
+          <Field label={t('bedtimeTo')}>
+            <input type="time" value={bedtime.to} onChange={e => set('to')(e.target.value)} />
+          </Field>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+const SUBJECT: Record<string, Key> = {logic: 'subjectLogic', numbers: 'subjectNumbers', words: 'subjectWords', world: 'subjectWorld'};
+/** Rounds listed on the kid's page; the backend keeps more. */
+const ROUNDS_SHOWN = 5;
+
+/**
+ * Puzzles on the TV for this kid: on or off and how hard, changed right here like the budget (saved a moment after
+ * a tap), and how the last rounds went: each question right or missed, and the missed ones in words.
+ */
+function PuzzlesCard({child, version}: {child: Child; version: number}) {
+  const api = useApi();
+  const {t, lang} = useI18n();
+  const patch = usePatchChild(child.id);
+  const [settings, setSettings] = useState<PuzzleSettings>(() => ({puzzles: child.puzzles.on, puzzleLevel: child.puzzles.level}));
+  const saved = useAutosave(settings, value => patch(value));
+  const [rounds, setRounds] = useState<PuzzleRound[] | null>(null);
+  useEffect(() => {
+    let alive = true;
+    api.puzzleRounds(child.id).then(
+      list => {
+        if (alive) setRounds(list);
+      },
+      () => undefined,
+    );
+    return () => {
+      alive = false;
+    };
+  }, [api, child.id, version]);
+  const subject = (id: string) => (SUBJECT[id] ? t(SUBJECT[id]) : id);
+  // Where the kid's answers have put them, per subject (only while the difficulty follows the kid).
+  const levels = Object.entries(child.puzzles.levels).filter(([id]) => SUBJECT[id]);
+  const now = Date.now();
+  return (
+    <section className="card form">
+      <h2 className="card-title">
+        <Icon name="puzzle" />
+        {t('puzzlesTitle')}
+        {saved ? <SavedNote /> : null}
+      </h2>
+      <PuzzleFields value={settings} levelAges={child.puzzles.levelAges} starsNeeded={child.puzzles.starsNeeded} onChange={change => setSettings(current => ({...current, ...change}))} />
+      {settings.puzzles && !settings.puzzleLevel && levels.length ? (
+        <p className="meta">{t('puzzleNow', {levels: levels.map(([id, level]) => t('puzzleSubjectLevel', {subject: subject(id), n: level})).join(' · ')})}</p>
+      ) : null}
+      <h3 className="sub-title">{t('puzzleRoundsTitle')}</h3>
+      {rounds && rounds.length === 0 ? <p className="muted-ink">{t('puzzleNoRounds')}</p> : null}
+      {rounds && rounds.length > 0 ? (
+        <ul className="history">
+          {rounds.slice(0, ROUNDS_SHOWN).map(round => {
+            const missed = round.answers.filter(answer => !answer.right);
+            return (
+              <li key={round.at} className="history-row">
+                <span className="grow">
+                  <span className="round-line">
+                    <span className="round-marks" aria-hidden="true">
+                      {round.answers.map((answer, i) => (
+                        <span key={i} className={`round-mark${answer.right ? ' round-mark-right' : ''}`}>
+                          {answer.right ? <Icon name="check" size={12} /> : null}
+                        </span>
+                      ))}
+                    </span>
+                    <span className="history-reason">{t('puzzleRoundScore', {n: round.right, max: round.total})}</span>
+                  </span>
+                  <span className="meta">{timeAgo(lang, round.at, now)}</span>
+                  {missed.map((answer, i) => (
+                    <span key={i} className="round-missed">
+                      {t('puzzleMissed')} {answer.prompt} <span className="meta">({t('puzzleSubjectLevel', {subject: subject(answer.subject), n: answer.level})})</span>
+                    </span>
+                  ))}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
     </section>
   );
 }

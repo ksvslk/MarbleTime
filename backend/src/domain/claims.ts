@@ -1,5 +1,5 @@
 /** Claims: a kid's "I did it!" on the TV, and a grown-up's yes or not yet (docs/03 §4.1; rewards: budget.ts). */
-import {jobMinutes, rewardFor} from './budget';
+import {jobMinutes, keptPromise, rewardFor} from './budget';
 import type {Deps} from './deps';
 import {busy, conflict, notFound} from './errors';
 import {bumped, withoutChild} from './family';
@@ -7,10 +7,10 @@ import {currentChild} from './ledger';
 import {pushNewClaim} from './push';
 import type {Decision} from './repo';
 import {checkTvPin} from './pin';
-import {newId} from './secrets';
+import {newId, sha256Hex} from './secrets';
 import {isoWeekday, localDay, WEEK} from './time';
-import type {Claim, ClaimStatus, Device, Family, LedgerEntry} from './types';
-import type {ClaimInput, DecideInput} from './validate';
+import type {Claim, ClaimStatus, Device, Family, LedgerEntry, NotYetReason} from './types';
+import type {ClaimInput, DecideInput, PushDecisionInput} from './validate';
 import {claimView, newestFirst} from './views';
 
 /** GET /claims shows every waiting claim and at most this many decided ones, the latest first. */
@@ -27,7 +27,8 @@ const createdBy = (who: Who) => (who.by === 'parent' ? `parent:${who.sub}` : `tv
 export async function claimChore(deps: Deps, family: Family, input: ClaimInput) {
   const existing = await deps.repo.getClaim(family.id, input.id);
   if (existing) return {created: false, claim: claimView(existing)};
-  const [child, chore] = await Promise.all([deps.repo.getChild(family.id, input.childId), deps.repo.getChore(family.id, input.choreId)]);
+  // The jar as of now, so the promise is worked out on today's room.
+  const [child, chore] = await Promise.all([currentChild(deps, family, input.childId, true), deps.repo.getChore(family.id, input.choreId)]);
   if (!child) throw notFound('child');
   if (!chore) throw notFound('job');
   if (!chore.childIds.includes(child.id)) {
@@ -40,9 +41,13 @@ export async function claimChore(deps: Deps, family: Family, input: ClaimInput) 
   if (chore.repeat.kind === 'weekdays' && !chore.repeat.days.includes(isoWeekday(day))) {
     throw conflict('not_today', "This job isn't on today");
   }
+  // What the card shows is what a yes gives: the room the kid's other waiting claims were promised is spoken for.
+  const waiting = (await deps.repo.waitingClaims(family.id)).filter(c => c.childId === child.id);
+  const reservedMin = waiting.reduce((sum, c) => sum + (c.promised?.minutes ?? 0), 0);
+  const {reward, minutesCredited} = rewardFor(child, {minutes: chore.minutes}, reservedMin);
   const claim: Claim = {
-    id: input.id, childId: child.id, choreId: chore.id, choreTitle: chore.title, minutes: jobMinutes(chore.minutes), routine: chore.routine ?? false,
-    status: 'waiting', createdAt, slot: chore.repeat.kind === 'once' ? 'once' : day,
+    id: input.id, childId: child.id, choreId: chore.id, choreTitle: chore.title, minutes: jobMinutes(chore.minutes),
+    status: 'waiting', createdAt, slot: chore.repeat.kind === 'once' ? 'once' : day, promised: {reward, minutes: minutesCredited},
   };
   switch (await deps.repo.createClaim(family.id, claim)) {
     case 'created':
@@ -77,7 +82,7 @@ export async function takeBack(deps: Deps, family: Family, claimId: string): Pro
  * Yes or not yet, exactly once. Repeating the same decision returns the claim unchanged (nothing is credited
  * twice); the opposite decision after one was made is a 409.
  */
-export async function decide(deps: Deps, family: Family, claimId: string, yes: boolean, who: Who) {
+export async function decide(deps: Deps, family: Family, claimId: string, yes: boolean, who: Who, reason?: NotYetReason) {
   const status: ClaimStatus = yes ? 'approved' : 'rejected';
   for (let attempt = 0; attempt < 3; attempt++) {
     const claim = await deps.repo.getClaim(family.id, claimId);
@@ -86,7 +91,9 @@ export async function decide(deps: Deps, family: Family, claimId: string, yes: b
     if (claim.status !== 'waiting') throw conflict('already_decided', `This claim was already ${claim.status}`);
     const now = deps.now();
     const decided: Claim = {...claim, status, decidedAt: now, decidedBy: who.by};
-    const decision: Decision = yes ? await approval(deps, family, decided, who, now) : {claim: decided, releaseSlot: true};
+    const decision: Decision = yes
+      ? await approval(deps, family, decided, who, now)
+      : {claim: {...decided, ...(reason !== undefined && {notYetReason: reason})}, releaseSlot: true};
     if ((await deps.repo.decideClaim(family.id, decision)) === 'ok') {
       deps.changed(family.id);
       return claimView(decision.claim);
@@ -97,9 +104,10 @@ export async function decide(deps: Deps, family: Family, claimId: string, yes: b
 }
 
 /**
- * What a yes gives (budget.ts rewardFor, the same rule on the phone and on the TV): marbles into the jar while it has
- * room (waiting for the Amazon Kids hand-off), a character token once it's full, praise for a routine job. A parent
- * who set a name signs it ("– Dad"). A one-off job is then done for this kid.
+ * What a yes gives, the same on the phone and on the TV: what the claim was promised at "I did it!" (budget.ts
+ * keptPromise). Marbles go into the jar (waiting for the Amazon Kids hand-off); a job that didn't fit gives the part
+ * that fitted and a character token (a claim promised praise before Oct 13 keeps that). A parent who set a name signs it ("– Dad"). A one-off
+ * job is then done for this kid.
  */
 async function approval(deps: Deps, family: Family, claim: Claim, who: Who, now: number): Promise<Decision> {
   const familyId = family.id;
@@ -110,10 +118,12 @@ async function approval(deps: Deps, family: Family, claim: Claim, who: Who, now:
     who.by === 'parent' ? deps.repo.getParentName(who.sub) : undefined,
   ]);
   if (!child) throw notFound('child');
-  // Claims from before routine jobs existed follow the job as it is now.
-  const {reward, minutesCredited} = rewardFor(child, {minutes: claim.minutes, routine: claim.routine ?? chore?.routine ?? false});
+  // Claims from before promises existed get what the jar has room for now.
+  const {reward, minutesCredited} = claim.promised
+    ? keptPromise(child, {reward: claim.promised.reward, minutesCredited: claim.promised.minutes})
+    : rewardFor(child, {minutes: claim.minutes});
   const approved: Claim = {...claim, reward, minutesCredited, ...(approverName !== undefined && {approverName})};
-  const entry: LedgerEntry | undefined = reward === 'marbles' ? {
+  const entry: LedgerEntry | undefined = minutesCredited > 0 ? {
     id: newId(), childId: claim.childId, deltaSec: minutesCredited * 60, type: 'CHORE', reason: claim.choreTitle,
     refId: claim.id, createdBy: createdBy(who), createdAt: now, handoff: 'PENDING',
   } : undefined;
@@ -125,10 +135,23 @@ async function approval(deps: Deps, family: Family, claim: Claim, who: Who, now:
   return {claim: approved, releaseSlot: true, ...credit, chore: {before: chore, after: after && {...after, updatedAt: bumped(deps, chore)}}};
 }
 
+/**
+ * A grown-up answers from the notification itself, with the pass their browser was sent (push.ts). The pass works
+ * once and for a day; the answer counts as that parent's, like one given in the app. Without a valid pass: 404 (the
+ * grown-up opens the app instead).
+ */
+export async function decideWithPass(deps: Deps, input: PushDecisionInput) {
+  const pass = await deps.repo.takePushPass(sha256Hex(input.token));
+  if (!pass || pass.expiresAt <= deps.now()) throw notFound('pass');
+  const family = await deps.repo.getFamily(pass.familyId);
+  if (!family) throw notFound('family');
+  return decide(deps, family, pass.claimId, input.yes, {by: 'parent', sub: pass.sub});
+}
+
 /** A grown-up decides on the TV with the family PIN (pin.ts: more than 5 wrong PINs a minute on one TV → 429). */
 export async function decideOnTv(deps: Deps, family: Family, device: Device, claimId: string, input: DecideInput) {
   await checkTvPin(deps, family, device, input.pin);
-  return decide(deps, family, claimId, input.yes, {by: 'tv', deviceId: device.id});
+  return decide(deps, family, claimId, input.yes, {by: 'tv', deviceId: device.id}, input.reason);
 }
 
 /** Newest first: every waiting claim, plus the latest decided ones (filtered by `status` if given). */

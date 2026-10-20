@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {budgetOf, changedBudget, defaultBase, defaultMax, jobMinutes, maxCeiling, rewardFor} from '../src/domain/budget';
+import {budgetOf, changedBudget, defaultBase, defaultMax, jobMinutes, keptPromise, maxCeiling, rewardFor} from '../src/domain/budget';
 import {DAY, family, setup} from './helpers';
 
 const kid = (age: number, balanceMin: number, budget: {dailyMaxMin?: number; dailyBaseMin?: number} = {}) => ({age, balanceSec: balanceMin * 60, ...budget});
@@ -36,39 +36,53 @@ describe('the daily budget (docs/08 §1)', () => {
 });
 
 describe('what approving a job gives (rewardFor)', () => {
-  it('praises a routine job, crediting nothing, whatever the jar holds', () => {
-    expect(rewardFor(kid(5, 0), {minutes: 30, routine: true})).toEqual({reward: 'praise', minutesCredited: 0});
-    expect(rewardFor(kid(5, 30), {minutes: 10, routine: true})).toEqual({reward: 'praise', minutesCredited: 0});
-  });
-
   it('puts the job\'s marbles in the jar while there is room for them', () => {
     // Under 7: a 60-minute jar with 30 given, so 30 to earn.
-    expect(rewardFor(kid(5, 0), {minutes: 30, routine: false})).toEqual({reward: 'marbles', minutesCredited: 30});
-    expect(rewardFor(kid(5, 10), {minutes: 20, routine: false})).toEqual({reward: 'marbles', minutesCredited: 20});
+    expect(rewardFor(kid(5, 0), {minutes: 30})).toEqual({reward: 'marbles', minutesCredited: 30});
+    expect(rewardFor(kid(5, 10), {minutes: 20})).toEqual({reward: 'marbles', minutesCredited: 20});
     // From 7: 90 with 50 given, so 40 to earn.
-    expect(rewardFor(kid(8, 10), {minutes: 30, routine: false})).toEqual({reward: 'marbles', minutesCredited: 30});
+    expect(rewardFor(kid(8, 10), {minutes: 30})).toEqual({reward: 'marbles', minutesCredited: 30});
   });
 
-  it('credits only what fits, in whole marbles, when the job is worth more than the room left', () => {
-    expect(rewardFor(kid(5, 10), {minutes: 30, routine: false})).toEqual({reward: 'marbles', minutesCredited: 20});
-    expect(rewardFor(kid(8, 30), {minutes: 30, routine: false})).toEqual({reward: 'marbles', minutesCredited: 10});
+  it('gives the part that fits and a character for the rest when the job is worth more than the room left', () => {
+    expect(rewardFor(kid(5, 10), {minutes: 30})).toEqual({reward: 'character', minutesCredited: 20});
+    expect(rewardFor(kid(8, 30), {minutes: 30})).toEqual({reward: 'character', minutesCredited: 10});
     // An odd balance from older data: 15 minutes of room is one marble.
-    expect(rewardFor(kid(5, 15), {minutes: 30, routine: false})).toEqual({reward: 'marbles', minutesCredited: 10});
+    expect(rewardFor(kid(5, 15), {minutes: 30})).toEqual({reward: 'character', minutesCredited: 10});
+    // A job that fits exactly fills the jar and is just marbles.
+    expect(rewardFor(kid(5, 10), {minutes: 20})).toEqual({reward: 'marbles', minutesCredited: 20});
+  });
+
+  it('leaves out room already promised to the kid\'s other waiting claims', () => {
+    expect(rewardFor(kid(5, 0), {minutes: 20}, 10)).toEqual({reward: 'marbles', minutesCredited: 20});
+    expect(rewardFor(kid(5, 0), {minutes: 20}, 20)).toEqual({reward: 'character', minutesCredited: 10});
+    expect(rewardFor(kid(5, 0), {minutes: 20}, 30)).toEqual({reward: 'character', minutesCredited: 0});
+  });
+
+  it('keeps a promise at approval; only the jar\'s maximum can cut it, and the cut is a character (keptPromise)', () => {
+    const marbles = {reward: 'marbles' as const, minutesCredited: 20};
+    expect(keptPromise(kid(5, 0), marbles)).toEqual(marbles);
+    expect(keptPromise(kid(5, 10), marbles)).toEqual(marbles);
+    expect(keptPromise(kid(5, 20), marbles)).toEqual({reward: 'character', minutesCredited: 10});
+    expect(keptPromise(kid(5, 30), marbles)).toEqual({reward: 'character', minutesCredited: 0});
+    // More room than when it was promised changes nothing: the card showed a character.
+    expect(keptPromise(kid(5, 0), {reward: 'character', minutesCredited: 0})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(keptPromise(kid(5, 30), {reward: 'praise', minutesCredited: 0})).toEqual({reward: 'praise', minutesCredited: 0});
   });
 
   it('gives a character token instead of time once the jar is full (less than a marble of room)', () => {
-    expect(rewardFor(kid(5, 30), {minutes: 10, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
-    expect(rewardFor(kid(5, 25), {minutes: 10, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
-    expect(rewardFor(kid(8, 90), {minutes: 30, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(5, 30), {minutes: 10})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(5, 25), {minutes: 10})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(8, 90), {minutes: 30})).toEqual({reward: 'character', minutesCredited: 0});
     // A base as big as the jar: everything earns characters.
-    expect(rewardFor(kid(9, 0, {dailyMaxMin: 60, dailyBaseMin: 60}), {minutes: 10, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(9, 0, {dailyMaxMin: 60, dailyBaseMin: 60}), {minutes: 10})).toEqual({reward: 'character', minutesCredited: 0});
     // Marbles never disappear: a jar that is over full (a bonus, or an older bigger budget) gives characters too.
-    expect(rewardFor(kid(5, 50), {minutes: 10, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(5, 50), {minutes: 10})).toEqual({reward: 'character', minutesCredited: 0});
   });
 
   it('reads old job values and budgets by today\'s rules', () => {
-    expect(rewardFor(kid(5, 0, {dailyBaseMin: 25}), {minutes: 15, routine: false})).toEqual({reward: 'marbles', minutesCredited: 20});
-    expect(rewardFor(kid(9, 0, {dailyBaseMin: 240}), {minutes: 15, routine: false})).toEqual({reward: 'character', minutesCredited: 0});
+    expect(rewardFor(kid(5, 0, {dailyBaseMin: 25}), {minutes: 15})).toEqual({reward: 'marbles', minutesCredited: 20});
+    expect(rewardFor(kid(9, 0, {dailyBaseMin: 240}), {minutes: 15})).toEqual({reward: 'character', minutesCredited: 0});
   });
 });
 
@@ -96,34 +110,70 @@ describe('approving through the API: the same rule on the phone and on the TV', 
     expect(ledger.entries.map((e: {deltaSec: number}) => e.deltaSec)).toEqual([600, 600, 600]);
   });
 
-  it('credits part of a job when only part fits', async () => {
+  it('fills the jar with the part that fits and gives a character for the rest', async () => {
     const f = await family();
     const {body: big} = await f.mom.post('/chores', {title: 'Clean the garage', minutes: 30, childIds: [f.mia.id]});
     await f.mom.post(`/children/${f.mia.id}/adjust`, {deltaMin: 10, reason: 'Kind'});
     f.clock.now += 1000; // so the ledger's newest entry is the job's
     const {body: claim} = await f.claim(f.mia.id, big.id);
-    expect((await f.mom.post(`/claims/${claim.id}/approve`)).body).toMatchObject({minutes: 30, reward: 'marbles', minutesCredited: 20});
-    expect(await f.balance(f.mia.id)).toBe(1800);
+    expect(claim.promised).toEqual({reward: 'character', minutes: 20});
+    expect((await f.mom.post(`/claims/${claim.id}/approve`)).body).toMatchObject({minutes: 30, reward: 'character', minutesCredited: 20});
+    expect(await f.child(f.mia.id)).toMatchObject({balanceSec: 1800, characterTokens: 1});
     const {body: ledger} = await f.mom.get(`/children/${f.mia.id}/ledger`);
     expect(ledger.entries[0]).toMatchObject({type: 'CHORE', deltaSec: 1200, handoff: 'PENDING'});
   });
 
-  it('praises a routine job without a marble, even with room in the jar (the job is read as it was when claimed)', async () => {
+  it('gives what the card showed at "I did it!": waiting claims hold their room, whatever is decided first', async () => {
     const f = await family();
-    await f.mom.patch(`/chores/${f.teeth.id}`, {routine: true});
+    // Mia: a 60-minute jar, 30 given, so room for 3 marbles.
+    const {body: big} = await f.mom.post('/chores', {title: 'Clean the garage', minutes: 20, childIds: [f.mia.id]});
+    const {body: bed} = await f.mom.post('/chores', {title: 'Make the bed', minutes: 20, childIds: [f.mia.id]});
+    const {body: first} = await f.claim(f.mia.id, big.id);
+    const {body: second} = await f.claim(f.mia.id, bed.id);
+    expect(first.promised).toEqual({reward: 'marbles', minutes: 20});
+    expect(second.promised).toEqual({reward: 'character', minutes: 10});
+    // The second is approved first, and the first gets a "not yet": both get exactly what they were shown.
+    expect((await f.mom.post(`/claims/${second.id}/approve`)).body).toMatchObject({reward: 'character', minutesCredited: 10});
+    expect((await f.mom.post(`/claims/${first.id}/reject`)).body).toMatchObject({status: 'rejected', promised: {reward: 'marbles', minutes: 20}});
+    expect(await f.child(f.mia.id)).toMatchObject({balanceSec: 600, characterTokens: 1});
+    // Its room is free again for the next claim.
+    const {body: third} = await f.claim(f.mia.id, f.toys.id);
+    expect(third.promised).toEqual({reward: 'marbles', minutes: 10});
+  });
+
+  it('never goes over the maximum for a promise: a jar filled meanwhile turns the rest into a character', async () => {
+    const f = await family();
+    const {body: big} = await f.mom.post('/chores', {title: 'Clean the garage', minutes: 20, childIds: [f.mia.id]});
+    const {body: claim} = await f.claim(f.mia.id, big.id);
+    expect(claim.promised).toEqual({reward: 'marbles', minutes: 20});
+    await f.mom.post(`/children/${f.mia.id}/adjust`, {deltaMin: 20, reason: 'Kind'});
+    expect((await f.mom.post(`/claims/${claim.id}/approve`)).body).toMatchObject({reward: 'character', minutesCredited: 10});
+    expect(await f.child(f.mia.id)).toMatchObject({balanceSec: 1800, characterTokens: 1});
+  });
+
+  it('gives every job its TV time: a job once marked routine earns its marbles like any other', async () => {
+    const f = await family();
+    // The switch is gone: sending it changes nothing, and jobs always read as not routine.
+    expect((await f.mom.patch(`/chores/${f.teeth.id}`, {routine: true})).body.routine).toBe(false);
+    // A job stored as routine by an older version gives its minutes too.
+    const stored = (await f.repo.getChore(f.familyId, f.teeth.id))!;
+    await f.repo.putChore(f.familyId, {...stored, routine: true});
     const {body: claim} = await f.claim(f.leo.id, f.teeth.id);
-    await f.mom.patch(`/chores/${f.teeth.id}`, {routine: false}); // too late for this claim
-    expect((await f.mom.post(`/claims/${claim.id}/approve`)).body).toMatchObject({reward: 'praise', minutesCredited: 0});
-    expect(await f.child(f.leo.id)).toMatchObject({balanceSec: 0, characterTokens: 0});
-    expect((await f.mom.get(`/children/${f.leo.id}/ledger`)).body.entries).toEqual([]);
-    // A claim made before routine jobs existed follows the job as it is now.
+    expect(claim.promised).toEqual({reward: 'marbles', minutes: 10});
+    expect((await f.mom.post(`/claims/${claim.id}/approve`)).body).toMatchObject({reward: 'marbles', minutesCredited: 10});
+    expect(await f.child(f.leo.id)).toMatchObject({balanceSec: 600});
+    // A claim that was promised praise before the change keeps its promise.
     const {body: old} = await f.claim(f.mia.id, f.teeth.id);
-    const stored = (await f.repo.getClaim(f.familyId, old.id))!;
-    const {routine: _, ...before} = stored;
-    await f.repo.deleteClaim(f.familyId, stored);
-    await f.repo.createClaim(f.familyId, before);
-    await f.mom.patch(`/chores/${f.teeth.id}`, {routine: true});
-    expect((await f.mom.post(`/claims/${old.id}/approve`)).body).toMatchObject({reward: 'praise'});
+    const waiting = (await f.repo.getClaim(f.familyId, old.id))!;
+    await f.repo.deleteClaim(f.familyId, waiting);
+    await f.repo.createClaim(f.familyId, {...waiting, routine: true, promised: {reward: 'praise', minutes: 0}});
+    expect((await f.mom.post(`/claims/${old.id}/approve`)).body).toMatchObject({reward: 'praise', minutesCredited: 0});
+    // And one from before promises existed gets what the jar has room for.
+    const {body: older} = await f.claim(f.mia.id, f.toys.id);
+    const {promised: _, ...before} = (await f.repo.getClaim(f.familyId, older.id))!;
+    await f.repo.deleteClaim(f.familyId, {...before, promised: undefined} as never);
+    await f.repo.createClaim(f.familyId, {...before, routine: true});
+    expect((await f.mom.post(`/claims/${older.id}/approve`)).body).toMatchObject({reward: 'marbles', minutesCredited: 10});
   });
 
   it('never lets two approvals at once overfill the jar', async () => {

@@ -61,7 +61,22 @@ MATHS = {"en": ("plus", "is"), "et": ("pluss", "on"), "de": ("plus", "ist"), "es
 def lines_by_lang() -> dict:
     tsx = SHARED / "node_modules/.bin/tsx"
     out = subprocess.run([str(tsx), str(ROOT / "scripts/voice-lines.ts")], check=True, capture_output=True, text=True)
-    return json.loads(out.stdout)
+    printed = json.loads(out.stdout)
+    NUMBERS.update(printed["numbers"])
+    return printed["lines"]
+
+
+# Each language's words for 0–20 (from the app), longest first when matching.
+NUMBERS: dict = {}
+
+
+def digits(lang: str, text: str) -> str:
+    """The line with its number words as digits ("Three marbles" → "3 marbles"): the listener writes numbers as
+    digits, so the two are compared the same way."""
+    words = sorted(enumerate(NUMBERS.get(lang, [])), key=lambda pair: -len(pair[1]))
+    for n, word in words:
+        text = re.sub(rf"(?<!\w){re.escape(word)}(?!\w)", str(n), text, flags=re.IGNORECASE)
+    return text
 
 
 def spoken(lang: str, text: str) -> str:
@@ -73,18 +88,25 @@ def clip_name(lang: str, text: str) -> str:
     return hashlib.sha1(f"{lang}|{MODEL}|{VOICE}|{style(lang)}|{PROCESSING}|{text}".encode()).hexdigest()[:12] + ".mp3"
 
 
+_AUTH: dict = {}
+
+
 def google_auth() -> tuple[str, str]:
-    token = subprocess.run(["gcloud", "auth", "print-access-token"], check=True, capture_output=True, text=True).stdout.strip()
-    project = os.environ.get("GOOGLE_CLOUD_PROJECT") or subprocess.run(
-        ["gcloud", "config", "get-value", "project"], check=True, capture_output=True, text=True).stdout.strip()
-    return token, project
+    """The gcloud sign-in's token and project. The token is asked for again every few minutes: gcloud hands out the
+    one it has until that is about to run out, and a long recording run outlives it."""
+    if not _AUTH or time.time() - _AUTH["at"] > 240:
+        _AUTH["token"] = subprocess.run(["gcloud", "auth", "print-access-token"], check=True, capture_output=True, text=True).stdout.strip()
+        _AUTH.setdefault("project", os.environ.get("GOOGLE_CLOUD_PROJECT") or subprocess.run(
+            ["gcloud", "config", "get-value", "project"], check=True, capture_output=True, text=True).stdout.strip())
+        _AUTH["at"] = time.time()
+    return _AUTH["token"], _AUTH["project"]
 
 
 def google(url: str, body: dict, auth: tuple[str, str]) -> dict:
     """POST to a Google API; a timeout, a busy model or the per-minute quota (low on this project) is waited out."""
-    token, project = auth
     answer: dict = {}
     for attempt in range(8):
+        token, project = google_auth()
         # The body goes in on stdin: no audio (or token) on a command line or in an error message.
         out = subprocess.run(
             ["curl", "-sS", "-m", "60", "-X", "POST", url, "-H", f"Authorization: Bearer {token}",
@@ -162,7 +184,7 @@ def check(lang: str, text: str, wav_path: pathlib.Path, auth: tuple[str, str]) -
     if seconds > 1.0 + 0.15 * len(text):
         return f"{seconds:.1f} s of speech is too long"
     transcript = heard(lang, padded(wav_path), auth)
-    score = difflib.SequenceMatcher(None, letters(spoken(lang, text)), letters(transcript)).ratio()
+    score = difflib.SequenceMatcher(None, letters(digits(lang, spoken(lang, text))), letters(digits(lang, transcript))).ratio()
     return None if score >= MATCH else f"heard {transcript!r} ({score:.2f})"
 
 

@@ -31,6 +31,7 @@ npm install
 npm test                    # typecheck + all tests (in memory; no model or AWS call)
 npm run dev                 # API on http://0.0.0.0:8787 (PORT=…), data in memory; a TV on the LAN can reach it
 npm run dev -- --seed       # … with the demo family (below)
+DATA_FILE=../.data/dev.bin npm run dev   # … data kept in that file between runs (scripts/dev.sh does this)
 MODEL_ID=fake npm run dev -- --seed   # characters without any model (a template character in the card's colours)
 npx cdk synth               # CloudFormation template in cdk.out/; needs no AWS account
 ../scripts/fire.sh backend local      # the Fire TV uses this machine's server (pair it from the LAN parent app; `backend cloud` goes back)
@@ -82,7 +83,7 @@ Deployed as `MarbleTime-dev` (us-east-1). Each deploy is approved by the user:
 
 The voices (Cloud Text-to-Speech, Gemini-TTS) and listening (Vertex AI, Gemini) are Google services, so the API Lambda needs Google credentials. The plan is **keyless Workload Identity Federation from the Lambda's AWS role** (no service-account key to store or rotate):
 1. In the Google project: enable `texttospeech.googleapis.com` and `aiplatform.googleapis.com`; create a service account (e.g. `marbletime-speech`) with `roles/aiplatform.user`, and let it use the project's quota (`roles/serviceusage.serviceUsageConsumer`).
-2. Create a workload identity pool with an **AWS provider** for account 713072916910, and give the API Lambda's role (`principalSet://iam.googleapis.com/projects/<number>/locations/global/workloadIdentityPools/<pool>/attribute.aws_role/arn:aws:sts::713072916910:assumed-role/<ApiFunction role name>`) `roles/iam.workloadIdentityUser` on the service account.
+2. Create a workload identity pool with an **AWS provider** for account <aws account id>, and give the API Lambda's role (`principalSet://iam.googleapis.com/projects/<number>/locations/global/workloadIdentityPools/<pool>/attribute.aws_role/arn:aws:sts::<aws account id>:assumed-role/<ApiFunction role name>`) `roles/iam.workloadIdentityUser` on the service account.
 3. In the code (not built yet): a token source in `src/ai/google-auth.ts` that signs an AWS `GetCallerIdentity` request with the Lambda's own credentials, exchanges it at `sts.googleapis.com` for a federated token, and impersonates the service account (`iamcredentials.googleapis.com … :generateAccessToken`); `google-auth-library`'s external-account client (Apache-2.0) does exactly this from the Lambda's environment. It replaces `notInAwsYet()` in `src/lambda.ts`.
 4. Deploy with `--context googleProject=<id> --context googleWifProvider=//iam.googleapis.com/projects/<number>/locations/global/workloadIdentityPools/<pool>/providers/<provider> --context googleServiceAccount=<email>`; the stack hands them to the API Lambda (`GOOGLE_CLOUD_PROJECT`, `GOOGLE_WIF_PROVIDER`, `GOOGLE_SERVICE_ACCOUNT`).
 

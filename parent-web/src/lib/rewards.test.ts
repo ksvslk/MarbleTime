@@ -29,6 +29,11 @@ describe('what an approval gave', () => {
     expect(rewardText('en', approved({minutes: 30, reward: 'marbles', minutesCredited: 5}), 'Mia')).toBe('Mia +5 min');
   });
 
+  it('character with marbles: the job only partly fitted', () => {
+    expect(rewardText('en', approved({reward: 'character', minutesCredited: 10}), 'Mia')).toBe('Mia +1 marble and a new character');
+    expect(rewardText('et', approved({reward: 'character', minutesCredited: 20}), 'Mia')).toBe('Mia +2 kuuli ja uus tegelane');
+  });
+
   it('character: the jar was full', () => {
     expect(rewardText('en', approved({reward: 'character', minutesCredited: 0}), 'Mia')).toBe('Jar was full: Mia earned a new character');
     expect(rewardText('es', approved({reward: 'character', minutesCredited: 0}), 'Mia')).toBe('El tarro estaba lleno: Mia ganó un personaje nuevo');

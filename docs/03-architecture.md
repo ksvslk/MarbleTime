@@ -331,7 +331,7 @@ CLAUDE.md · FRICTION_LOG.md · FEEDBACK.md · FEATURE_REQUESTS.md
 
 **Speaking:** lines are pre-written templates in the family's language (`characters.ts`: en, et, de, es), never AI-written; the TV asks `POST /device/speech` for each with the character's id. Gemini-TTS speaks it **in character**: the character's own Gemini voice (one of 12, picked by the art director) and a speaking style composed from fixed words (what it is, its mood, and its voice traits: pitch, pace, energy, texture, also picked by the art director), so the kid's idea never reaches the speech model as instructions. The audio is loudness-normalised to about −16 LUFS (like the read-aloud), returned as WAV with the mouth's opening every 40 ms, cached per character, language and text. The line plays after the read-aloud; MarbleAudio's `onLine` event starts the mouth.
 
-**Listening:** the kid's idea, recorded on the parent's phone, goes to Gemini as audio for an exact transcript in the family's language (no audio or words are kept).
+**Listening:** none since Oct 19 (docs/08, Decisions Oct 19): the kid's idea is typed, on the TV or by a grown-up in the phone app. (Until then it was recorded on the parent's phone and transcribed by Gemini.)
 
 **Models:** Gemini 3.8 Flash on Vertex AI for local runs; Bedrock (Claude Haiku 4.5) in the cloud once AWS lifts the account block (FRICTION_LOG). Measured before the art director and picture check existed: 100 of 100 drawings valid after at most one repair, median 23.5 s, p90 44 s, 1.26 ¢ each.
 

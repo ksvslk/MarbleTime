@@ -1,13 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Image, ScrollView, StyleSheet, View} from 'react-native';
-import {Avatar, ART, Button, FitText, Focusable, Icon, Jar, Marble, MarbleRow, Sparkle, T} from '../components';
-import {KidId, textOf} from '../data';
-import {t} from '../i18n';
-import {buddyOf, Character, drawingFor, isDone, jarSize, marblesIn, notYetToday, rewardFor, State, takenToday, timeToday, tokensOf, useStore, Why} from '../state';
+import {Avatar, ART, Button, FitText, Focusable, Icon, Jar, Marble, MarbleRow, RewardPill, Sparkle, T} from '../components';
+import {Kid, KidId, textOf} from '../data';
+import {Lang, t} from '../i18n';
+import {bedtimeMinutes, buddyOf, Character, drawingFor, Gives, givesOf, inBedtime, isDone, jarSize, marblesIn, notYetToday, puzzlesOf, State, stillPicked, takenToday, timeToday, tokensOf, useStore, Why} from '../state';
 import {colors, MIN_PER_MARBLE, s} from '../theme';
 import {Sound} from '../sound';
-import {Appear, Flip, Twinkle} from '../motion';
+import {Appear, Beat, Flip, Twinkle} from '../motion';
 import {narration, useSay} from '../speech';
+import {Strict} from '../strict';
+import {StarRow} from './PuzzleScreen';
 import {CharacterView} from '../CharacterView';
 import {lineFor, Moment, playLine, useArt, useLine, useTalk} from '../characters';
 
@@ -16,6 +18,16 @@ const kidOf = (state: State, id: KidId) => state.family.kids.find(k => k.id === 
 const pendingMinutes = (state: State, id: KidId) => state.celebrations.reduce((sum, c) => sum + (c.kidId === id && 'marbles' in c ? c.marbles * MIN_PER_MARBLE : 0), 0);
 /** Kid-facing text goes through this: the language tag turns on CAPITALS when the grown-ups chose it. */
 export const capsOf = (state: State) => (state.caps ? state.lang : false);
+
+/** What a job gives, in words to read aloud: "Two marbles", "and a new character", "A thank-you". */
+function givesLines(lang: Lang, gives: Gives): string[] {
+  if (gives.reward === 'praise') return [t(lang, 'sayPraise')];
+  const marbles = Math.round(gives.minutes / MIN_PER_MARBLE);
+  const said = marbles >= 1 && marbles <= 3 ? [t(lang, `sayMarbles${marbles as 1 | 2 | 3}`)] : [];
+  return gives.reward === 'character' ? [...said, t(lang, said.length ? 'sayAndCharacter' : 'sayCharacter')] : said;
+}
+/** "Not yet" notes already read aloud since the app started (by claim id): each is read once. */
+const saidNotYet = new Set<string>();
 
 /** Screen 1 · "Who's here?" — any number of kids, any name length. */
 export function WhoScreen() {
@@ -58,12 +70,121 @@ export function WhoScreen() {
           </Appear>
         ))}
       </View>
+      {Strict.available && state.strict && kids.length ? (
+        // Strict mode: video apps open for the kids who say they are watching.
+        <View style={{position: 'absolute', left: s(96), bottom: s(54)}}>
+          <Focusable label={t(lang, 'watchTv')} onPress={() => dispatch({type: 'go', screen: {name: 'watch'}})} style={styles.smallChip}>
+            <Icon name="play" size={s(30)} color={colors.white} />
+            <FitText text={t(lang, 'watchTv')} width={s(320)} max={s(30)} min={s(22)} style={{marginLeft: s(12), fontWeight: '500'}} />
+          </Focusable>
+        </View>
+      ) : null}
       <View style={{position: 'absolute', right: s(96), bottom: s(54)}}>
         <Focusable label={t(lang, 'grownups')} preferred={!kids.length} onPress={() => dispatch({type: 'go', screen: {name: 'pin'}})} style={styles.smallChip}>
           <Icon name="lock" size={s(30)} color={colors.white} />
           <FitText text={t(lang, 'grownups')} width={s(320)} max={s(30)} min={s(22)} style={{marginLeft: s(12), fontWeight: '500'}} />
         </Focusable>
       </View>
+    </View>
+  );
+}
+
+/**
+ * Strict mode · "Who's watching?": the kids who will watch pick themselves (the TV is shared, and each pays from
+ * their own jar), then "Watch" lets the video apps open. The counter on the stick also opens this screen by itself
+ * when a video app is in front with nobody picked, or when a watcher's jar is empty. One row: the kids, then Watch.
+ */
+export function WatchScreen({why}: {why?: 'who' | 'empty' | 'bedtime'}) {
+  const {state, dispatch} = useStore();
+  const {lang} = state;
+  const caps = capsOf(state);
+  const kids = state.family.kids;
+  const [picked, setPicked] = useState<KidId[]>([]);
+  // Bedtime can begin while this screen is open.
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000);
+    return () => clearInterval(timer);
+  }, []);
+  // Seconds left today: the backend's count, or this TV's own jar until the first answer.
+  const leftSec = (id: KidId) => Math.max(0, state.leftSec[id] ?? timeToday(state, id) * 60);
+  // A kid's bedtime has begun, unless a grown-up allowed 30 more minutes with the PIN.
+  const allowedUntil = Strict.state()?.bedtimeAllowedUntil ?? 0;
+  const asleep = (kid: Kid) => now >= allowedUntil && inBedtime(kid, now);
+  const canWatch = (id: KidId) => {
+    const kid = kids.find(k => k.id === id);
+    return kid !== undefined && leftSec(id) >= 60 && !asleep(kid);
+  };
+  // Opened because a jar ran out or bedtime began: say whose, so the kids know why the video stopped.
+  const [stoppedKid] = useState(() => {
+    const watched = (k: Kid) => Strict.state()?.watchers.find(w => w.childId === k.id);
+    if (why === 'empty') return kids.find(k => (watched(k)?.leftSec ?? 1) <= 0);
+    if (why === 'bedtime') return kids.find(k => watched(k) && inBedtime(k, Date.now()));
+    return undefined;
+  });
+  const title = !stoppedKid ? t(lang, 'watchTitle') : t(lang, why === 'bedtime' ? 'bedtimeKid' : 'jarEmpty', {kid: stoppedKid.name});
+  const say = useSay();
+  useEffect(() => {
+    say(stoppedKid ? [title, t(lang, 'watchTitle')] : [title]);
+  }, [say, lang, title, stoppedKid]);
+  const toggle = (id: KidId) => setPicked(current => (current.includes(id) ? current.filter(k => k !== id) : [...current, id]));
+  // A kid who can't watch any more (the jar ran out, bedtime began) is picked no more.
+  const chosen = stillPicked(picked, canWatch);
+  useEffect(() => {
+    if (chosen.length !== picked.length) setPicked(chosen);
+  }, [chosen, picked.length]);
+  // The remote starts on the first kid who can watch; at bedtime with nobody who can, on "30 more minutes".
+  const bedtimeNow = kids.some(asleep);
+  const nobody = !kids.some(k => canWatch(k.id));
+  const first = kids.find(k => canWatch(k.id))?.id ?? (bedtimeNow ? undefined : kids[0]?.id);
+  const watch = () => {
+    Strict.startSession(chosen.map(id => ({childId: id, leftSec: leftSec(id), ...bedtimeMinutes(kids.find(k => k.id === id) ?? {})})));
+    dispatch({type: 'go', screen: {name: 'who'}});
+    Strict.leave();
+  };
+  const avatar = kids.length <= 2 ? 300 : kids.length === 3 ? 260 : 210;
+  return (
+    <View style={[styles.screen, {alignItems: 'center'}]}>
+      <FitText text={title} caps={caps} width={s(1600)} max={s(110)} min={s(56)} style={{marginTop: s(40), textAlign: 'center'}} />
+      {stoppedKid ? <FitText text={t(lang, 'watchTitle')} caps={caps} width={s(1400)} max={s(56)} min={s(34)} style={{color: colors.soft, marginTop: s(10), textAlign: 'center'}} /> : null}
+      <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
+        {kids.map((kid, i) => {
+          const minutes = Math.floor(leftSec(kid.id) / 60);
+          const sleeping = asleep(kid);
+          const on = chosen.includes(kid.id);
+          return (
+            <Appear key={kid.id} from="pop" delay={120 + i * 110} style={{alignItems: 'center', marginHorizontal: s(36), width: s(avatar + 40)}}>
+              <View style={{alignItems: 'center', opacity: canWatch(kid.id) ? 1 : 0.4}}>
+              {/* A kid with an empty jar (their jobs are on their board) or whose bedtime began can't be picked. */}
+              <Focusable preferred={kid.id === first} label={kid.name} onPress={() => canWatch(kid.id) && toggle(kid.id)} style={{borderRadius: s(avatar), padding: s(6)}}>
+                <Avatar art={kid.avatar} bg={kid.avatarBg} size={s(avatar)} />
+                {on ? (
+                  <Appear from="pop" style={[styles.badge, {top: s(-6), right: s(-6)}]}>
+                    <Icon name="check" size={s(54)} />
+                  </Appear>
+                ) : null}
+              </Focusable>
+              <FitText text={kid.name} caps={caps} width={s(avatar + 40)} max={s(64)} min={s(32)} style={{marginTop: s(20), textAlign: 'center'}} />
+              <View style={[styles.smallChip, {marginTop: s(14)}]}>
+                <Icon name={sleeping ? 'moon' : 'clock'} size={s(32)} color={colors.white} />
+                <T style={{fontSize: s(34), marginLeft: s(12)}}>{sleeping ? t(lang, 'bedtime') : t(lang, 'minutes', {n: minutes})}</T>
+              </View>
+              </View>
+            </Appear>
+          );
+        })}
+        {chosen.length ? (
+          <Appear from="right" distance={s(40)} style={{marginLeft: s(50)}}>
+            <Button title={t(lang, 'watch')} icon="play" primary onPress={watch} />
+          </Appear>
+        ) : null}
+      </View>
+      {/* At bedtime a grown-up can allow 30 more minutes, with the PIN. */}
+      {bedtimeNow ? (
+        <View style={{marginBottom: s(50)}}>
+          <Button title={t(lang, 'bedtimeMore')} icon="lock" size={0.8} preferred={nobody} onPress={() => dispatch({type: 'go', screen: {name: 'pin', for: 'bedtime'}})} />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -79,7 +200,7 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
 
   const waiting = (jobId: string) => state.claims.some(c => c.kidId === kidId && c.jobId === jobId && c.status === 'waiting');
   // Jobs approved today come back tomorrow (one-off jobs don't). Each card shows what it gives now: marbles while
-  // today's jar has room, a new character once it's full, praise for a routine job.
+  // today's jar has room, a new character once it's full.
   const cards = (state.family.jobs[kidId] ?? [])
     .filter(j => !isDone(state, kidId, j))
     .map(j => ({
@@ -87,7 +208,7 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
       title: textOf(j.title, lang),
       color: j.color,
       icon: j.icon,
-      gives: rewardFor(state, kidId, j),
+      gives: givesOf(state, kidId, j),
       waiting: waiting(j.id),
       go: () => {
         Sound.play('claim');
@@ -95,26 +216,39 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
       },
     }));
   const preferredId = focusId ? (cards.find(c => c.id.endsWith(`:${focusId}`))?.id ?? cards[0]?.id) : cards[0]?.id;
+  // Puzzles sit after the jobs: one short session a day, for a star toward the next character (never TV time).
+  const puzzles = puzzlesOf(state, kidId);
+  // Puzzles and playing with characters are screen time: they need time in the jar, and take it as they go.
+  const hasTime = timeToday(state, kidId) > 0;
+  const emptyLine = t(lang, 'jarEmpty', {kid: kid.name});
+  const puzzleLines = [t(lang, 'puzzles'), ...(!hasTime ? [emptyLine] : [t(lang, 'sayStar'), ...(puzzles.stars + 1 >= puzzles.starsNeeded ? [t(lang, 'sayAndCharacter')] : [])])];
   // Marbles a "Yay!" is about to drop in stay out of this jar until then, so it never looks full before they land.
   const minutes = Math.max(0, timeToday(state, kidId) - pendingMinutes(state, kidId));
-  const full = minutes >= jarSize(state, kidId) * MIN_PER_MARBLE;
+  // "Full" only while the jar really is: once some of today's time is used, it says the minutes left.
+  const full = minutes >= kid.dailyMaxMin;
   // Why the jar or a job changed, calmly, for the rest of the day: the newest of "not yet" and taken-away minutes.
   const taken = takenToday(state, kidId);
   const notYet = notYetToday(state, kidId)[0];
   const notYetJob = notYet && (state.family.jobs[kidId] ?? []).find(j => j.id === notYet.jobId);
+  const notYetText = notYetJob
+    ? [t(lang, 'notYetNote', {job: textOf(notYetJob.title, lang)}), ...(notYet.notYetReason ? [t(lang, `notYetWhy_${notYet.notYetReason}`)] : [])]
+    : [];
   const note =
     notYetJob && (!taken.length || (notYet.decidedAt ?? notYet.at) > taken[0].at)
-      ? t(lang, 'notYetNote', {job: textOf(notYetJob.title, lang)})
+      ? notYetText.join('. ')
       : taken.length
         ? t(lang, 'tookAway', {n: -taken.reduce((sum, a) => sum + a.deltaMin, 0), reason: taken[0].reason})
         : null;
 
-  // Top right: the kid's character, and what's new about characters (one being drawn, or one to ask for).
+  // Top right, characters in one place (so what stars are for needs no words): the kid's newest character, the stars
+  // toward the next one, and the next one itself as a shape with a "?". What's new about characters (one being
+  // drawn, or one to ask for) takes the stars' place while it lasts.
   const buddyArt = useArt(buddyOf(state, kidId));
   const status = drawingFor(state, kidId) ? t(lang, 'characterDrawing') : tokensOf(state, kidId) > 0 ? t(lang, 'characterWaiting') : null;
-  const corner = buddyArt ? s(290) : 0;
-  const noteBox = note ? (status ? s(420) : s(820) - corner / 2) : 0;
-  const nameBox = Math.min(s(1400), Math.max(s(260), s(1596) - corner - (note ? noteBox + s(152) : 0) - (status ? s(300 + 134) : 0)));
+  const track = status ? s(278) : puzzles.on ? s(252) : 0;
+  const corner = s(60) + s(40) + (buddyArt ? s(190) : 0) + track + s(130);
+  const noteBox = note ? s(820) - corner / 2 : 0;
+  const nameBox = Math.min(s(1400), Math.max(s(260), s(1596) - corner - (note ? noteBox + s(152) : 0)));
 
   const renderCard = (card: (typeof cards)[number]) => (
     <Appear key={card.id} from="right" distance={s(140)} delay={60 + cards.indexOf(card) * 70} style={{alignItems: 'center', marginRight: s(30)}}>
@@ -131,12 +265,16 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
           {/* Between the picture and the marbles there's room for 3 lines of 36 px, or fewer, bigger ones. */}
           <FitText text={card.title} caps={caps} width={s(280)} height={s(124)} max={s(42)} min={s(22)} lines={3} style={{color: colors.ink, textAlign: 'center'}} />
         </View>
-        {card.gives.reward === 'marbles' ? (
-          <MarbleRow count={card.gives.minutes / MIN_PER_MARBLE} size={s(40)} />
-        ) : (
-          // A new character (the jar is full) or a thank-you (a routine job): not time, so no gold.
-          <Icon name={card.gives.reward === 'character' ? 'sparkle' : 'heart'} size={s(44)} color={colors.ink} />
-        )}
+        {/* What "I did it!" gives, in the same pill in the same place on every card: "+" and the marbles that fit,
+            then the next character's shape when the rest is a new character; a heart, with no "+", for a thank-you
+            (only a claim promised one before every job gave TV time). A character and a thank-you aren't time, so no gold. */}
+        <RewardPill size={s(40)} plus={card.gives.reward !== 'praise'}>
+          {Array.from({length: card.gives.minutes / MIN_PER_MARBLE}).map((_, i) => (
+            <Marble key={i} size={s(40)} style={{marginLeft: i ? s(10) : 0}} />
+          ))}
+          {card.gives.reward === 'character' ? <Icon name="mystery" size={s(46)} color={colors.ink} style={{marginLeft: card.gives.minutes > 0 ? s(10) : 0}} /> : null}
+          {card.gives.reward === 'praise' ? <Icon name="heart" size={s(40)} color={colors.ink} /> : null}
+        </RewardPill>
         {card.waiting ? (
           <Appear from="pop" delay={400} style={styles.badge}>
             <Flip>
@@ -159,20 +297,31 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
   // The family's own words come from the backend's narrator: ask for this board's ahead (one at a time, gently), so a
   // card is read as soon as the D-pad lands on it.
   const token = state.link?.token;
-  const toPrefetch = state.voice && token ? [t(lang, 'greatJob', {name: kid.name}), ...cards.map(c => c.title)].join('\n') : '';
+  const toPrefetch = state.voice && token ? [...new Set([t(lang, 'greatJob', {name: kid.name}), ...cards.flatMap(c => [c.title, ...givesLines(lang, c.gives)])])].join('\n') : '';
   useEffect(() => {
     if (!toPrefetch || !token) return;
     toPrefetch.split('\n').reduce((done, line) => done.then(() => narration({base: state.apiUrl, token}, lang, line).then(() => undefined)), Promise.resolve());
   }, [toPrefetch, token, state.apiUrl, lang]);
 
-  // Read the selected card's name once the D-pad settles on it.
+  // Read the selected card once the D-pad settles on it: its name, then what it gives ("Feed the cat. Two marbles."),
+  // so the marbles, the sparkle and the heart need no reading.
   const say = useSay();
-  const focusedTitle = cards.find(c => c.id === focused)?.title;
+  const focusedCard = cards.find(c => c.id === focused);
+  const focusedLines = focusedCard ? [focusedCard.title, ...givesLines(lang, focusedCard.gives)].join('\n') : focused === 'puzzles' ? puzzleLines.join('\n') : '';
   useEffect(() => {
-    if (!focusedTitle) return;
-    const timer = setTimeout(() => say([focusedTitle]), 300);
+    if (!focusedLines) return;
+    const timer = setTimeout(() => say(focusedLines.split('\n')), 300);
     return () => clearTimeout(timer);
-  }, [focusedTitle, say]);
+  }, [focusedLines, say]);
+
+  // A "not yet" with its reason is read once when the kid comes back to the board, so they know what to do next.
+  const notYetId = notYetJob && notYet.notYetReason ? notYet.id : undefined;
+  const notYetSpoken = notYetText.join('\n');
+  useEffect(() => {
+    if (!notYetId || saidNotYet.has(notYetId)) return;
+    saidNotYet.add(notYetId);
+    say(notYetSpoken.split('\n'));
+  }, [notYetId, notYetSpoken, say]);
 
   return (
     <View style={styles.screen}>
@@ -192,33 +341,51 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
             />
           </View>
         ) : null}
-        {status ? (
-          <Appear from="up" style={[styles.smallChip, {marginLeft: s(24)}]}>
-            <Sparkle size={s(34)} />
-            <FitText text={status} caps={caps} width={s(300)} max={s(28)} min={s(20)} lines={2} style={{marginLeft: s(12), fontWeight: '500'}} />
+      </View>
+      {/* OK opens the kid's characters (with an empty jar it says why not, once there is a character to play with). */}
+      <Appear from="pop" delay={200} style={styles.corner}>
+        <Focusable
+          label={t(lang, 'galleryTitle')}
+          onPress={() => (hasTime || !buddyArt ? dispatch({type: 'go', screen: {name: 'gallery', kidId}}) : void say([emptyLine]))}
+          onFocusChange={setBuddyFocused}
+          style={styles.characters}>
+          {/* Still until selected: the board stays calm (and smooth on the stick) while kids pick a job. */}
+          {buddyArt ? <CharacterView art={buddyArt} size={s(190)} still={!buddyFocused} /> : null}
+          {status ? (
+            <FitText text={status} caps={caps} width={s(250)} max={s(30)} min={s(20)} lines={3} style={{marginHorizontal: s(14), fontWeight: '500', textAlign: 'center'}} />
+          ) : puzzles.on ? (
+            <View style={{marginHorizontal: s(14)}}>
+              <StarRow stars={puzzles.stars} needed={puzzles.starsNeeded} coming pulse={focused === 'puzzles'} end="none" size={s(40)} color={colors.white} />
+            </View>
+          ) : null}
+          {/* The prize at the end of the stars: the next character, still a mystery. It beats when it is about to
+              come: one is waiting to be described, or the selected job gives one. */}
+          <View style={{width: s(130), height: s(150), alignItems: 'center', justifyContent: 'center'}}>
+            {status || focusedCard?.gives.reward === 'character' ? (
+              <Beat>
+                <Icon name="mystery" size={s(130)} color={colors.ink} />
+              </Beat>
+            ) : (
+              <Icon name="mystery" size={s(130)} color={colors.ink} />
+            )}
+            <T style={{position: 'absolute', left: 0, right: s(18), top: s(26), textAlign: 'center', fontSize: s(54), fontWeight: '700'}}>?</T>
+          </View>
+        </Focusable>
+        {/* Selected, the character just comes alive: no "Play!" label (the founder, Oct 13). With an empty jar the note says why OK opens nothing. */}
+        {buddyFocused && !hasTime && buddyArt ? (
+          <Appear from="right" distance={s(24)} style={[styles.hint, {position: 'absolute', right: '100%', marginRight: s(20), top: s(62), width: s(660)}]}>
+            <Icon name="clock" size={s(40)} color={colors.ink} />
+            <FitText text={emptyLine} caps={caps} width={s(520)} max={s(42)} min={s(24)} style={{color: colors.ink, marginLeft: s(14)}} />
           </Appear>
         ) : null}
-      </View>
-      {buddyArt ? (
-        // It stands on the row of cards and idles; up from the jobs selects it, and OK opens the kid's characters.
-        <Appear from="pop" delay={200} style={styles.corner}>
-          <Focusable label={t(lang, 'galleryTitle')} onPress={() => dispatch({type: 'go', screen: {name: 'gallery', kidId}})} onFocusChange={setBuddyFocused} style={{borderRadius: s(40)}}>
-            {/* Still until selected: the board stays calm (and smooth on the stick) while kids pick a job. */}
-            <CharacterView art={buddyArt} size={s(240)} still={!buddyFocused} />
-          </Focusable>
-          {buddyFocused ? (
-            <Appear from="right" distance={s(24)} style={[styles.hint, {position: 'absolute', right: s(280), top: s(80)}]}>
-              <Icon name="sparkle" size={s(40)} color={colors.ink} />
-              <FitText text={t(lang, 'play')} caps={caps} width={s(240)} max={s(42)} min={s(26)} style={{color: colors.ink, marginLeft: s(14)}} />
-            </Appear>
-          ) : null}
-        </Appear>
-      ) : null}
+      </Appear>
       <View style={{flex: 1, flexDirection: 'row', alignItems: 'center'}}>
         <View style={{width: s(460), alignItems: 'center'}}>
-          <Jar marbles={marblesIn(minutes)} size={jarSize(state, kidId)} />
+          {/* The marbles a selected job would give show faintly where they would land. */}
+          <Jar marbles={marblesIn(minutes)} size={jarSize(state, kidId)} preview={focusedCard && !focusedCard.waiting ? focusedCard.gives.minutes / MIN_PER_MARBLE : 0} />
           <View style={[styles.smallChip, {marginTop: s(18)}]}>
-            <Icon name={full ? 'sparkle' : 'clock'} size={s(40)} color={colors.white} />
+            {/* A TV, not a clock: what the minutes are for. */}
+            <Icon name="tv" size={s(44)} color={colors.white} />
             <T style={{fontSize: s(40), marginLeft: s(14)}}>{full ? t(lang, 'jarFull', {n: minutes}) : t(lang, 'minutes', {n: minutes})}</T>
           </View>
           {/* What one marble is worth, for parents and older kids. */}
@@ -227,9 +394,42 @@ export function BoardScreen({kidId, focusId}: {kidId: KidId; focusId?: string}) 
             <T style={{fontSize: s(30), marginLeft: s(10), color: colors.muted, fontWeight: '500'}}>{t(lang, 'marbleValue', {n: MIN_PER_MARBLE})}</T>
           </View>
         </View>
-        {cards.length ? (
+        {cards.length || puzzles.on ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginLeft: s(60)}} contentContainerStyle={{paddingVertical: s(10), paddingHorizontal: s(20)}}>
             {cards.map(renderCard)}
+            {puzzles.on ? (
+              <Appear from="right" distance={s(140)} delay={60 + cards.length * 70} style={{alignItems: 'center', marginRight: s(30)}}>
+                <Focusable
+                  preferred={!cards.length}
+                  label={t(lang, 'puzzles')}
+                  onPress={() => {
+                    if (!hasTime) return;
+                    Sound.play('tap');
+                    dispatch({type: 'go', screen: {name: 'puzzle', kidId}});
+                  }}
+                  onFocusChange={f => setFocused(cur => (f ? 'puzzles' : cur === 'puzzles' ? null : cur))}
+                  style={[styles.card, {backgroundColor: colors.lilac, opacity: hasTime ? 1 : 0.55}]}>
+                  <View style={styles.cardArt}>
+                    <Icon name="puzzle" size={s(150)} />
+                  </View>
+                  <View style={{flex: 1, justifyContent: 'center'}}>
+                    <FitText text={t(lang, 'puzzles')} caps={caps} width={s(280)} height={s(124)} max={s(42)} min={s(22)} lines={3} style={{color: colors.ink, textAlign: 'center'}} />
+                  </View>
+                  {/* What a round gives, like every card: a star. The stars so far are with the characters, top right. */}
+                  <RewardPill size={s(40)} plus>
+                    <Icon name="starfull" size={s(44)} color={colors.ink} />
+                  </RewardPill>
+                </Focusable>
+                <View style={{height: s(130), justifyContent: 'center'}}>
+                  {focused === 'puzzles' ? (
+                    <Appear from="up" distance={s(24)} style={styles.hint}>
+                      <Icon name={hasTime ? 'play' : 'clock'} size={s(46)} />
+                      <FitText text={hasTime ? t(lang, 'play') : emptyLine} caps={caps} width={s(hasTime ? 340 : 560)} max={s(46)} min={s(26)} style={{color: colors.ink, marginLeft: s(16)}} />
+                    </Appear>
+                  ) : null}
+                </View>
+              </Appear>
+            ) : null}
           </ScrollView>
         ) : (
           // Nothing to do today: no jobs from the grown-ups.
@@ -465,10 +665,19 @@ export function GalleryScreen({kidId}: {kidId: KidId}) {
   const caps = capsOf(state);
   const kid = kidOf(state, kidId);
   const characters = state.characters.filter(c => c.kidId === kidId && c.status === 'ready').sort((a, b) => b.createdAt - a.createdAt);
-  // A grown-up removed the last one meanwhile: back to the board.
-  useEffect(() => {
-    if (!characters.length) dispatch({type: 'go', screen: {name: 'board', kidId}});
-  }, [characters.length, dispatch, kidId]);
+  const puzzles = puzzlesOf(state, kidId);
+  const waiting = tokensOf(state, kidId) > 0;
+  // The open place at the end says what brings the next character: a waiting one needs the kid's idea; otherwise
+  // the rule for stars from puzzles, in words ("5 stars: a new character!"), so a press on the card, which opens
+  // nothing without a character waiting, says why (a job done with a full jar brings one too: the job cards show it).
+  const nextLine = waiting
+    ? t(lang, 'characterWaiting')
+    : drawingFor(state, kidId)
+      ? t(lang, 'characterDrawing')
+      : puzzles.on
+        ? t(lang, 'starsCharacter', {n: puzzles.starsNeeded})
+        : t(lang, 'nextCharacter');
+  const say = useSay();
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -486,6 +695,21 @@ export function GalleryScreen({kidId}: {kidId: KidId}) {
               <CharacterCard character={c} kidName={kid.name} preferred={i === 0} />
             </Appear>
           ))}
+          {/* The collection's open place: the next character, and what brings it. */}
+          <Appear from="right" distance={s(140)} delay={60 + characters.length * 70} style={{alignItems: 'center', marginRight: s(30)}}>
+            {/* With a character waiting to be made, this is where the kid describes it. */}
+            <Focusable preferred={!characters.length || waiting} label={nextLine} onPress={() => (waiting && state.link ? dispatch({type: 'go', screen: {name: 'characterNew', kidId}}) : void say([nextLine]))} style={[styles.characterCard, {justifyContent: 'center'}]}>
+              <Twinkle>
+                <Sparkle size={s(120)} />
+              </Twinkle>
+              <FitText text={nextLine} caps={caps} width={s(320)} max={s(34)} min={s(20)} lines={3} style={{textAlign: 'center', marginTop: s(26), color: colors.soft}} />
+              {puzzles.on && !waiting ? (
+                <View style={{marginTop: s(22)}}>
+                  <StarRow stars={puzzles.stars} needed={puzzles.starsNeeded} size={s(40)} color={colors.white} />
+                </View>
+              ) : null}
+            </Focusable>
+          </Appear>
         </ScrollView>
       </View>
     </View>
@@ -546,6 +770,7 @@ export const styles = StyleSheet.create({
   groupLabel: {height: s(56), marginBottom: s(14), paddingLeft: s(14)},
   divider: {width: s(3), marginTop: s(90), marginBottom: s(150), marginLeft: s(6), marginRight: s(36), borderRadius: s(2), backgroundColor: 'rgba(255,255,255,0.22)'},
   tile: {width: s(150), height: s(150), borderRadius: s(40), alignItems: 'center', justifyContent: 'center'},
-  corner: {position: 'absolute', top: s(14), right: s(86)},
+  corner: {position: 'absolute', top: s(14), right: s(60)},
+  characters: {flexDirection: 'row', alignItems: 'center', height: s(220), paddingHorizontal: s(20), borderRadius: s(48), backgroundColor: colors.glass},
   characterCard: {width: s(380), height: s(480), borderRadius: s(48), paddingTop: s(20), alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.10)'},
 });

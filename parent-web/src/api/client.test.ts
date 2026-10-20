@@ -65,21 +65,6 @@ describe('API client', () => {
     expect(JSON.parse(calls[1].init.body as string)).toEqual({description: 'a dragon who loves pancakes'});
   });
 
-  it('sends a recording as audio/wav as it is (not JSON), and returns the words', async () => {
-    const {fetch, calls} = fakeFetch(json(200, {text: 'a dragon who loves pancakes'}));
-    const wav = new Blob([new Uint8Array(44)], {type: 'audio/wav'});
-    expect(await api(fetch).speechToText(wav)).toBe('a dragon who loves pancakes');
-    expect(`${calls[0].init.method} ${calls[0].url}`).toBe('POST http://api.test/speech-to-text');
-    expect(header(calls[0].init, 'Content-Type')).toBe('audio/wav');
-    expect(header(calls[0].init, 'Authorization')).toBe('Bearer dev-mia');
-    expect(calls[0].init.body).toBe(wav);
-  });
-
-  it('passes on 413 when a recording is too long', async () => {
-    const {fetch} = fakeFetch(json(413, {error: {code: 'too_large', message: 'At most 15 seconds'}}));
-    await expect(api(fetch).speechToText(new Blob([]))).rejects.toMatchObject({status: 413});
-  });
-
   it('fetches the push key, and sends a subscription in (POST) and out (DELETE with the endpoint)', async () => {
     const {fetch, calls} = fakeFetch(json(200, {publicKey: 'BKey'}), new Response(null, {status: 201}), new Response(null, {status: 204}));
     const client = api(fetch);

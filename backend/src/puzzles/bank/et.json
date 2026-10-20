@@ -1,0 +1,4301 @@
+[
+ {
+  "id": "7a1a4a4165049549",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Vaata rida. Mis tuleb järgmiseks?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pärast banaani tuleb jälle õun.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9f1890e0b941a1d0",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Üks nendest ei sobi teistega kokku. Mis ei ole puuvili?",
+  "picture": [
+   "🍎",
+   "🍐",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "Õun"
+   },
+   {
+    "text": "Pirn"
+   },
+   {
+    "text": "Auto"
+   }
+  ],
+  "answer": 2,
+  "reason": "Auto on sõiduk, mitte puuvili.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8822291b4c7f2c56",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Mul on pehmed kõrvad ja ma haugun rõõmsalt. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Koer haugub.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "20b5cfddbd857163",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Vaata neid loomi. Kes nendest ei oska lennata?",
+  "picture": [
+   "🦉",
+   "🦆",
+   "🐢"
+  ],
+  "choices": [
+   {
+    "text": "Öökull"
+   },
+   {
+    "text": "Part"
+   },
+   {
+    "text": "Kilpkonn"
+   }
+  ],
+  "answer": 2,
+  "reason": "Kilpkonn kõnnib maas ja ei lenda.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "38da884b348f50ff",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Mis sobib kokku hambaharjaga, kui peseme hambaid?",
+  "picture": [
+   "🪥"
+  ],
+  "choices": [
+   {
+    "emoji": "🦷"
+   },
+   {
+    "emoji": "⚽"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Hambaharjaga pestakse hambaid.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "15cab8d82ea5c44f",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Ma elan vees ja ujun sabaga. Mul ei ole jalgu. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🦊"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kala elab vees ja ujub.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0e807039e3c6e89f",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Mis käib jalga enne õue minekut?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👟"
+   },
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "🧤"
+   }
+  ],
+  "answer": 0,
+  "reason": "Tossud pannakse jalga.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fa15ea1e2bb0e8a5",
+  "lang": "et",
+  "subject": "logic",
+  "level": 1,
+  "prompt": "Üks neist ei sobi teistega kokku. Mis ei ole riideese?",
+  "picture": [
+   "👕",
+   "👗",
+   "🍕"
+  ],
+  "choices": [
+   {
+    "text": "Särk"
+   },
+   {
+    "text": "Kleit"
+   },
+   {
+    "text": "Pitsa"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pitsa on söök, mitte riie.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0cd3d93d47dd8b8b",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Mis sobib ritta järgmiseks?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 0,
+  "reason": "Õun ja banaan korduvad kordamööda.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e67276acce77532f",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Mis siia ritta ei sobi?",
+  "picture": [
+   "🐱",
+   "🐶",
+   "🚗",
+   "🐰"
+  ],
+  "choices": [
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🚗"
+   }
+  ],
+  "answer": 2,
+  "reason": "Auto on masin, teised on loomad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6020ab06555845dd",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Mul on neli jalga ja ma haugun rõõmsalt. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kass"
+   },
+   {
+    "text": "koer"
+   },
+   {
+    "text": "konn"
+   }
+  ],
+  "answer": 1,
+  "reason": "Koer haugub ja kõnnib neljal jalal.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "226fe57d61b3cfc2",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Mis on vastand sõnale suur?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "pikk"
+   },
+   {
+    "text": "soe"
+   },
+   {
+    "text": "väike"
+   }
+  ],
+  "answer": 2,
+  "reason": "Suure vastand on väike.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c1ed68bfe92fa55f",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Mul on tiivad ja ma teen magusat mett. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "mesilane"
+   },
+   {
+    "text": "part"
+   },
+   {
+    "text": "liblikas"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mesilane kogub õitelt mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6b392df7e6234887",
+  "lang": "et",
+  "subject": "logic",
+  "level": 2,
+  "prompt": "Kes nendest loomadest on päriselt kõige suurem?",
+  "picture": [
+   "🐭",
+   "🐱",
+   "🐘"
+  ],
+  "choices": [
+   {
+    "emoji": "🐭"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐘"
+   }
+  ],
+  "answer": 2,
+  "reason": "Elevant on hiirest ja kassist palju suurem.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "32ebea45c21018b9",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis sobib siia ritta järgmiseks?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🍎",
+   "🍌",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "emoji": "🍌"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🍇"
+   }
+  ],
+  "answer": 0,
+  "reason": "Õun ja banaan korduvad kordamööda.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ec0a7a3226816031",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mul on tiivad ja ma valmistan magusat mett. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Mesilane"
+   },
+   {
+    "text": "Liblikas"
+   },
+   {
+    "text": "Öökull"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mesilane teeb magusat mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "079e11bd6a381f5c",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Kes nendest loomadest ei sobi teistega kokku?",
+  "picture": [
+   "🐶",
+   "🐱",
+   "🐟",
+   "🐰"
+  ],
+  "choices": [
+   {
+    "text": "Koer"
+   },
+   {
+    "text": "Kala"
+   },
+   {
+    "text": "Kass"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kala elab vees, aga teised elavad maal.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "42b4352f4c604fca",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis nendest asjadest on päriselt kõige suurem?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "Buss"
+   },
+   {
+    "text": "Auto"
+   },
+   {
+    "text": "Jalgratas"
+   }
+  ],
+  "answer": 0,
+  "reason": "Buss on suurem kui auto või jalgratas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7e03870a54097d94",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis nendest ei sobi teistega kokku?",
+  "picture": [
+   "👕",
+   "👖",
+   "👗",
+   "🎸"
+  ],
+  "choices": [
+   {
+    "text": "Kitarr"
+   },
+   {
+    "text": "Särk"
+   },
+   {
+    "text": "Kleit"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kitarr on pill, teised aga riided.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2dc6fd6bc1c9aa13",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mul on pikk tüvi ja rohelised lehed. Minu otsas kasvavad käbid või viljad. Mis ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Lill"
+   },
+   {
+    "text": "Puu"
+   },
+   {
+    "text": "Seen"
+   }
+  ],
+  "answer": 1,
+  "reason": "Puul on tüvi ja lehed.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ebef31df04e79440",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis ese sobib kokku supikausiga?",
+  "picture": [
+   "🥣"
+  ],
+  "choices": [
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🔑"
+   },
+   {
+    "emoji": "🔔"
+   }
+  ],
+  "answer": 0,
+  "reason": "Suppi süüakse lusikaga.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "05bea2fcff8df034",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis kuju sobib ritta järgmiseks?",
+  "picture": [
+   "🔴",
+   "🟦",
+   "🔴",
+   "🟦"
+  ],
+  "choices": [
+   {
+    "emoji": "🟦"
+   },
+   {
+    "emoji": "🟡"
+   },
+   {
+    "emoji": "🔴"
+   }
+  ],
+  "answer": 2,
+  "reason": "Punane ring ja sinine ruut vahelduvad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bd6ff11ce1bb4989",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mis nendest asjadest on päriselt kõige kergem?",
+  "picture": [
+   "🐘",
+   "🐜",
+   "🐕"
+  ],
+  "choices": [
+   {
+    "text": "Sipelgas"
+   },
+   {
+    "text": "Koer"
+   },
+   {
+    "text": "Elevant"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pisike sipelgas kaalub vähem kui koer või elevant.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "72f21d0da8e8c3a1",
+  "lang": "et",
+  "subject": "logic",
+  "level": 3,
+  "prompt": "Mul on neli jalga ja kõva kilp seljas. Ma liigun väga aeglaselt. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Konn"
+   },
+   {
+    "text": "Kilpkonn"
+   },
+   {
+    "text": "Hiir"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kilpkonnal on seljas kõva kilp.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0cd3d93d47dd8b8b",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mis sobib ritta järgmiseks?",
+  "picture": [
+   "⭐",
+   "🌙",
+   "⭐",
+   "🌙",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "emoji": "🌞"
+   },
+   {
+    "emoji": "⭐"
+   },
+   {
+    "emoji": "🌙"
+   }
+  ],
+  "answer": 2,
+  "reason": "Täht ja kuu vahelduvad reas ükshaaval.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8c3117c8ecdd08c1",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mul on neli jalga ja seljas okkad. Olen väike ja magan talvel. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦔"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Siilil on teravad okkad ja ta magab talveund.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "35c91bf160c7b614",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Milline neist asjadest ei sobi teiste hulka?",
+  "picture": [
+   "🍎",
+   "🍌",
+   "🥕",
+   "🍇"
+  ],
+  "choices": [
+   {
+    "text": "porgand"
+   },
+   {
+    "text": "õun"
+   },
+   {
+    "text": "viinamari"
+   }
+  ],
+  "answer": 0,
+  "reason": "Porgand on köögivili, teised aga puuviljad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "120af209f2a7cccf",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mis käib selle asjaga alati kokku?",
+  "picture": [
+   "🔑"
+  ],
+  "choices": [
+   {
+    "emoji": "🚪"
+   },
+   {
+    "emoji": "🪑"
+   },
+   {
+    "emoji": "🧹"
+   }
+  ],
+  "answer": 0,
+  "reason": "Võtmega keeratakse ust lukku ja lahti.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9d73e709f5ea7a02",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Laua peal on viis korvi ja igas korvis on kolm õuna. Mitu õuna on kokku?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kaksteist"
+   },
+   {
+    "text": "viisteist"
+   },
+   {
+    "text": "kaheksateist"
+   }
+  ],
+  "answer": 1,
+  "reason": "Viis korda kolm on viisteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d394b97df8a0a509",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Milline neist sõidukitest ei sobi teistega kokku?",
+  "picture": [
+   "🚗",
+   "🚌",
+   "⛵",
+   "🚕"
+  ],
+  "choices": [
+   {
+    "text": "buss"
+   },
+   {
+    "text": "purjekas"
+   },
+   {
+    "text": "takso"
+   }
+  ],
+  "answer": 1,
+  "reason": "Purjekas sõidab vee peal, teised autod sõidavad teel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fffc19ce4debd719",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Vaata seda rida. Mis tuleb küsimärgi asemele?",
+  "picture": [
+   "🐱",
+   "🐱",
+   "🐶",
+   "🐱",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐭"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mustris on kaks kassi ja neile järgneb üks koer.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6d491568c3dfe30a",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Elevant on suurem kui rebane. Rebane on suurem kui sipelgas. Kes neist kolmest on kõige väiksem?",
+  "picture": [
+   "🐘",
+   "🦊",
+   "🐜"
+  ],
+  "choices": [
+   {
+    "text": "elevant"
+   },
+   {
+    "text": "rebane"
+   },
+   {
+    "text": "sipelgas"
+   }
+  ],
+  "answer": 2,
+  "reason": "Sipelgas on neist kolmest kõige tillukesem.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2a21d121f2a68322",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mul on tiivad, aga ma pole lind. Lendan lillest lillele ja teen magusat mett. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐝"
+   },
+   {
+    "emoji": "🦋"
+   },
+   {
+    "emoji": "🐞"
+   }
+  ],
+  "answer": 0,
+  "reason": "Mesilane kogub õitelt nektarit ja valmistab mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6e00afa060fb63b8",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mis sobib kokku supikausiga?",
+  "picture": [
+   "🥣"
+  ],
+  "choices": [
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🔨"
+   },
+   {
+    "emoji": "🔑"
+   }
+  ],
+  "answer": 0,
+  "reason": "Supi söömiseks kausist kasutatakse lusikat.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7b6c91a7d6e9b60a",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Mul ei ole jalgu, aga ma ujun vees. Hingan lõpustega ja mul on soomused. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kala elab vees ning tal on lõpused ja soomused.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d1128880d6995919",
+  "lang": "et",
+  "subject": "logic",
+  "level": 4,
+  "prompt": "Vaata arve: kaks, neli, kuus, kaheksa. Mis arv tuleb järgmiseks?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "üheksa"
+   },
+   {
+    "text": "kümme"
+   },
+   {
+    "text": "üksteist"
+   }
+  ],
+  "answer": 1,
+  "reason": "Iga järgmine arv on kahe võrra suurem.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ea275a79a74a92f0",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Loeme koos: üks, kaks, kolm... Mis arv tuleb järgmiseks?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "viis"
+   },
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pärast kolme tuleb neli.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "61f4901ba6b1aba7",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Karul on üks õun. Jänes annab talle veel ühe õuna juurde. Mitu õuna on karul nüüd?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 0,
+  "reason": "Üks ja veel üks kokku teeb kaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3d434deb31967b5b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Mitu kollast banaani on pildil?",
+  "picture": [
+   "🍌",
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 1,
+  "reason": "Pildil on üks, kaks ja kolm banaani.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3c0c162d6c39a97b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Kumba on pildil rohkem, kas porgandeid või maasikaid?",
+  "picture": [
+   "🥕",
+   "🥕",
+   "🥕",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍓"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 0,
+  "reason": "Porgandeid on kolm, aga maasikaid on ainult üks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "18148bf0f03314ef",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Mitu armsat parti ujub vees?",
+  "picture": [
+   "🦆",
+   "🦆"
+  ],
+  "choices": [
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   }
+  ],
+  "answer": 1,
+  "reason": "Pildil on kaks parti.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3688da600f911b8b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Mitu ratast on sellel pisikesel tõukerattal?",
+  "picture": [
+   "🛴"
+  ],
+  "choices": [
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "neli"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 0,
+  "reason": "Tõukerattal on ees üks ja taga teine ratas, kokku kaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ebf4e48fd12866b9",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Taldrikul oli kolm küpsist. Poiss sõi ühe ära. Mitu küpsist jäi alles?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kui kolmest võtta üks ära, jääb järele kaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7848fe50cfd15d4d",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Loeme edasi: kaks, kolm, neli... Mis arv tuleb nüüd?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "viis"
+   },
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kolm"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pärast nelja tuleb viis.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f8ac6d7730a191c6",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Mitu punast õuna on ritta pandud?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "viis"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pildil on täpselt neli õuna.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2ce76c673b6f363b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Pesa peal oli kaks muna. Ema leidis veel kaks muna. Mitu muna on nüüd pesas?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kaks ja kaks kokku on neli.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "be919a55c1446867",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 1,
+  "prompt": "Mitu säravat tähte paistab taevas?",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pildil on viis tähte.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "026ffba743756e48",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Vaata neid loomi. Kas pildil on rohkem koeri või kasse?",
+  "picture": [
+   "🐶",
+   "🐶",
+   "🐶",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "emoji": "🐶"
+   },
+   {
+    "emoji": "🐱"
+   },
+   {
+    "emoji": "🐭"
+   }
+  ],
+  "answer": 0,
+  "reason": "Koeri on kolm, aga kasse on ainult üks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b7a9677d1e7912c3",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mial on kaks punast õuna. Ta saab emalt ühe õuna juurde. Mitu õuna on nüüd Mial kokku?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kaks ja üks kokku on kolm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3d434deb31967b5b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mitu kollast banaani on pildil?",
+  "picture": [
+   "🍌",
+   "🍌",
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "neli"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 1,
+  "reason": "Reas on neli banaani.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6a2f7e7acd7582ef",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mitu kala ujub pildil?",
+  "picture": [
+   "🐟",
+   "🐟",
+   "🐟",
+   "🐟",
+   "🐟"
+  ],
+  "choices": [
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "viis"
+   },
+   {
+    "text": "kuus"
+   }
+  ],
+  "answer": 1,
+  "reason": "Pildil ujub viis kala.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "27643e39b526972a",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Taldrikul oli neli maitsvat maasikat. Siim sõi ühe maasika ära. Mitu maasikat jäi alles?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "viis"
+   },
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   }
+  ],
+  "answer": 2,
+  "reason": "Neljast ühe ära võttes jääb kolm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "68fefd8bc60f8cc8",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Kumba on pildil vähem, kas jänkusid või porgandeid?",
+  "picture": [
+   "🐰",
+   "🐰",
+   "🥕",
+   "🥕",
+   "🥕"
+  ],
+  "choices": [
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 0,
+  "reason": "Jänkusid on kaks, porgandeid on aga kolm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3672cbf5f6449ca5",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mis number tuleb loendades kohe pärast viite?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "neli"
+   },
+   {
+    "text": "seitse"
+   },
+   {
+    "text": "kuus"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pärast arvu viis loendame kuus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "073aa7e9e0af4fb2",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Laual oli kaks küpsist ja vanaema tõi juurde veel kaks küpsist. Mitu küpsist on nüüd laual?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kaks ja kaks on kokku neli.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "59b562754f44420b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mitu säravat tähte särab taevas?",
+  "picture": [
+   "⭐",
+   "⭐",
+   "⭐"
+  ],
+  "choices": [
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   }
+  ],
+  "answer": 2,
+  "reason": "Reas on kolm tähte.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "09a4769acd25dcb6",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 2,
+  "prompt": "Mis arv on arvu viis ja arvu seitse vahel?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "neli"
+   },
+   {
+    "text": "kaheksa"
+   },
+   {
+    "text": "kuus"
+   }
+  ],
+  "answer": 2,
+  "reason": "Viie ja seitsme vahel on arv kuus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "902e7347aaef89ce",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Joonas küpsetas viisteist küpsist. Ta sõi neist neli ära. Mitu küpsist jäi alles?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "11"
+   },
+   {
+    "text": "9"
+   },
+   {
+    "text": "12"
+   }
+  ],
+  "answer": 0,
+  "reason": "Viieteistkümnest neli ära võttes jääb alles üksteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e9150f11d1f9b5d3",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Missugune arv sobib ritta küsimärgi asemele: neli, seitse, kümme, kolmteist, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "15"
+   },
+   {
+    "text": "16"
+   },
+   {
+    "text": "17"
+   }
+  ],
+  "answer": 1,
+  "reason": "Iga järgmine arv on kolme võrra suurem, seega kolmteist pluss kolm on kuusteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "edf3a356dcc24526",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Pargis jalutas üheksa koera. Sinna jooksis juurde veel seitse koera. Mitu koera on nüüd pargis?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "14"
+   },
+   {
+    "text": "15"
+   },
+   {
+    "text": "16"
+   }
+  ],
+  "answer": 2,
+  "reason": "Üheksa pluss seitse on kokku kuusteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "79d5cdb0f7c33d72",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Peenral kasvas seitseteist porgandit. Jänes sõi ära üheksa porgandit. Mitu porgandit jäi mulda?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "7"
+   },
+   {
+    "text": "8"
+   },
+   {
+    "text": "9"
+   }
+  ],
+  "answer": 1,
+  "reason": "Seitseteist miinus üheksa on kaheksa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ba5285a977f9ba9b",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Missugune arv tuleb jadas järgmisena: kakskümmend, kaheksateist, kuusteist, neliteist, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "12"
+   },
+   {
+    "text": "13"
+   },
+   {
+    "text": "10"
+   }
+  ],
+  "answer": 0,
+  "reason": "Arvud vähenevad kahe võrra, seega neljateistkümnest kaks vähem on kaksteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c7e9400b1a86d4d5",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Missugune arv sobib ritta punktiiri asemele: viis, kümme, viisteist, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "16"
+   },
+   {
+    "text": "18"
+   },
+   {
+    "text": "20"
+   }
+  ],
+  "answer": 2,
+  "reason": "Viie kaupa edasi lugedes tuleb pärast viitteist arv kakskümmend.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "97f4079017544e7d",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Kassil on neli käppa. Mitu käppa on kokku neljal kassil?",
+  "picture": [
+   "🐱",
+   "🐱",
+   "🐱",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "12"
+   },
+   {
+    "text": "14"
+   },
+   {
+    "text": "16"
+   }
+  ],
+  "answer": 2,
+  "reason": "Neli korda neli käppa teeb kokku kuusteist käppa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "28dcf0253cab2927",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 3,
+  "prompt": "Kaarel korjas puu otsast kaksteist õuna. Ta andis vennale viis õuna. Mitu õuna jäi Kaarlile?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "7"
+   },
+   {
+    "text": "6"
+   },
+   {
+    "text": "8"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kaheteistkümnest viis ära võttes jääb seitse.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b12ef967fa622218",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Vaata rida ja arva ära, mis number peab tulema punktiiri asemele: 4, 8, 12, 16, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "18"
+   },
+   {
+    "text": "20"
+   },
+   {
+    "text": "24"
+   }
+  ],
+  "answer": 1,
+  "reason": "Iga järgmine arv reas on nelja võrra suurem, seega kuusteist pluss neli on kakskümmend.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "165e854d0d6f3d06",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Õpetaja jagas kakskümmend neli pliiatsit võrdselt nelja topsi vahel. Mitu pliiatsit sai igasse topsi?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Viis"
+   },
+   {
+    "text": "Kuus"
+   },
+   {
+    "text": "Seitse"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kakskümmend neli jagatud neljaga on kuus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ad17c3bdffcfd806",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Karbis oli kuus kommi. Martin pani sinna veel seitse kommi ja võttis siis kolm ära. Mitu kommi on nüüd karbis?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Kümme"
+   },
+   {
+    "text": "Üheksa"
+   },
+   {
+    "text": "Kaksteist"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kuus pluss seitse on kolmteist ning kolmteist miinus kolm on kümme.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7bf37cabdf96e74c",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Milline arv sobib punktiiri asemele: 50, 45, 40, 35, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "30"
+   },
+   {
+    "text": "25"
+   },
+   {
+    "text": "32"
+   }
+  ],
+  "answer": 0,
+  "reason": "Arvud vähenevad igal sammul viie võrra, seega kolmkümmend viis miinus viis on kolmkümmend.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "86de4a9d3a30d60d",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Pargis jalutab neli koera ja viis kassi. Mitu looma jalga on neil kõigil kokku?",
+  "picture": [
+   "🐶",
+   "🐶",
+   "🐶",
+   "🐶",
+   "🐱",
+   "🐱",
+   "🐱",
+   "🐱",
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "32 jalga"
+   },
+   {
+    "text": "36 jalga"
+   },
+   {
+    "text": "40 jalga"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kokku on üheksa looma ja igal loomal on neli jalga, seega üheksa korda neli on kolmkümmend kuus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "38d4154b198a9408",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Lauril on taskus viis küpsist, aga Annil on kolm korda rohkem. Mitu küpsist on Annil?",
+  "picture": [
+   "🍪",
+   "🍪",
+   "🍪",
+   "🍪",
+   "🍪"
+  ],
+  "choices": [
+   {
+    "text": "8 küpsist"
+   },
+   {
+    "text": "12 küpsist"
+   },
+   {
+    "text": "15 küpsist"
+   }
+  ],
+  "answer": 2,
+  "reason": "Viis korda kolm on viisteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "21a055e63b11f3ce",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Mõtle ühele arvule: kui korrutad selle arvu kolmega ja liidad juurde viis, saad neliteist. Mis arv see on?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "2"
+   },
+   {
+    "text": "3"
+   },
+   {
+    "text": "4"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kolm korda kolm on üheksa ning üheksa pluss viis on neliteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9b62ffc8e9953bd9",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Mitu ratast on kokku neljal sõiduautol ja kahel jalgrattal?",
+  "picture": [
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚗",
+   "🚲",
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "18 ratast"
+   },
+   {
+    "text": "20 ratast"
+   },
+   {
+    "text": "22 ratast"
+   }
+  ],
+  "answer": 1,
+  "reason": "Autodel on kuusteist ratast ja ratastel neli ratast, kokku kakskümmend ratast.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e4f8fc532bda4323",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Vaata arvurida ja leia puuduv arv: 3, 6, 12, 24, ...?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "36"
+   },
+   {
+    "text": "48"
+   },
+   {
+    "text": "30"
+   }
+  ],
+  "answer": 1,
+  "reason": "Iga järgmine arv on eelmisest kaks korda suurem, seega kakskümmend neli korda kaks on nelikümmend kaheksa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "da83fe07c47d1c2e",
+  "lang": "et",
+  "subject": "numbers",
+  "level": 4,
+  "prompt": "Kooliteel on seitse puud. Igal puul istub neli lindu. Siis lendab kuus lindu ära. Mitu lindu jääb puudele?",
+  "picture": [
+   "🌳",
+   "🐦"
+  ],
+  "choices": [
+   {
+    "text": "20 lindu"
+   },
+   {
+    "text": "22 lindu"
+   },
+   {
+    "text": "24 lindu"
+   }
+  ],
+  "answer": 1,
+  "reason": "Seitse korda neli on kakskümmend kaheksa ning kakskümmend kaheksa miinus kuus on kakskümmend kaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4acb17fddaaba98c",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Milline neist on puuvili?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 1,
+  "reason": "Õun on magus puuvili.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "89bc583669097cdb",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis loom on pildil?",
+  "picture": [
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "Kass"
+   },
+   {
+    "text": "Karu"
+   },
+   {
+    "text": "Kala"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pildil on nurruv kass.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "09f17fad86f5c098",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis on sõna \"suur\" vastand?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Väike"
+   },
+   {
+    "text": "Kõrge"
+   },
+   {
+    "text": "Pikk"
+   }
+  ],
+  "answer": 0,
+  "reason": "Suure vastand on väike.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f5da03c7f711f964",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Milline neist on sõiduk?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🌻"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Autoga saab teel sõita.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "43a6638263f2fb8e",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis riimub sõnaga \"maja\"?",
+  "picture": [
+   "🏠"
+  ],
+  "choices": [
+   {
+    "text": "Kaja"
+   },
+   {
+    "text": "Puu"
+   },
+   {
+    "text": "Auto"
+   }
+  ],
+  "answer": 0,
+  "reason": "Sõnad maja ja kaja kõlavad kokku.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ef721751379e8084",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis on sõna \"soe\" vastand?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Pehme"
+   },
+   {
+    "text": "Külm"
+   },
+   {
+    "text": "Märg"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sooja vastand on külm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "be1b7e70eab49d04",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Milline neist on riideese?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧀"
+   },
+   {
+    "emoji": "👗"
+   },
+   {
+    "emoji": "⚽"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kleit pannakse selga.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f75ee063be3efb6e",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis on sõna \"päev\" vastand?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Hommik"
+   },
+   {
+    "text": "Päike"
+   },
+   {
+    "text": "Öö"
+   }
+  ],
+  "answer": 2,
+  "reason": "Päeva vastand on pimedam öö.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b013e267924d41b6",
+  "lang": "et",
+  "subject": "words",
+  "level": 1,
+  "prompt": "Mis tegevus sobib selle pildiga?",
+  "picture": [
+   "😴"
+  ],
+  "choices": [
+   {
+    "text": "Magama"
+   },
+   {
+    "text": "Hüppama"
+   },
+   {
+    "text": "Sööma"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pildil olev laps magab.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ed4a2ec642be488e",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõna on vastand sõnale \"soe\"?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "külm"
+   },
+   {
+    "text": "pikk"
+   },
+   {
+    "text": "pehme"
+   }
+  ],
+  "answer": 0,
+  "reason": "Sooja vastand on külm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "098abee1fc7ce99d",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõnaga riimub sõna \"maja\"?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "pall"
+   },
+   {
+    "text": "kaja"
+   },
+   {
+    "text": "tuba"
+   }
+  ],
+  "answer": 1,
+  "reason": "Maja ja kaja kõlavad sarnaselt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d501091be2d2c44e",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis täht on pildil oleva looma nime alguses?",
+  "picture": [
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "K"
+   },
+   {
+    "text": "M"
+   },
+   {
+    "text": "L"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kass algab K-tähega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4a3a9e8803938bdb",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõna sobib pildil oleva eseme kohta?",
+  "picture": [
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "auto"
+   },
+   {
+    "text": "rong"
+   },
+   {
+    "text": "laev"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pildil sõidab auto.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d71f3af5efaf3ffe",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõna on vastand sõnale \"suur\"?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kiire"
+   },
+   {
+    "text": "väike"
+   },
+   {
+    "text": "valge"
+   }
+  ],
+  "answer": 1,
+  "reason": "Suure vastand on väike.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4acb17fddaaba98c",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Milline neist on puuvili?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🥦"
+   },
+   {
+    "emoji": "🍎"
+   }
+  ],
+  "answer": 2,
+  "reason": "Õun on magus puuvili.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "958a76b448a38950",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõnaga riimub sõna \"kell\"?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "päev"
+   },
+   {
+    "text": "tass"
+   },
+   {
+    "text": "hell"
+   }
+  ],
+  "answer": 2,
+  "reason": "Kell ja hell riimuvad kenasti.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d0a0f22bd34ac49e",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis täht on pildil oleva asja nime alguses?",
+  "picture": [
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "A"
+   },
+   {
+    "text": "B"
+   },
+   {
+    "text": "P"
+   }
+  ],
+  "answer": 1,
+  "reason": "Banaan algab B-tähega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5cda74f374743bd5",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Milline neist on lind?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦉"
+   },
+   {
+    "emoji": "🦊"
+   },
+   {
+    "emoji": "🐸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Öökull on tiibadega lind.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8445b76f72ffeca4",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Mis sõna on vastand sõnale \"päev\"?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "hommik"
+   },
+   {
+    "text": "valgus"
+   },
+   {
+    "text": "öö"
+   }
+  ],
+  "answer": 2,
+  "reason": "Päeva vastand on öö.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "be1b7e70eab49d04",
+  "lang": "et",
+  "subject": "words",
+  "level": 2,
+  "prompt": "Milline neist on riideese?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🥄"
+   },
+   {
+    "emoji": "🎈"
+   }
+  ],
+  "answer": 0,
+  "reason": "Sokk pannakse jalga ja see on riie.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0b1b33d0f512ad33",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Mis on sõna „soe” vastandsõna?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "külm"
+   },
+   {
+    "text": "valge"
+   },
+   {
+    "text": "suur"
+   }
+  ],
+  "answer": 0,
+  "reason": "Külm on sooja vastand.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1982e3af45822cd5",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Milline neist toitudest on puuvili?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🍎"
+   },
+   {
+    "emoji": "🥦"
+   }
+  ],
+  "answer": 1,
+  "reason": "Õun on puuvili, porgand ja brokoli on köögiviljad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b4d11d2115631695",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Millise tähega algab selle looma eestikeelne nimi?",
+  "picture": [
+   "🐸"
+  ],
+  "choices": [
+   {
+    "text": "K"
+   },
+   {
+    "text": "L"
+   },
+   {
+    "text": "M"
+   }
+  ],
+  "answer": 0,
+  "reason": "Konn algab K-tähega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1a275da31faba92f",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Milline sõna sobib pildi kohta kõige paremini?",
+  "picture": [
+   "🚗"
+  ],
+  "choices": [
+   {
+    "text": "auto"
+   },
+   {
+    "text": "laev"
+   },
+   {
+    "text": "rong"
+   }
+  ],
+  "answer": 0,
+  "reason": "Pildil on auto.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "07f924a94616dd19",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Mis on sõna „kõrge” vastandsõna?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "lai"
+   },
+   {
+    "text": "pikk"
+   },
+   {
+    "text": "madal"
+   }
+  ],
+  "answer": 2,
+  "reason": "Kõrge vastand on madal.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ab2beab454fcae5b",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Mis on sõna „päev” vastandsõna?",
+  "picture": [
+   "🌞"
+  ],
+  "choices": [
+   {
+    "text": "öö"
+   },
+   {
+    "text": "hommik"
+   },
+   {
+    "text": "valgus"
+   }
+  ],
+  "answer": 0,
+  "reason": "Päeva vastand on öö.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b017b8c7e288101e",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Millise häälikuga lõpeb sõna „karu”?",
+  "picture": [
+   "🐻"
+  ],
+  "choices": [
+   {
+    "text": "A"
+   },
+   {
+    "text": "R"
+   },
+   {
+    "text": "U"
+   }
+  ],
+  "answer": 2,
+  "reason": "Sõna „karu” viimane täht ja häälik on U.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b38a45d98b90dc42",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Milline neist asjadest kuulub muusikariistade hulka?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🔨"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🔦"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kitarr on pill, millega tehakse muusikat.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "bbdf894a967d22c4",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Mis riimub sõnaga „kass”?",
+  "picture": [
+   "🐱"
+  ],
+  "choices": [
+   {
+    "text": "koer"
+   },
+   {
+    "text": "tass"
+   },
+   {
+    "text": "lind"
+   }
+  ],
+  "answer": 1,
+  "reason": "Sõnad „kass” ja „tass” riimuvad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5ef371cf5982258f",
+  "lang": "et",
+  "subject": "words",
+  "level": 3,
+  "prompt": "Milline neist loomadest oskab lennata?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦉"
+   },
+   {
+    "emoji": "🐕"
+   },
+   {
+    "emoji": "🐘"
+   }
+  ],
+  "answer": 0,
+  "reason": "Öökull on lind ja lendab tiibadega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "34c00dcf90723076",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mis vili sobib pildil olevate puuviljadega samasse rühma?",
+  "picture": [
+   "🍎",
+   "🍐",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "emoji": "🍊"
+   },
+   {
+    "emoji": "🥕"
+   },
+   {
+    "emoji": "🥔"
+   }
+  ],
+  "answer": 0,
+  "reason": "Apelsin on puuvili nagu õun, pirn ja banaan.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8a27ea0678849ca1",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mis sõnaga riimub sõna „kell”?",
+  "picture": [
+   "🔔"
+  ],
+  "choices": [
+   {
+    "text": "lind"
+   },
+   {
+    "text": "pall"
+   },
+   {
+    "text": "sell"
+   }
+  ],
+  "answer": 2,
+  "reason": "Sõnad „kell” ja „sell” kõlavad lõpust ühtmoodi.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "36f3a2901141f89d",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mis tähega algab pildil oleva looma eestikeelne nimi?",
+  "picture": [
+   "🦊"
+  ],
+  "choices": [
+   {
+    "text": "R"
+   },
+   {
+    "text": "K"
+   },
+   {
+    "text": "M"
+   }
+  ],
+  "answer": 0,
+  "reason": "Rebane algab R-tähega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "42cb5f631219a5e1",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Olen magus ja külm maius, mida lakutakse tihti suvel. Kes või mis ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🍦"
+   },
+   {
+    "emoji": "🍕"
+   },
+   {
+    "emoji": "🍞"
+   }
+  ],
+  "answer": 0,
+  "reason": "Jäätis on külm ja magus maius.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3908e220b05e54af",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Milline neist sõnadest tähendab sõna „vaikne” vastandsõna?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kauge"
+   },
+   {
+    "text": "vali"
+   },
+   {
+    "text": "tume"
+   }
+  ],
+  "answer": 1,
+  "reason": "Vaikse vastand on vali.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "24d00b3ee8b18859",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Kaks neist asjadest on muusikariistad, aga üks ei ole. Milline neist ei ole pill?",
+  "picture": [
+   "🎸",
+   "🥁",
+   "🚗"
+  ],
+  "choices": [
+   {
+    "emoji": "🚗"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🥁"
+   }
+  ],
+  "answer": 0,
+  "reason": "Auto on sõiduk, mitte pill.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "fb9176c46fd22a41",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Milline neist sõnadest on sõna „tark” vastandsõna?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "rumal"
+   },
+   {
+    "text": "pikk"
+   },
+   {
+    "text": "kaval"
+   }
+  ],
+  "answer": 0,
+  "reason": "Targa vastandsõna on rumal.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "abd4bc67be25faba",
+  "lang": "et",
+  "subject": "words",
+  "level": 4,
+  "prompt": "Mul on kõva koorik, liigun aeglaselt ja tõmban pea ohu korral peitu. Kes ma olen?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐸"
+   },
+   {
+    "emoji": "🐢"
+   },
+   {
+    "emoji": "🐟"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kilpkonnal on tugev kilp ja ta liigub aeglaselt.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "27bc8414bf030823",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Mis aitab sul kuulata lindude laulu ja muusikat?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Nina"
+   },
+   {
+    "text": "Kõrv"
+   },
+   {
+    "text": "Käsi"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kõrvadega me kuuleme helisid.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b29c7ecd1204900f",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Kes neist loomadest armastab porgandit krõmpsutada ja oskab hästi hüpata?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🐟"
+   },
+   {
+    "emoji": "🐢"
+   }
+  ],
+  "answer": 0,
+  "reason": "Jänes hüppab kiiresti ja sööb porgandit.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ae7bb63060602b6f",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Mida me teeme igal õhtul enne magamaminekut oma hammastega?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Peseme hambaharjaga"
+   },
+   {
+    "text": "Värvime pintsliga"
+   },
+   {
+    "text": "Kammime kammiga"
+   }
+  ],
+  "answer": 0,
+  "reason": "Hambaid pestakse hambaharja ja pastaga puhtaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "4b9a3cc42467ffd3",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Kes neist oskab õhus lennata ja puu otsas laulda?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐦"
+   },
+   {
+    "emoji": "🐖"
+   },
+   {
+    "emoji": "🐌"
+   }
+  ],
+  "answer": 0,
+  "reason": "Linnul on tiivad ja ta oskab lennata.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0c3420e68487b671",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Millest saab talvel õues ehitada vahva lumemehe?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Liivast"
+   },
+   {
+    "text": "Lumest"
+   },
+   {
+    "text": "Kividest"
+   }
+  ],
+  "answer": 1,
+  "reason": "Lumememm veeretatakse kokku lumepallidest.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "0ca580bd4763181c",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Millega me toas põrandat pühime, kui puru maha pudiseb?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧹"
+   },
+   {
+    "emoji": "🎸"
+   },
+   {
+    "emoji": "🚗"
+   }
+  ],
+  "answer": 0,
+  "reason": "Harjaga saab põrandalt prahi ja puru kokku pühkida.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "3d434deb31967b5b",
+  "lang": "et",
+  "subject": "world",
+  "level": 1,
+  "prompt": "Mitu kollast banaani on pildil?",
+  "picture": [
+   "🍌",
+   "🍌",
+   "🍌",
+   "🍌"
+  ],
+  "choices": [
+   {
+    "text": "Kaks"
+   },
+   {
+    "text": "Neli"
+   },
+   {
+    "text": "Viis"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kokku on ritta pandud neli banaani.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "011504b6a062063b",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Mida me teeme õhtul enne magamaminekut oma hammastega?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🪥"
+   },
+   {
+    "emoji": "🔨"
+   },
+   {
+    "emoji": "🎸"
+   }
+  ],
+  "answer": 0,
+  "reason": "Enne magamaminekut pestakse hambaid hambaharjaga puhtaks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "895a53aba5ef4bac",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Kellel nendest loomadest on seljas teravad okkad?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Kass"
+   },
+   {
+    "text": "Siil"
+   },
+   {
+    "text": "Konn"
+   }
+  ],
+  "answer": 1,
+  "reason": "Siilil on seljas torkivad okkad.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f6673a50d1f9a4db",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Vaata pilti! Mitu punast õuna on puu otsas kokku?",
+  "picture": [
+   "🍎",
+   "🍎",
+   "🍎",
+   "🍎"
+  ],
+  "choices": [
+   {
+    "text": "kaks"
+   },
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "neli"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pildil on kokku neli õuna.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d291037e5cd38cd6",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Millisel aastaajal ehitatakse õue lumememme?",
+  "picture": [
+   "⛄"
+  ],
+  "choices": [
+   {
+    "text": "Suvel"
+   },
+   {
+    "text": "Talvel"
+   },
+   {
+    "text": "Sügisel"
+   }
+  ],
+  "answer": 1,
+  "reason": "Lund sajab ja lumememme saab teha talvel.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "e0dcc166ee7464e1",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Millise kehaosaga me kuuleme linnulaulu?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👄"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kõrvad on kuulmiseks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "6897048057ce8864",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Lillepeenras oli viis maasikat. Karu sõi ära kaks marja. Mitu maasikat jäi alles?",
+  "picture": [
+   "🍓",
+   "🍓",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "text": "üks"
+   },
+   {
+    "text": "kolm"
+   },
+   {
+    "text": "viis"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kui viiest võtta ära kaks, jääb järele kolm.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f699ebc7c1a971ef",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Öö on pime, aga päev on...",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Külm"
+   },
+   {
+    "text": "Märg"
+   },
+   {
+    "text": "Valge"
+   }
+  ],
+  "answer": 2,
+  "reason": "Pimeduse vastand on valgus.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "8a0f5d604c8335da",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Mida paned jalga enne õue mängima minemist?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👟"
+   },
+   {
+    "emoji": "🧢"
+   },
+   {
+    "emoji": "🧤"
+   }
+  ],
+  "answer": 0,
+  "reason": "Jalatsid pannakse jalga.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "2afe172e02df961d",
+  "lang": "et",
+  "subject": "world",
+  "level": 2,
+  "prompt": "Mis korjab lilledelt magusat nektarit ja teeb maitsvat mett?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "Liblikas"
+   },
+   {
+    "text": "Mesilane"
+   },
+   {
+    "text": "Tigu"
+   }
+  ],
+  "answer": 1,
+  "reason": "Mesilased valmistavad mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "d22be90a9abc1a69",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Mille abil me kuuleme linnulaulu ja muusikat?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "👂"
+   },
+   {
+    "emoji": "👃"
+   },
+   {
+    "emoji": "👀"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kõrvad on meile kuulamiseks.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ce97a267ce7a0acf",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Mille me paneme kätte, kui talvel on väljas külm ja sajab lund?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🧦"
+   },
+   {
+    "emoji": "🧤"
+   },
+   {
+    "emoji": "🧢"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kindad hoiavad käed soojas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "08440c87a3ebc111",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Missugune loom lendab õielt õiele ja teeb mett?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "liblikas"
+   },
+   {
+    "text": "tigu"
+   },
+   {
+    "text": "mesilane"
+   }
+  ],
+  "answer": 2,
+  "reason": "Mesilased koguvad nektarit ja valmistavad mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7b7e192a4cdee669",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Mida on hea teha igal hommikul ja õhtul, et hambad püsiksid terved?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "hambaid pesta"
+   },
+   {
+    "text": "kommi süüa"
+   },
+   {
+    "text": "multikat vaadata"
+   }
+  ],
+  "answer": 0,
+  "reason": "Hammaste pesemine hoiab suu puhtana.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "ac1d08ddafdf9dec",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Puu otsas kasvas kaksteist õuna. Neli õuna kukkus maha. Mitu õuna jäi puu otsa?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kuus"
+   },
+   {
+    "text": "kaheksa"
+   },
+   {
+    "text": "kümme"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kaksteist miinus neli on kaheksa.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "41588013dfcfc35d",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Mis juhtub veega, kui õues on väga külm ja paugub talvepakane?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "vesi läheb soojaks"
+   },
+   {
+    "text": "vesi muutub jääks"
+   },
+   {
+    "text": "vesi hakkab keema"
+   }
+  ],
+  "answer": 1,
+  "reason": "Külmaga vesi jäätub.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "59c189fc660d2d9f",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Millal me näeme taevas kuud ja säravaid tähti?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "lõuna ajal"
+   },
+   {
+    "text": "hommikul"
+   },
+   {
+    "text": "öösel"
+   }
+  ],
+  "answer": 2,
+  "reason": "Tähed ja kuu paistavad pimedal ööl.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "7d0fbc914622cfdf",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Mis hakkab kevadel puudel ja põõsastel rohetama?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "lehed"
+   },
+   {
+    "text": "lumi"
+   },
+   {
+    "text": "kivid"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kevadel puhkevad puudel uued rohelised lehed.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "65df201e71375c12",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Korvis oli üheksa maasikat. Vanaema tõi juurde viis maasikat. Mitu maasikat on nüüd kokku?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "kolmteist"
+   },
+   {
+    "text": "neliteist"
+   },
+   {
+    "text": "viisteist"
+   }
+  ],
+  "answer": 1,
+  "reason": "Üheksa pluss viis on neliteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "9d129cc703b392be",
+  "lang": "et",
+  "subject": "world",
+  "level": 3,
+  "prompt": "Kes neist loomadest magab terve talve oma soojas pesas talveund?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦊"
+   },
+   {
+    "emoji": "🐰"
+   },
+   {
+    "emoji": "🐻"
+   }
+  ],
+  "answer": 2,
+  "reason": "Karu magab talvel oma koopas.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "80ac9d5d534c1396",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Metsas kasvab neli puud ja iga puu all sibab ringi kolm siili. Mitu siili on kokku metsas?",
+  "picture": [
+   "🌲",
+   "🌲",
+   "🌲",
+   "🌲"
+  ],
+  "choices": [
+   {
+    "text": "seitse siili"
+   },
+   {
+    "text": "kaksteist siili"
+   },
+   {
+    "text": "üheksa siili"
+   }
+  ],
+  "answer": 1,
+  "reason": "Neli korda kolm on kokku kaksteist.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "f0da7976156d9c84",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "See kehaosa pumpab ööpäev läbi kehas verd ringi ja lööb kiiremini, kui jooksed. Mis elund see on?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "süda"
+   },
+   {
+    "text": "kopsud"
+   },
+   {
+    "text": "magu"
+   }
+  ],
+  "answer": 0,
+  "reason": "Süda pumpab verd üle kogu keha.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "29dd7c67bc146239",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "See loom magab talvel, sööb hea meelega marju ning armastab väga mett. Kes ta on?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🐻"
+   },
+   {
+    "emoji": "🦊"
+   },
+   {
+    "emoji": "🐰"
+   }
+  ],
+  "answer": 0,
+  "reason": "Karu magab talveund ja armastab maiustada magusa meega.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "b0f879ec94785392",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Laual on kuus taldrikut ja igal taldrikul on neli punast maasikat. Mitu maasikat on kokku?",
+  "picture": [
+   "🍓",
+   "🍓",
+   "🍓",
+   "🍓"
+  ],
+  "choices": [
+   {
+    "text": "kakskümmend neli"
+   },
+   {
+    "text": "kümme"
+   },
+   {
+    "text": "kaheksateist"
+   }
+  ],
+  "answer": 0,
+  "reason": "Kuus korda neli on kakskümmend neli.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c3b1b99145b7e7dd",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Päevad lähevad lühemaks, lehed langevad puudelt ja rändlinnud lendavad soojale maale. Mis aastaaeg see on?",
+  "picture": [
+   "🍂",
+   "🍁",
+   "🍄"
+  ],
+  "choices": [
+   {
+    "text": "kevad"
+   },
+   {
+    "text": "suvi"
+   },
+   {
+    "text": "sügis"
+   }
+  ],
+  "answer": 2,
+  "reason": "Sügisel värvuvad lehed kirjuks ja langevad maha.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a2c239184284829c",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Väljas on juba pime ja teed hakkavad külmuma. Mis tuleb kindlasti enne rattasõitu teha?",
+  "picture": [
+   "🚲"
+  ],
+  "choices": [
+   {
+    "text": "kell helisema panna"
+   },
+   {
+    "text": "panna kiiver ja tuled"
+   },
+   {
+    "text": "rattakorv tühjendada"
+   }
+  ],
+  "answer": 1,
+  "reason": "Pimedas peavad rattal põlema tuled ja peas peab olema kiiver.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "883be91e0519c5a2",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Mis hoiab meie keha püsti ja võimaldab lihastel luid liigutada?",
+  "picture": [],
+  "choices": [
+   {
+    "text": "luustik"
+   },
+   {
+    "text": "nahk"
+   },
+   {
+    "text": "küüned"
+   }
+  ],
+  "answer": 0,
+  "reason": "Luustik on tugev tugi, mis hoiab keha koos.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "a0e43662f7a06218",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "See väike putukas lendab õielt õiele, korjab nektarit ja valmistab sellest magusat mett. Kes see on?",
+  "picture": [],
+  "choices": [
+   {
+    "emoji": "🦋"
+   },
+   {
+    "emoji": "🐞"
+   },
+   {
+    "emoji": "🐝"
+   }
+  ],
+  "answer": 2,
+  "reason": "Mesilane kogub õietolmu ja teeb tarus mett.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "5f46f406a6e4c46f",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Tuppa astudes vajutad lülitit ja laes süttib lamp. Mis paneb lambi heledalt põlema?",
+  "picture": [
+   "💡"
+  ],
+  "choices": [
+   {
+    "text": "vesi torudes"
+   },
+   {
+    "text": "soe õhk"
+   },
+   {
+    "text": "elektrivool"
+   }
+  ],
+  "answer": 2,
+  "reason": "Elektrivool liigub mööda juhtmeid lambipirnini.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "1532a7760ac9ba44",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "Vanaema kudus kolmele lapselapsele sokke. Iga laps sai kaks paari sokke. Mitu üksikut sokki vanaema kudus?",
+  "picture": [
+   "🧦",
+   "🧦"
+  ],
+  "choices": [
+   {
+    "text": "kuus sokki"
+   },
+   {
+    "text": "kaksteist sokki"
+   },
+   {
+    "text": "kaheksa sokki"
+   }
+  ],
+  "answer": 1,
+  "reason": "Kolmel lapsel on kokku kuus paari ehk kaksteist sokki.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ },
+ {
+  "id": "c74ed648e507350f",
+  "lang": "et",
+  "subject": "world",
+  "level": 4,
+  "prompt": "See loom elab vees, kuid hingab õhku läbi pealael oleva ava ja hüppab vahel lainetest välja. Kes ta on?",
+  "picture": [
+   "🌊"
+  ],
+  "choices": [
+   {
+    "emoji": "🐬"
+   },
+   {
+    "emoji": "🐠"
+   },
+   {
+    "emoji": "🐙"
+   }
+  ],
+  "answer": 0,
+  "reason": "Delfiin on imetaja, kes tõuseb veepinnale hingama.",
+  "source": {
+   "by": "ai",
+   "model": "gemini-3.8-flash",
+   "solvers": "gemini-3.5-flash, gemini-2.5-flash, gemini-3.8-flash",
+   "at": "2026-10-12"
+  }
+ }
+]

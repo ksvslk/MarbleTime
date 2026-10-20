@@ -24,6 +24,8 @@ self.addEventListener('push', event => {
       body: message.body ?? '',
       icon: '/icons/icon-192.png',
       badge: '/icons/badge-96.png',
+      // "Yes" and "Not yet", answered right here (below) with the pass the message carries.
+      actions: Array.isArray(message.actions) ? message.actions.slice(0, 2) : [],
       data,
       // One notification per claim: a repeat replaces it, and still makes a sound.
       tag: data.claimId ?? 'marbletime',
@@ -32,20 +34,33 @@ self.addEventListener('push', event => {
   );
 });
 
-// Tapping a notification brings MarbleTime to the front (or opens it) on the page it points to.
+// Where the API is: the page says so when it registers this worker (/sw.js?api=…), since a worker has no config of its own.
+const API = new URL(self.location.href).searchParams.get('api') ?? '';
+
+/** Brings MarbleTime to the front (or opens it) on one of its own pages, whatever the message says. */
+async function openApp(path) {
+  const target = new URL(path ?? '/', self.location.origin);
+  const url = target.origin === self.location.origin ? target.href : self.location.origin + '/';
+  const windows = await self.clients.matchAll({type: 'window', includeUncontrolled: true});
+  const open = windows.find(client => new URL(client.url).origin === self.location.origin);
+  if (!open) return self.clients.openWindow(url);
+  await open.focus();
+  // navigate() works only for pages this worker controls; otherwise the app is at least in front.
+  if (open.url !== url) await open.navigate(url).catch(() => undefined);
+}
+
+/** "Yes" or "Not yet" from the notification: POST /push/decisions with the single-use pass (backend/openapi.yaml). */
+async function answer(token, yes) {
+  const response = await fetch(`${API}/push/decisions`, {method: 'POST', headers: {'content-type': 'application/json'}, body: JSON.stringify({token, yes})});
+  if (!response.ok) throw new Error(`answer refused: ${response.status}`);
+}
+
+// A tap on the notification opens the page where jobs are approved; a tap on "Yes" or "Not yet" answers at once,
+// without opening anything. If the answer can't be given (no network, the pass is used or too old), the app opens
+// so the grown-up can answer there.
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const target = new URL(event.notification.data?.url ?? '/', self.location.origin);
-  // Only this app's own pages, whatever the message says.
-  const url = target.origin === self.location.origin ? target.href : self.location.origin + '/';
-  event.waitUntil(
-    (async () => {
-      const windows = await self.clients.matchAll({type: 'window', includeUncontrolled: true});
-      const open = windows.find(client => new URL(client.url).origin === self.location.origin);
-      if (!open) return self.clients.openWindow(url);
-      await open.focus();
-      // navigate() works only for pages this worker controls; otherwise the app is at least in front.
-      if (open.url !== url) await open.navigate(url).catch(() => undefined);
-    })(),
-  );
+  const data = event.notification.data ?? {};
+  const decided = event.action === 'yes' || event.action === 'not_yet';
+  event.waitUntil(decided && data.token && API ? answer(data.token, event.action === 'yes').catch(() => openApp(data.url)) : openApp(data.url));
 });

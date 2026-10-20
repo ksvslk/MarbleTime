@@ -1,13 +1,14 @@
 /** Every route in openapi.yaml, with who may call it. infra/stack.ts creates the same routes in API Gateway. */
 import {characterArt, createCharacter, listCharacters, removeCharacter} from '../domain/characters';
-import {claimChore, decide, decideOnTv, listClaims, takeBack} from '../domain/claims';
+import {claimChore, decide, decideOnTv, decideWithPass, listClaims, takeBack} from '../domain/claims';
 import {authenticateDevice, confirmPairing, deviceState, heartbeat, listDevices, patchDevice, pollPairing, removeDevice, startPairing} from '../domain/devices';
 import {ApiError} from '../domain/errors';
 import {
   addChild, addChore, changeSettingsOnTv, createFamily, familyBundle, me, patchChild, patchChore, patchFamily, patchMe, removeChild, removeChore,
   requireFamily,
 } from '../domain/family';
-import {adjust, handoff, history, settleHandoff} from '../domain/ledger';
+import {adjust, handoff, history, settleHandoff, useTime} from '../domain/ledger';
+import {finishPuzzles, puzzleRounds, puzzleSession} from '../domain/puzzle-results';
 import {subscribe, unsubscribe} from '../domain/push';
 import {speak, speechToText} from '../domain/speech';
 import type {Device, Family, Parent} from '../domain/types';
@@ -69,6 +70,7 @@ export const routes: Route[] = [
   family('GET', '/children/{childId}/characters', async ({deps, family, params}) => json(200, await listCharacters(deps, family, params.childId))),
   family('POST', '/children/{childId}/characters', async ({deps, family, params, body}) =>
     json(202, await createCharacter(deps, family, params.childId, check.characterInput(body, 'body')))),
+  family('GET', '/children/{childId}/puzzles', async ({deps, family, params}) => json(200, await puzzleRounds(deps, family, params.childId))),
   family('DELETE', '/children/{childId}/characters/{characterId}', async ({deps, family, params}) => {
     await removeCharacter(deps, family, params.childId, params.characterId);
     return noContent();
@@ -94,10 +96,12 @@ export const routes: Route[] = [
   }),
   family('POST', '/claims/{claimId}/approve', async ({deps, parent, family, params}) =>
     json(200, await decide(deps, family, params.claimId, true, {by: 'parent', sub: parent.sub}))),
-  family('POST', '/claims/{claimId}/reject', async ({deps, parent, family, params}) =>
-    json(200, await decide(deps, family, params.claimId, false, {by: 'parent', sub: parent.sub}))),
+  family('POST', '/claims/{claimId}/reject', async ({deps, parent, family, params, body}) =>
+    json(200, await decide(deps, family, params.claimId, false, {by: 'parent', sub: parent.sub}, check.notYetInput(body ?? {}, 'body').reason))),
 
   // Parent: notifications
+  // No sign-in: the single-use pass from the notification is the secret (like a pairing code).
+  open('POST', '/push/decisions', async ({deps, body}) => json(200, await decideWithPass(deps, check.pushDecisionInput(body, 'body')))),
   open('GET', '/push/key', async ({deps}) => json(200, {publicKey: await deps.push.publicKey()})),
   family('POST', '/push/subscriptions', async ({deps, parent, family, body}) => {
     await subscribe(deps, family, parent, check.pushSubscriptionInput(body, 'body'));
@@ -138,8 +142,13 @@ export const routes: Route[] = [
     await takeBack(deps, family, params.claimId);
     return noContent();
   }),
+  device('GET', '/device/puzzles/session', async ({deps, family, req}) => json(200, await puzzleSession(deps, family, check.anId(req.query.childId, 'childId')))),
+  device('POST', '/device/puzzles/results', async ({deps, family, body}) => json(200, await finishPuzzles(deps, family, check.puzzleResultInput(body, 'body')))),
+  device('POST', '/device/usage', async ({deps, family, device, body}) => json(200, await useTime(deps, family, device, check.usageInput(body, 'body')))),
   device('POST', '/device/claims/{claimId}/decide', async ({deps, family, device, params, body}) =>
     json(200, await decideOnTv(deps, family, device, params.claimId, check.decideInput(body, 'body')))),
+  device('POST', '/device/children/{childId}/characters', async ({deps, family, params, body}) =>
+    json(202, await createCharacter(deps, family, params.childId, check.characterInput(body, 'body')))),
   device('GET', '/device/characters/{characterId}', async ({deps, family, params}) =>
     json(200, await characterArt(deps, family, params.characterId), FOREVER)),
   device('POST', '/device/speech', async ({deps, family, device, body}) => json(200, await speak(deps, family, device, check.speechInput(body, 'body')))),

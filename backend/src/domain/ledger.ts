@@ -3,9 +3,10 @@ import type {Deps} from './deps';
 import {busy, conflict, notFound} from './errors';
 import {newId} from './secrets';
 import {localDay, nextDay, startOfDay} from './time';
-import type {Child, Family, LedgerEntry, Parent} from './types';
-import type {AdjustInput, HandoffInput} from './validate';
-import {entryView, newestFirst} from './views';
+import type {Child, Device, Family, LedgerEntry, Parent} from './types';
+import type {AdjustInput, HandoffInput, UsageInput} from './validate';
+import {baseLeftSec} from './budget';
+import {childView, entryView, newestFirst} from './views';
 
 /**
  * Settles a kid's hand-off from before today. Minutes marked handed off (DONE or SKIPPED) stay in the jar for the rest
@@ -18,6 +19,25 @@ import {entryView, newestFirst} from './views';
  * debt, so no minutes stay in the jar for good. (The jar then always holds pending minutes + today's due − the debt.)
  */
 export async function settleDue(deps: Deps, family: Family, child: Child): Promise<{child: Child; settled: boolean}> {
+  const result = await settleDueOnly(deps, family, child);
+  return {...result, child: asOfToday(result.child, localDay(deps.now(), family.timezone))};
+}
+
+/**
+ * A kid as read today: watched time counted on another day reads as none, so every reader sees today's jar.
+ * `usedDay` stays as stored: a USAGE write is conditional on it (useTime).
+ */
+const asOfToday = (child: Child, today: string): Child => {
+  const {puzzleDay, ...rest} = child;
+  return {
+    ...rest,
+    ...(child.usedDay !== today && {usedBaseSec: 0, usedEarnedSec: 0}),
+    // A puzzle session from another day isn't today's: `puzzleDay` is set only while today's is done.
+    ...(puzzleDay === today && {puzzleDay}),
+  };
+};
+
+async function settleDueOnly(deps: Deps, family: Family, child: Child): Promise<{child: Child; settled: boolean}> {
   let current = child;
   for (let attempt = 0; attempt < 3; attempt++) {
     const {handoffDueSec: dueSec, handoffDueDay: dueDay, ...rest} = current;
@@ -104,6 +124,40 @@ async function previousAdjust(deps: Deps, familyId: string, childId: string, id:
   return done?.entry;
 }
 
+/**
+ * The TV counted watched time: it comes out of the jar, today's base first and then earned time, and never below an
+ * empty jar (what the jar didn't hold isn't counted). Idempotent on the TV's `id`; answers the kid as of now, so the
+ * TV shows the same time left as the phone.
+ */
+export async function useTime(deps: Deps, family: Family, device: Device, input: UsageInput) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const done = await deps.repo.getRef(family.id, input.childId, input.id);
+    if (done && done.kind !== 'usage') throw conflict('id_in_use', 'This id was already used for something else');
+    const child = await requireChild(deps, family, input.childId, true);
+    if (done) return childView(child);
+    const now = deps.now();
+    const day = localDay(now, family.timezone);
+    const fromBase = Math.min(input.seconds, baseLeftSec(child));
+    const fromEarned = Math.min(input.seconds - fromBase, child.balanceSec);
+    if (fromBase + fromEarned === 0) return childView(child);
+    const entry: LedgerEntry = {
+      id: newId(), childId: child.id, deltaSec: -fromEarned, type: 'USAGE', reason: 'TV', createdBy: `tv:${device.id}`, createdAt: now, baseSec: fromBase,
+    };
+    const result = await deps.repo.addEntry(family.id, entry, {
+      ref: {id: input.id, value: {kind: 'usage'}},
+      minBalanceSec: fromEarned,
+      used: {
+        day, baseSec: (child.usedBaseSec ?? 0) + fromBase, earnedSec: (child.usedEarnedSec ?? 0) + fromEarned,
+        ...(child.usedDay !== undefined && {prevDay: child.usedDay}), prevBaseSec: child.usedBaseSec ?? 0,
+      },
+    });
+    if (result === 'ok') deps.changed(family.id);
+    if (result !== 'changed') return childView(await requireChild(deps, family, input.childId, false));
+    // The jar changed at the same moment (another TV, an approval): look again.
+  }
+  throw busy();
+}
+
 export async function history(deps: Deps, family: Family, childId: string, limit: number) {
   await requireChild(deps, family, childId, false);
   return {entries: (await deps.repo.entries(family.id, childId, limit)).map(entryView)};
@@ -122,7 +176,8 @@ export async function handoff(deps: Deps, family: Family, childId: string) {
   const child = await requireChild(deps, family, childId, false);
   const pending = await deps.repo.pendingEntries(family.id, childId);
   return {
-    pendingMinutes: Math.max(0, Math.floor((total(pending) - child.debtSec) / 60)),
+    // Earned time already watched on a strict-mode TV is gone from the jar: there is at most the jar left to hand off.
+    pendingMinutes: Math.max(0, Math.floor(Math.min(total(pending) - child.debtSec, child.balanceSec) / 60)),
     entries: pending.sort(newestFirst).map(entryView),
   };
 }
