@@ -34,6 +34,18 @@ describe('characters on a paired TV (docs/08)', () => {
     expect(sync(s, [dragon, ready(owl, 'Rollerskate Owl')]).celebrations).toHaveLength(1);
   });
 
+  it('a different family behind the same TV brings no old news: its characters and bonuses are not celebrated', () => {
+    const other: ServerState = {...server, family: {...server.family, id: 'f2', name: 'Other'}, adjustments: [
+      {id: 'a1', childId: 'k1', deltaMin: 10, reason: 'Kind to Leo', at: now - 60_000},
+    ]};
+    const before = sync(sync(paired, []), [owl]);
+    const after = applyServer(before, {...other, characters: [dragon]}, now);
+    expect([after.celebrations, after.seenCharacters, after.link?.familyId]).toEqual([[], ['ch1'], 'f2']);
+    // The same family again: new is new.
+    const later = applyServer(after, {...other, characters: [dragon, ready(owl, 'Rollerskate Owl')]}, now);
+    expect(later.celebrations).toEqual([{id: 'meet-ch2', kidId: 'k1', meet: 'ch2'}]);
+  });
+
   it('says hello where the kid can see it, like other good news', () => {
     const s = sync(sync(sync(paired, []), [owl]), [ready(owl, 'Rollerskate Owl')]);
     expect(celebrationToShow({...s, screen: {name: 'who'}})).toEqual({id: 'meet-ch2', kidId: 'k1', meet: 'ch2'});

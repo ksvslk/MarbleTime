@@ -36,6 +36,12 @@ class StrictEngineTest {
     assertEquals(AppKind.Metered, Allowlist.kindOf("app.marbletime.cartoons", own, guard = true))
   }
 
+  @Test fun `Amazon's parental-controls PIN in front of settings is left alone, with or without a family PIN`() {
+    val own = "app.marbletime.tv"
+    assertEquals(AppKind.Free, Allowlist.kindOf("com.amazon.tv.parentalcontrols", own, guard = true))
+    assertEquals(AppKind.Free, Allowlist.kindOf("com.amazon.tv.parentalcontrols", own, guard = false))
+  }
+
   @Test fun `a grown-ups-only app stays closed until the PIN opens it for a while, and never costs time`() {
     val engine = watching("mia" to 600)
     assertEquals(Mode.Locked, engine.tick(AppKind.GrownupsOnly, 5, nowMs = 1_000))

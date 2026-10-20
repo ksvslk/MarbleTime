@@ -103,6 +103,9 @@ object Allowlist {
     "com.amazon.tv.oobe",
     "com.amazon.tv.notificationcenter",
     "com.amazon.tv.ime",           // on-screen keyboard
+    // Amazon's own parental-controls PIN, which Fire OS puts in front of settings when the parent turned it on: a
+    // guard itself, so it is never metered or locked (a lock there would put "Who's watching?" in a parent's way).
+    "com.amazon.tv.parentalcontrols",
     "com.google.android.apps.tv.launcherx", // Google TV home
     "com.google.android.tvlauncher",        // Android TV home
     "com.google.android.inputmethod.latin", // their on-screen keyboard

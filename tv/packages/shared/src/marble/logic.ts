@@ -92,6 +92,8 @@ export interface Link {
   token: string;
   deviceId: string;
   familyName: string;
+  /** The family the TV last synced with; when another one comes back, nothing of its past is news. */
+  familyId?: string;
   /** The family's grown-ups PIN as hex(sha256(salt + ":" + pin)), so the TV can check it offline. */
   pin: {salt: string; hash: string} | null;
   /** Where the backend pushes "something changed" (WebSocket); learnt from the first sync. */
@@ -394,15 +396,17 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
   ];
   const waitingHere = new Set(state.claims.filter(c => c.status === 'waiting').map(c => c.id));
   const approvedElsewhere = server.claims.filter(c => c.status === 'approved' && waitingHere.has(c.id) && !decided.has(c.id));
-  // Bonuses given on the phone since the last sync are celebrated; on the first sync after pairing, nothing is new.
+  // Nothing is news on the first sync after pairing, or when the link now leads to another family.
+  const fresh = firstSyncPending(state) || (state.link?.familyId !== undefined && state.link.familyId !== server.family.id);
+  // Bonuses given on the phone since the last sync are celebrated.
   const adjustments = server.adjustments ?? [];
   const seen = new Set(state.seenAdjustments);
-  const newBonuses = firstSyncPending(state) ? [] : adjustments.filter(a => a.deltaMin > 0 && !seen.has(a.id));
-  // A character that finished drawing is introduced once ("Meet …!"); on the first sync after pairing, none are new.
+  const newBonuses = fresh ? [] : adjustments.filter(a => a.deltaMin > 0 && !seen.has(a.id));
+  // A character that finished drawing is introduced once ("Meet …!").
   const characters: Character[] = (server.characters ?? []).map(c => ({id: c.id, kidId: c.childId, status: c.status, name: c.name, voice: c.voice, mood: c.mood, createdAt: c.createdAt}));
   const ready = characters.filter(c => c.status === 'ready');
   const introduced = new Set(state.seenCharacters);
-  const newCharacters = firstSyncPending(state) ? [] : ready.filter(c => !introduced.has(c.id));
+  const newCharacters = fresh ? [] : ready.filter(c => !introduced.has(c.id));
   const readyIds = new Set(ready.map(c => c.id));
   // Settings changed here and not sent yet stay as the TV has them.
   const mine = state.outbox.some(o => o.kind === 'settings');
@@ -441,7 +445,7 @@ export function applyServer(state: State, server: ServerState, now: number): Sta
     seenAdjustments: adjustments.map(a => a.id),
     characters,
     seenCharacters: ready.map(c => c.id),
-    link: state.link && {...state.link, familyName: server.family.name, pin: server.family.pin, realtimeUrl: server.realtimeUrl},
+    link: state.link && {...state.link, familyId: server.family.id, familyName: server.family.name, pin: server.family.pin, realtimeUrl: server.realtimeUrl},
   };
 }
 
