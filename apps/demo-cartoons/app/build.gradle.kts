@@ -34,3 +34,8 @@ android {
 kotlin {
     compilerOptions { jvmTarget.set(JvmTarget.JVM_17) }
 }
+
+dependencies {
+    // ExoPlayer, for its choice of decoder: a software one draws frames that the stick's screen recordings can see.
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+}

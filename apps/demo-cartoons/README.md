@@ -6,6 +6,8 @@ mode meters and locks in tests and in the demo video, so no real streaming servi
 - Video: *Big Buck Bunny* © 2008 Blender Foundation, [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/),
   streamed from Wikimedia Commons (480p VP9). The credit shows on screen for the first seconds.
 - Remote: OK or play/pause pauses and resumes.
+- Plays through ExoPlayer with software decoders first, into a `TextureView`, so the stick's screen recordings show
+  the cartoon (the hardware decoder's frames come out black: FRICTION_LOG, Oct 5).
 
 Build and install (same toolchain as the TV app):
 

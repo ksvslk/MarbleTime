@@ -171,26 +171,40 @@ Added on Oct 5: the parent app speaks the same four languages; **recurring jobs*
 
 ### Demo video storyboard (< 3:00), updated Oct 20
 
-A made-up family only (Mia and Leo, "Dad", PIN 1234: the seeded demo family on its own ports), so no real name is on
-screen. No third-party apps or logos: the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end
-card). English narration by an Amazon Polly voice.
+It has to sell: the fight every parent knows, the joy of the marbles dropping early, proof on a real Fire TV, and the
+ask. A made-up family only (Mia and Leo, "Dad", PIN 1234), so no real name is on screen. No third-party apps or logos:
+the video app is Demo Cartoons (*Big Buck Bunny*, CC BY 3.0, credited on the end card).
 
-| Time | On screen | Recorded with | Narration |
-|---|---|---|---|
-| 0:00–0:12 | Title over the TV's "Who's here?" | stick (`screenrecord`), title by ffmpeg | "Screen time is a daily negotiation. Amazon Kids can set a limit, but it can't let kids earn time." |
-| 0:12–0:30 | Mia's board: the jar (today's time) and job cards that show what they give | stick | "MarbleTime puts the deal on the TV. Mia's jar is her TV time for today. Each marble is ten minutes, and every day starts half full." |
-| 0:30–0:45 | She picks "Toys away" with the remote → "I did it!" | stick | "She picks a job with the remote and says she did it." |
-| 0:45–1:05 | Side by side: the notification on Dad's phone with "Yes" and "Not yet" → Yes → the marbles drop, with sound | phone's own screen recording + stick | "Dad gets a notification and says yes. The marbles drop into the jar." |
-| 1:05–1:35 | Full jar → one more job → "A new character!" → she types "a dragon who loves pancakes" → (cut over the drawing) → it waves and talks | stick | "When the jar is full, extra jobs earn something else: a character she invents. An AI draws it from her words, code and a second model check it, and it talks to her." |
-| 1:35–2:05 | **Strict mode** (label: "Fire OS prototype, sideloaded"): pick who's watching → Demo Cartoons → "1 minute left" → locked: "Mia's jar is empty" → a yes on the phone → watching again; then Settings → the PIN pad | a phone camera on the TV (the stick records video as black), the stick for MarbleTime's own screens, fast clock (`fast=1`) | "On Fire OS, strict mode counts the time in any video app. At zero it locks, until a grown-up says yes to a job. The TV's settings need the parents' PIN." |
-| 2:05–2:15 | Bedtime: the moon on "Who's watching?" | stick | "At bedtime the TV stays off, whatever is in the jar." |
-| 2:15–2:30 | The same app on the Vega Virtual Device | macOS screen recording of the VVD | "The same React Native app runs on Vega. There, Amazon Kids keeps the limit." |
-| 2:30–2:45 | How it's built: Fire OS + Vega · Kotlin strict module · AWS (API Gateway, Lambda, DynamoDB, Cognito, CloudFront) · AI checked by code | card | "One codebase for both platforms, a Kotlin module for strict mode, and the backend on AWS." |
-| 2:45–2:58 | The ask: the Earned Time API; the repo address; credits | card | "Our ask to Amazon: an Earned Time API, so a family app can add time to Amazon Kids. Then this works on every Fire TV." |
+**The presenter's script**, read to the camera (about 50 s; the face goes in a circle at the bottom right):
 
-Needed on filming day: the stick paired to the demo family (and back to the real family afterwards), a second phone
-or a camera for the strict-mode shot (the stick's recordings show any video as black, even in a `TextureView`:
-FRICTION_LOG Oct 5), Do Not Disturb on the phone, the Vega Virtual Device running the same build.
+1. "Every parent knows this fight: just five more minutes! MarbleTime turns it into a game."
+2. "Kids earn TV time with real jobs. This jar is Mia's TV time for today. Every marble is ten minutes."
+3. "Mia tidies her toys and tells the TV. Dad taps yes on his phone, and the marbles drop in."
+4. "A full jar? Extra jobs earn something even better: a character Mia invents. She types a dragon who loves
+   pancakes, and AI brings it to life."
+5. "And it really works. On Fire TV, strict mode counts the minutes in any app. When the jar is empty, the TV stops.
+   No nagging, no arguing."
+6. "One app for Fire OS and Vega, with the backend on AWS."
+7. "Amazon Kids already counts the time. Give us one Earned Time API, and every family on Fire TV can earn it.
+   MarbleTime: TV time, earned."
+
+| Line | On screen | Recorded with |
+|---|---|---|
+| 1 | Cold open: marbles drop into the jar, with their clink; then the title card | stick (`screenrecord`), card |
+| 2 | "Who's here?" → Mia → her board: the jar and job cards that show what they give | stick |
+| 3 | "Toys away" → "I did it!"; side by side, the phone app's "Yes"; the marbles drop | stick, phone app |
+| 4 | Full jar → one more job → "A new character!" → the typed idea → (cut over the drawing) → it waves and talks | stick |
+| 5 | Strict mode (label: "Fire OS prototype, sideloaded"): who's watching → Demo Cartoons → "1 minute left" → locked: "Mia's jar is empty"; Settings → the PIN pad | stick with the fast clock (`fast=1`) |
+| 6 | The same app on the Vega Virtual Device; then the "How it's built" card | VVD window, card |
+| 7 | The ask: the Earned Time API, the repo address, credits | card |
+
+Labels on screen say where each shot comes from: "Fire TV Stick 4K Plus", "Vega Virtual Device". The stick's
+recordings have no sound, so the app's own sounds are added in the edit from its assets.
+
+Filmed by the agent on the real stick and the Vega Virtual Device. The stick shows the demo family from a filming
+data file in which it is the demo family's TV under its own token hash, so its pairing with the real family is kept.
+Demo Cartoons decodes in software, so the cartoon shows in the stick's recordings. The phone app is filmed in a
+phone-sized browser window.
 
 ## What to cut if we're behind
 

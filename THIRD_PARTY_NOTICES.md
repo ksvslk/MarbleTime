@@ -69,6 +69,9 @@ demand.
 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). Streamed from Wikimedia Commons, not bundled;
 the app shows this credit on screen.
 
+The app plays it with [AndroidX Media3 ExoPlayer](https://github.com/androidx/media) 1.4.1 (Apache License 2.0),
+a Gradle dependency of `apps/demo-cartoons`, bundled in its APK.
+
 ## Libraries bundled in the TV app
 
 Beyond React Native, Expo and the Vega SDK: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator)

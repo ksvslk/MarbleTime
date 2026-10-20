@@ -31,7 +31,8 @@ mkdir -p "$certs"
 url="https://$lan:5173"
 
 # The demo family never mixes with the real data: with --seed nothing is read from or written to the file.
-[[ " $* " == *" --seed "* ]] || export DATA_FILE="$ROOT/.data/dev.bin"
+# DATA_FILE=<file> keeps the data in another file instead (e.g. a family made up for filming).
+[[ " $* " == *" --seed "* ]] || export DATA_FILE="${DATA_FILE:-$ROOT/.data/dev.bin}"
 
 trap 'kill $(jobs -p) 2>/dev/null' EXIT
 (cd "$ROOT/backend" && DEV_CA_FILE="$(mkcert -CAROOT)/rootCA.pem" PWA_URL="$url" VAPID_PUBLIC_KEY="$VAPID_PUBLIC_KEY" VAPID_PRIVATE_KEY="$VAPID_PRIVATE_KEY" npm run dev -- "$@") &

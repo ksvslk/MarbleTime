@@ -132,9 +132,11 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Severity:** low.
 - **Workaround:** check the player state in `dumpsys`; verify by eye on the TV.
 - **Suggestion:** a developer option to include video layers in screen captures of non-DRM content.
-- **Oct 20:** drawing the video into a `TextureView` (a `MediaPlayer` on a `SurfaceTexture`) doesn't help: the
-  hardware VP9 decoder's frames (`OMX.MTK.VIDEO.DECODER.VP9`) stay black in `screencap` and `screenrecord` while the
-  app's own text shows. So any demo video of a video app on the stick has to be filmed with a camera.
+- **Oct 20:** the cause is the hardware decoder, not the view. A `TextureView` alone doesn't help: the frames of the
+  hardware VP9 decoder (`OMX.MTK.VIDEO.DECODER.VP9`) stay black in `screencap` and `screenrecord` while the app's own
+  text shows. A software decoder does: Demo Cartoons now plays through ExoPlayer with software decoders first
+  (`c2.android.vp9.decoder`) into a `TextureView`, and the stick's recordings show the cartoon. Nothing on the device
+  or in the docs says that hardware-decoded video is left out of captures.
 
 ## 2026-10-05 · A new AWS account can't call any Bedrock model ("Error 002")
 
