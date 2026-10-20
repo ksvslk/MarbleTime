@@ -26,6 +26,43 @@ How the TV time is enforced depends on the TV's mode, set per TV in the phone ap
 | **Strict** | Fire OS, sideloaded | MarbleTime itself (above) |
 | **API demo** | both | the *Earned Time API* we propose to Amazon ([docs/07](docs/07-earned-time-api.md)) |
 
+## Try it without building
+
+The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are on the
+[release page](https://github.com/ksvslk/MarbleTime/releases/latest).
+
+1. **Phone app:** open <https://d3uyrtcal2s4t9.cloudfront.net> on a phone (or a desktop browser) and sign up with an
+   email address; Cognito sends a code to confirm it. Your family starts empty: add a kid and a job or two.
+2. **The TV app.**
+   - *Fire TV (Fire OS):* on the TV, Settings → My Fire TV → Developer options → ADB debugging on. Then, from a
+     computer on the same network: `adb connect <the TV's IP>:5555` and `adb install MarbleTime-fireos.apk`.
+     MarbleTime appears under Your Apps.
+   - *Vega Virtual Device:* with the [Vega SDK](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html),
+     `vega virtual-device start`, then `vega run-app MarbleTime-vega-aarch64.vpkg app.marbletime.tv.main -d VirtualDevice`
+     (`-x86_64.vpkg` on an Intel computer).
+3. **Pair:** the TV shows a QR code and a six-letter code. In the phone app, open TVs and scan the code, or type it and
+   tap Go.
+4. **Try it:** on the TV, pick the kid and a job, and press "I did it!". Say yes on the phone (a notification, or
+   Approvals), and the marbles drop into the jar. The Puzzles card plays a round of five questions for a star.
+5. **Strict mode (Fire OS only):** give the app its two permissions once, then set the TV to *Strict* in the phone app
+   (TVs → the TV → Mode):
+   ```sh
+   adb shell appops set app.marbletime.tv GET_USAGE_STATS allow
+   adb shell appops set app.marbletime.tv SYSTEM_ALERT_WINDOW allow
+   ```
+   Any video app is counted. `DemoCartoons.apk` from the release plays *Big Buck Bunny* if you'd rather not use your
+   own. To see a jar run out in seconds, turn on the demo clock (a second counts as a minute):
+   `adb shell am start -a android.intent.action.VIEW -d 'marbletime://open?fast=1' app.marbletime.tv` (`fast=0` turns
+   it off).
+
+On AWS, two things work differently from the demo video:
+
+- **New characters can't be drawn there yet.** Amazon Bedrock is blocked on our AWS account ("Error 002", in
+  [FRICTION_LOG](FRICTION_LOG.md); a support case has been open since Oct 5), so the TV says characters can't be made
+  right now and the kid keeps the token. They work in the local setup below, and on AWS once the block is lifted.
+- **Voices are Amazon Polly's**, in English, German and Spanish. Polly has no Estonian voice, so Estonian lines that
+  aren't recorded in the app stay silent there.
+
 ## Run it
 
 You need macOS or Linux with Node 22, Yarn 4 (via Corepack), and for the TV: the Android SDK with JDK 17 and `adb`, a

@@ -397,3 +397,17 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Workaround:** the video script waits 45 s between tries. (The backend's own speech client already waits as long as
   Google's Retry-After or RetryInfo asks, when one comes.)
 - **Suggestion:** name the quota and give a retry time in every 429.
+
+## 2026-10-20 · Vega: the Release build aborts at start; the Debug build of the same code runs
+
+- **Task:** package MarbleTime for the judges: `react-native build-kepler --build-type Release`, installed with
+  `vega run-app … -d VirtualDevice` (Vega Virtual Device, aarch64).
+- **Expected:** the app starts, as the Debug build of the same commit does.
+- **Actual:** the process ends about 30 ms after FOREGROUND: `Process 'app.marbletime.tv' crashed with signal 6`,
+  crash fingerprint `JSThread_6_…`. `loggingctl log -f` has no JavaScript error before it, and the crash report sits
+  in `/var/lib/data/acr/`, which the `vega exec vda shell` user can't read. The Debug `.vpkg` (built a minute later
+  from the same tree) starts, pairs and runs.
+- **Severity:** medium: a Release build that dies silently can't be shipped, and nothing says why.
+- **Workaround:** the judges' release carries the Debug `.vpkg`s.
+- **Suggestion:** log the JavaScript exception (message and stack) before aborting a Release build, and let the
+  developer-mode shell read its own app's crash reports (or a `vega device crash-reports` command).

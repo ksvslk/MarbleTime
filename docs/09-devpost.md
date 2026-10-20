@@ -82,7 +82,7 @@ is worth.
   of opening, "Alexa, open YouTube" included.
 - The same app runs on Fire OS and on the Vega simulator.
 - 614 automated tests across the backend, the phone app, the TV's rules and the strict-mode engine.
-- 33 friction log entries, each with steps, a workaround and a suggestion.
+- 34 friction log entries, each with steps, a workaround and a suggestion.
 
 ### What we learned
 
@@ -109,10 +109,19 @@ claude-code
 ## Links
 
 - Code: <https://github.com/ksvslk/MarbleTime>
+- TV builds (Fire OS APK, Vega packages, Demo Cartoons): <https://github.com/ksvslk/MarbleTime/releases/latest>
+- Phone app (sign up with an email address): <https://d3uyrtcal2s4t9.cloudfront.net>
 - Video: to come
+
+### Testing instructions (for the Devpost field)
+
+The backend and the phone app run on AWS until Nov 20. Sign up in the phone app with an email address. Install the TV
+app from the release page (Fire TV: `adb install MarbleTime-fireos.apk`; Vega Virtual Device: `vega run-app
+MarbleTime-vega-aarch64.vpkg app.marbletime.tv.main -d VirtualDevice`). The TV shows a QR code and a six-letter code:
+in the phone app, open TVs and scan it, or type the code. Step by step, with strict mode's two `adb` commands and the
+demo clock: "Try it without building" in the README. On AWS, new characters can't be drawn yet (Amazon Bedrock is
+blocked on our account, "Error 002"), and voices are Amazon Polly's (English, German, Spanish).
 
 ## Still to fill in
 
 - The video link, after upload.
-- Testing notes for judges, after the AWS update: the phone app's address and a judges' account, and how to sideload
-  and pair the TV app.
