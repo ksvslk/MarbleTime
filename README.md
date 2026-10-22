@@ -43,12 +43,13 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
      and Enter work as the remote.
    - *Vega Virtual Device:* with the [Vega SDK](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html),
      `vega virtual-device start`, then `vega run-app MarbleTime-vega-aarch64.vpkg app.marbletime.tv.main -d VirtualDevice`
-     (`-x86_64.vpkg` on an Intel computer).
+     (`-x86_64.vpkg` on an Intel computer). Use OK on the simulator's on-screen remote: a scripted `KEY_ENTER`
+     doesn't press buttons ([FRICTION_LOG](FRICTION_LOG.md), Oct 5).
 3. **Pair:** the TV shows a QR code and a six-letter code. In the phone app, open TVs and scan the code, or type it and
    tap Go.
 4. **Try it:** on the TV, pick the kid and a job, and press "I did it!". Say yes on the phone (a notification, or
    Approvals) or on the TV under Grown-ups with the family PIN, and the marbles drop into the jar. The Puzzles card
-   plays a round of five questions for a star.
+   plays a round of five questions (ten from age 7) for a star.
 5. **Strict mode (Fire OS only):** give the app its two permissions once, then set the TV to *Strict* in the phone app
    (TVs → the TV → Mode):
    ```sh
