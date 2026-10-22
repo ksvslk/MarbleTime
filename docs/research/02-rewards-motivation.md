@@ -34,7 +34,7 @@ Input for the redesign (Oct 7, 2026). Compiled by a research agent; abstracts or
 13. **Random rewards resemble gambling (M, correlational).** "A variable ratio reinforcement schedule… underpins many forms of gambling"; 45% of games with loot boxes met all five gambling criteria [7]; loot-box spending linked to problem gambling at 16–18 (η²=0.120) [38]; mean r=0.27 across studies [32]; apps for 3–5-year-olds commonly use lures (45%), character pressure (25%), time pressure (17%) [25].
 14. **Streaks work by fear of losing them (W for children).** Broken streaks reduce engagement (adults) [30]; EU guidelines: switch off "communication 'streaks'" for minors by default and protect them from "virtual currencies or loot-boxes" [8].
 
-## 2. The agent's implications for MarbleTime
+## 2. Implications for MarbleTime
 
 1. **Jobs earn marbles; brain games mainly earn progress.** Show progress and skill ("3 solved!"); if games pay marbles at all: few, fixed, capped, paid in full for an easy standard every child can reach (least harmful form, F4); never per correct answer; never "play to unlock TV" (F6); let children keep playing after the cap without marbles.
 2. **Size rewards from the screen-time budget down.** The daily TV limit caps spending however full the jar is; keep the marble's value fixed; a normal day's routine jobs buy one short TV session (illustration: 60-minute limit with half earnable = 6 marbles over about 3 jobs); price games below jobs; small, occasional bonuses; 4–6-year-olds spend daily, 7–10-year-olds may save; parents can add non-screen rewards priced in marbles (park trip, choosing dinner).

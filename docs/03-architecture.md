@@ -1,13 +1,11 @@
-# 03 · Architecture (recommended approach)
+# 03 · Architecture
 
 > **Stack:**
-> - **React Native TV app** with shared screens, built for **Fire OS** (Expo TV, your stick) and **Vega** (simulator)
+> - **React Native TV app** with shared screens, built for **Fire OS** (Expo TV) and **Vega**
 > - a **Kotlin strict-mode module** in the Fire OS build only
 > - a parent **PWA**
 > - an **AWS serverless backend** (CDK: API Gateway + Lambda + DynamoDB + Cognito + Bedrock)
-> - TV screens for young kids: the [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh), rules in §12
->
-> Alternatives are in [02-approaches](02-approaches.md). The name MarbleTime was chosen on Oct 5 (TimeJar was the working title).
+> - TV screens for young kids, by the rules in §12
 
 ## 1. Big picture
 
@@ -339,7 +337,7 @@ CLAUDE.md · FRICTION_LOG.md · FEEDBACK.md · FEATURE_REQUESTS.md
 
 ## 12. TV design rules
 
-The [design canvas](https://claude.ai/artifact/7Fs9Pa4bPtV1vzPfF2wLxh) has all 13 screens. It is built for kids of about 4–8, many of whom can't read yet.
+The TV's screens are built for kids of about 4–8, many of whom can't read yet.
 
 - **Time is marbles.** One gold marble = 10 minutes. Rewards show as marbles; minutes appear small, for parents. The jar is today's budget: its size is the kid's daily ceiling, and faint empty places show what jobs can still add (docs/08). Marbles grow with the jar's size, so a full jar of any size looks full to the top (6 big marbles for 60 minutes, 12 smaller ones for 120).
 - **Gold** means only two things: time (marbles) and the main button.

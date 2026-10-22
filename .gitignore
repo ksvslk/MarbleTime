@@ -22,3 +22,8 @@ cdk.out/
 *.tsbuildinfo
 # A local 30 fps cartoon for recording the stick (apps/demo-cartoons/README.md); never committed.
 apps/demo-cartoons/app/src/main/assets/
+
+# Local working notes and agent setup (not part of the project)
+.notes/
+CLAUDE.md
+.adbt-config.json

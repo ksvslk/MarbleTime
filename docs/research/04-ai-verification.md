@@ -39,7 +39,7 @@ Input for the redesign (Oct 7, 2026). Compiled by a research agent that opened e
 19. Zero errors in an audit of N items → 95% upper bound ≈ 3/N; 300 clean items to claim under 1% [42]. S.
 20. Vision-language models averaged 58% on trivial counting/overlap tasks [43]; image generators struggle with exact object counts [44]. M.
 
-## 2. The agent's proposed pipeline (any question type)
+## 2. Proposed pipeline (any question type)
 
 Rule: the generator's key is a claim; an item ships only when independent checks agree; on disagreement discard and regenerate, never ask the generator to fix it (F10).
 

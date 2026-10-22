@@ -35,7 +35,7 @@ Input for the redesign (Oct 7, 2026). Compiled by a research agent; each finding
 15. **Sessions and read-aloud.** Sustained attention improves fast between 5–6 and 8–9 [S33]; spaced daily lessons beat one block (ages 5–7) [S34] (moderate). Three answer options is optimal (older students) [S35]; reading aloud helps, more with a human reader [S36] (strong). Time-pressure evidence sparse [S37] (weak).
 16. **Praise and mindset. Mixed.** Person/intelligence praise led to "helpless" reactions after setbacks, ages 4–11 [S38–S40]; a replication (n=624) [S41] and a preregistered study (n=150) [S42] found little or no effect. Mindset programmes weak [S43]; d=0.05, not significant after bias correction [S44]; d=0.14 when targeted [S45].
 
-## 2. The agent's implications for MarbleTime
+## 2. Implications for MarbleTime
 
 1. **One answer counts** (4–7): a wrong tile is marked calmly (no buzzer); show and say the right answer with a one-line reason tied to the picture; move on; ask a sibling question 2–4 items later or the next day; only first answers move the rating or earn credit; no retry (with 3 tiles it is a coin flip).
 2. **Guard against guessing** (4, 9): ignore taps before the read-aloud ends and very fast taps; shuffle the right tile's position; repeated fast misses → suggest a break and tell the parent; optional "?" skip without penalty.

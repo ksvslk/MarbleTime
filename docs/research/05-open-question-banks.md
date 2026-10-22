@@ -37,7 +37,7 @@ Input for the redesign. Compiled by a research agent that confirmed every licenc
 
 IM v.360 (CC BY-NC); EL Education / Bookworms (reported CC BY-NC); TIMSS/PIRLS (non-commercial only); MELQO (CC BY-NC-SA); ASDiv (CC BY-NC); CHILDES incl. Estonian corpora (CC BY-NC-SA); ARASAAC (BY-NC-SA); OpenStax (no K–5; NC); Siyavula (grades 4–12); MAWPS (no licence); EGRA/EGMA (all rights reserved); US state tests (no reuse terms); Dolch/Fry lists (no licence found; use DfE common exception words); MultiPic (no licence); Kobras (no licence, grades 5+); Innove/REKK worksheets on digar.ee ("Copyrighted").
 
-## 4. The agent's recommendation
+## 4. Recommendation
 
 1. Build the age map from open curricula (Development Matters, DfE maths guidance, English Appendix 1, the Estonian grade 1–3 curriculum).
 2. Keep a "gold" bank of human-made items (Oak 3-option questions, STA phonics and KS1 items, IM practice problems) with source, licence and credit on every item: use as they are (English), as examples for AI, and as difficulty anchors.

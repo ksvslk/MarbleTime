@@ -51,7 +51,7 @@ Input for the reward/time redesign (Oct 7, 2026). Compiled by a research agent t
 
 12. **No guideline adds weekend time. [G/X]** AAP 2026: limits "might vary … school nights versus weekends". Preschoolers already watch more at weekends (1.88 vs 1.24 h; Tang 2018). No study supports a specific weekend extra.
 
-## 2. Implications for MarbleTime (the agent's recommendations)
+## 2. Implications for MarbleTime
 
 1. A hard daily maximum covering base + jobs + games + bonus, games included: ages 4–5 → 60 min (parents can lower to 30–45; base 20–30; earnable ≤30); 6–7 → 60–90 (Estonia keeps 60 until 7; base 30; earnable ≤30–45); 8–10 → 90–120 (default 90; base 30–45; earnable ≤45). A parent setting for other screens lowers the TV maximum.
 2. The base is an allowance, not a wage: "today's jar fills up to a fixed top"; marbles can also buy non-screen treats; something for unused marbles (Epstein); earnable share about a third to a half of the maximum (assumption to test).

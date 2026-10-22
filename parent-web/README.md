@@ -161,8 +161,8 @@ A build without them shows "This app isn't set up yet" with the missing names.
   icons are Lucide (ISC, see `THIRD_PARTY_NOTICES.md`). The phone's own few (mic, stop, arrows) are plain shapes drawn
   here. Colours come from `src/tokens.ts`, a copy of the TV's tokens; one marble is 10 minutes.
 - **Translations** (English, Estonian, German, Spanish) are one table, `src/i18n/strings.ts`; a test checks that every
-  language has every key and the same `{holes}`. **Estonian, German and Spanish were written by the agent: have a
-  native speaker review them.** Where the phone names a TV button, it uses the TV's own words.
+  language has every key and the same `{holes}`. **Estonian, German and Spanish are machine-written: a native speaker
+  should review them.** Where the phone names a TV button, it uses the TV's own words.
 
 ## Layout
 
