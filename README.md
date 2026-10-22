@@ -65,14 +65,16 @@ On AWS, two things work differently from the demo video:
 
 ## Run it
 
-You need macOS or Linux with Node 22, Yarn 4 (via Corepack), and for the TV: the Android SDK with JDK 17 and `adb`, a
-Fire TV stick with ADB debugging on (or the Android TV emulator), and optionally the Vega SDK.
+You need macOS or Linux with Node 22, Yarn 4 (via Corepack) and [mkcert](https://github.com/FiloSottile/mkcert), and for
+the TV: the Android SDK with JDK 17 and `adb`, a Fire TV stick with ADB debugging on (or the Android TV emulator), and
+optionally the Vega SDK.
 
 **1. Backend and phone app** (on your computer, for a phone and a TV on the same Wi-Fi):
 
 ```sh
 cd backend && npm install && cd ../parent-web && npm install && cd ..
 scripts/dev.sh --seed     # a demo family (Mia and Leo, PIN 1234), in memory; without --seed your family is kept in .data/
+MODEL_ID=fake scripts/dev.sh --seed    # the same without a Google Cloud sign-in: stand-in drawings for new characters
 ```
 
 Open the printed `https://<computer>:5173` on your phone and sign in with any name (`demo` for the demo family). The
@@ -103,7 +105,7 @@ API Gateway (HTTP and WebSocket), S3 and CloudFront ([backend/README.md](backend
 cd backend && npm test                              # API, ledger, budget, characters, puzzles (in memory; DynamoDB Local with npm run test:dynamo)
 cd parent-web && npm test
 cd tv/packages/shared && yarn test:logic             # the TV's rules: jar, claims, strict-mode picking, bedtime, read-aloud
-cd tv/packages/expotv/android && ./gradlew :marble-strict:testReleaseUnitTest   # strict mode's engine
+cd tv/packages/expotv/android && ./gradlew :marble-strict:testReleaseUnitTest   # strict mode's engine (after scripts/fire.sh build makes android/)
 ```
 
 Device checks (the stick, the Android TV emulator, the Vega simulator) are written up in

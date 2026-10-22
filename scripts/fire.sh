@@ -7,15 +7,24 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 # shellcheck disable=SC1091
 [ -f "$ROOT/.env.local" ] && source "$ROOT/.env.local"
-: "${FIRETV:?Set FIRETV=<ip>:5555 in .env.local}"
 APP_ID="${APP_ID:-app.marbletime.tv}"
 SHOTS="$ROOT/.shots"
 
 cmd="${1:-}"; shift || true
+# Every command but build talks to the stick
+[ "$cmd" = build ] || : "${FIRETV:?Set FIRETV=<ip>:5555 in .env.local}"
 case "$cmd" in
   build)   # release APK for the stick (armeabi-v7a). --rerun on the JS bundle: Gradle doesn't see edits in tv/packages/shared.
     export ANDROID_HOME="${ANDROID_HOME:-$HOME/Library/Android/sdk}" JAVA_HOME="${JAVA_HOME:-/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home}"
     [ -d "$ROOT/tv/packages/expotv/android" ] || (cd "$ROOT/tv/packages/expotv" && EXPO_TV=1 CI=1 npx expo prebuild --clean --platform android)
+    # Reanimated 4.2 links worklets' library from build/intermediates/cmake/release/obj/<abi>/, where this Gradle no
+    # longer puts it, so a fresh checkout fails with "libworklets.so … missing": build worklets first and copy it there.
+    w="$ROOT/tv/packages/expotv/node_modules/react-native-worklets/android/build/intermediates"
+    if [ ! -f "$w/cmake/release/obj/armeabi-v7a/libworklets.so" ]; then
+      (cd "$ROOT/tv/packages/expotv/android" && ./gradlew :react-native-worklets:externalNativeBuildRelease -PreactNativeArchitectures=armeabi-v7a --console=plain -q)
+      mkdir -p "$w/cmake/release/obj/armeabi-v7a"
+      cp "$(ls -t "$w"/cxx/RelWithDebInfo/*/obj/armeabi-v7a/libworklets.so | head -1)" "$w/cmake/release/obj/armeabi-v7a/"
+    fi
     (cd "$ROOT/tv/packages/expotv/android" && ./gradlew :app:createBundleReleaseJsAndAssets --rerun assembleRelease -PreactNativeArchitectures=armeabi-v7a --console=plain -q) ;;
   connect) adb connect "$FIRETV" && adb -s "$FIRETV" shell getprop ro.build.version.sdk ;;
   install) adb -s "$FIRETV" install -r "${1:-$ROOT/tv/packages/expotv/android/app/build/outputs/apk/release/app-release.apk}" ;;
@@ -26,7 +35,8 @@ case "$cmd" in
   backend) # point the TV at this Mac's dev server (backend: npm run dev) or the cloud. Its pairing stays with the old
            # backend, so the TV shows the welcome screen: pair it again from that backend's parent app.
     case "${1:-}" in
-      local) api="http://$(ipconfig getifaddr en0 || ipconfig getifaddr en1):8787" ;;
+      local) # the address dev.sh prints (ipconfig and route are macOS; hostname -I is Linux)
+        api="http://$(ipconfig getifaddr "$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')" 2>/dev/null || hostname -I | awk '{print $1}'):8787" ;;
       cloud) api="https://ny4o9o0um2.execute-api.us-east-1.amazonaws.com" ;;
       *) echo "usage: $0 backend local|cloud" >&2; exit 2 ;;
     esac

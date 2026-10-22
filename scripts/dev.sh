@@ -24,7 +24,8 @@ fi
 
 # The Mac's address on the network it reaches the internet through (Wi-Fi or a cable, whichever is in use),
 # and a certificate for it (made again when the address changes).
-lan="$(ipconfig getifaddr "$(route -n get default | awk '/interface:/{print $2}')")"
+# (ipconfig and route are macOS; hostname -I is Linux)
+lan="$(ipconfig getifaddr "$(route -n get default 2>/dev/null | awk '/interface:/{print $2}')" 2>/dev/null || hostname -I | awk '{print $1}')"
 certs="$ROOT/parent-web/.cert"
 mkdir -p "$certs"
 [ -f "$certs/$lan.pem" ] || mkcert -cert-file "$certs/$lan.pem" -key-file "$certs/$lan-key.pem" "$lan" localhost
