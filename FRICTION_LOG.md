@@ -146,7 +146,7 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Actual:** `400 Error 002: Access to Bedrock models is not allowed for this account`, for every model, Amazon's own Nova Micro included. Adding a payment method didn't lift it. Nothing in the console says the account is restricted; per AWS re:Post it's an automatic limit on new accounts with little billing history, lifted only through a support case.
 - **Severity:** high for a time-boxed hackathon: the AI part of the project is blocked on a support ticket, and the error doesn't say what to do.
 - **Not IAM:** the deployed question writer, calling as its own Lambda IAM role (not root), gets the same `Error 002` on every call (Oct 7, 01:00 UTC nightly run), and so does a fresh test role with AWS's `AmazonBedrockFullAccess` policy (Nova Micro and Claude); a missing permission would be `AccessDeniedException … not authorized to perform bedrock:InvokeModel`.
-- **Still blocked on Oct 19**, 14 days after the first try, and on Oct 20: the Converse API gives the same `Error 002` for Nova Micro and Claude Haiku 4.5. With the free (Basic) support plan the CLI can't read support cases either (`SubscriptionRequiredException`), so a case's progress is visible only in the console.
+- **Still blocked on Oct 19**, 14 days after the first try, and on Oct 20: the Converse API gives the same `Error 002` for Nova Micro and Claude Haiku 4.5. The same on Oct 22 for Claude Haiku 4.5, Claude Sonnet 4.5 and Nova Pro. With the free (Basic) support plan the CLI can't read support cases either (`SubscriptionRequiredException`), so a case's progress is visible only in the console.
 - **Workaround:** a free Support case (Account and billing) asking to enable Bedrock model access; meanwhile the app runs on its built-in question bank.
 - **Why the workaround falls short (Oct 14):** the only other model this project can reach, Gemini (Vertex AI or API key), is barred by Google's terms from any app "directed towards or … likely to be accessed by individuals under the age of 18". For a kids' app the block leaves no allowed model for what children trigger at runtime (character making, on-demand puzzles); AWS's terms and Anthropic's Usage Policy do allow products for minors, with conditions (Google Cloud's Service Specific Terms, Generative AI Services, (d) Age Restrictions; AWS Service Terms §50.4; Anthropic's Usage Policy).
 - **Suggestion:** say in the error (and on the Bedrock console) that the account is restricted and link the request form; let hackathon participants skip the wait.
@@ -411,3 +411,18 @@ One entry per real snag with an Amazon tool or doc: task · steps · expected vs
 - **Workaround:** the judges' release carries the Debug `.vpkg`s.
 - **Suggestion:** log the JavaScript exception (message and stack) before aborting a Release build, and let the
   developer-mode shell read its own app's crash reports (or a `vega device crash-reports` command).
+
+## 2026-10-22 · `aws login`: after interrupted runs, the sign-in page says only "outdated link"
+
+- **Task:** sign the AWS CLI in again with `aws login` (us-east-1), run from the coding agent's terminal.
+- **Steps:** run `aws login`, and the browser opens the sign-in page. Stop the command before finishing in the
+  browser, run it again, and stop it again. Then finish signing in in the browser.
+- **Expected:** a page saying the sign-in request is no longer active and to run `aws login` again.
+- **Actual:** "You may have typed the address incorrectly or you may have used an outdated link. Please clear your
+  cookies and try the request again. If the problem persists, please contact Support." The CLI kept answering "Your
+  session has expired. Please reauthenticate using 'aws login'". We didn't find out which step the page rejected.
+- **Severity:** low: a few minutes lost, and the advice to clear cookies points away from the fix.
+- **Workaround:** run `aws login` once more and finish in the browser while the command is still waiting. The third
+  run worked.
+- **Suggestion:** name the cause on the page (an expired or already used request) and tell the user to run
+  `aws login` again.

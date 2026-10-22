@@ -32,7 +32,8 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
 [release page](https://github.com/ksvslk/MarbleTime/releases/latest).
 
 1. **Phone app:** open <https://d3uyrtcal2s4t9.cloudfront.net> on a phone (or a desktop browser) and sign up with an
-   email address; Cognito sends a code to confirm it. Your family starts empty: add a kid and a job or two.
+   email address; Cognito sends a code to confirm it. Your family starts empty: add a kid and a job or two. Judges:
+   the testing instructions on Devpost have a login for a ready family (two kids, jobs and a character).
 2. **The TV app.**
    - *Fire TV (Fire OS):* on the TV, open Settings → My Fire TV → About and press Select on the device name 7 times.
      Then Developer options → ADB debugging on. From a computer on the same network: `adb connect <the TV's IP>:5555`
@@ -46,7 +47,8 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
 3. **Pair:** the TV shows a QR code and a six-letter code. In the phone app, open TVs and scan the code, or type it and
    tap Go.
 4. **Try it:** on the TV, pick the kid and a job, and press "I did it!". Say yes on the phone (a notification, or
-   Approvals), and the marbles drop into the jar. The Puzzles card plays a round of five questions for a star.
+   Approvals) or on the TV under Grown-ups with the family PIN, and the marbles drop into the jar. The Puzzles card
+   plays a round of five questions for a star.
 5. **Strict mode (Fire OS only):** give the app its two permissions once, then set the TV to *Strict* in the phone app
    (TVs → the TV → Mode):
    ```sh
