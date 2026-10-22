@@ -34,8 +34,9 @@ is worth.
   and says "I did it!". The parent gets a notification with "Yes" and "Not yet", and on a yes the marbles drop into
   the jar on the big screen.
 - **Extra effort earns a character.** A job done when the jar is already full, or five puzzle stars, earns a new
-  character. The kid types what it should be ("a dragon who loves pancakes"), an AI draws it, code and a second
-  model check the drawing, and the character waves and talks on the TV.
+  character. The kid types what it should be ("a dragon who loves pancakes"), a language model draws it in code
+  (an SVG with every body part separate), code and a second model check the drawing, and the TV moves the parts so
+  the character waves and talks.
 - **For kids who can't read yet**, the Fire OS app reads every line aloud, in English, Estonian, German and Spanish.
 - **Three ways to enforce the time**, set per TV:
   - *Amazon Kids:* Amazon Kids keeps its own daily limit, and the phone app tells the parent how many earned minutes
