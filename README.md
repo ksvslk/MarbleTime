@@ -34,9 +34,12 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
 1. **Phone app:** open <https://d3uyrtcal2s4t9.cloudfront.net> on a phone (or a desktop browser) and sign up with an
    email address; Cognito sends a code to confirm it. Your family starts empty: add a kid and a job or two.
 2. **The TV app.**
-   - *Fire TV (Fire OS):* on the TV, Settings → My Fire TV → Developer options → ADB debugging on. Then, from a
-     computer on the same network: `adb connect <the TV's IP>:5555` and `adb install MarbleTime-fireos.apk`.
-     MarbleTime appears under Your Apps.
+   - *Fire TV (Fire OS):* on the TV, open Settings → My Fire TV → About and press Select on the device name 7 times.
+     Then Developer options → ADB debugging on. From a computer on the same network: `adb connect <the TV's IP>:5555`
+     (allow it on the TV) and `adb install MarbleTime-fireos.apk`. MarbleTime appears under Your Apps.
+   - *No Fire TV:* the same APK runs in Android Studio's emulator with a Google TV system image (tested on Android 14):
+     `adb install MarbleTime-fireos.apk`, then `adb shell am start -n app.marbletime.tv/.MainActivity`. The arrow keys
+     and Enter work as the remote.
    - *Vega Virtual Device:* with the [Vega SDK](https://developer.amazon.com/docs/vega/latest/install-vega-sdk.html),
      `vega virtual-device start`, then `vega run-app MarbleTime-vega-aarch64.vpkg app.marbletime.tv.main -d VirtualDevice`
      (`-x86_64.vpkg` on an Intel computer).
