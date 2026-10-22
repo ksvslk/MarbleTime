@@ -14,7 +14,8 @@ we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
 | Amazon Kids | The Appstore mode's time limit | Couldn't try it: not offered in Estonia |
 | AWS: CDK, Lambda, API Gateway, DynamoDB, Cognito, S3, CloudFront | The backend for both apps | Yes |
 | Amazon Bedrock | Drawing characters | Yes, the day our account may call it |
-| Amazon Polly, Amazon Transcribe | The first voices and listening (until Oct 7) | Polly for English, German and Spanish |
+| Amazon Polly | The voices on AWS: read-aloud and characters, in English, German and Spanish | Yes, and in Estonian once Polly has it |
+| Amazon Transcribe | Listening to a kid's idea, in the first build (until Oct 7) | Not needed since kids type their ideas |
 | AWS MCP Server, AWS agent skills | Help for the coding agent with AWS | The skills, yes; the server once it says when the sign-in has expired |
 | Amazon Devices Builder Tools | Vega docs search for the coding agent (from Oct 20) | Yes, from day one |
 
@@ -108,6 +109,8 @@ One CDK stack (`backend/infra/stack.ts`, first deployed Oct 6 as `MarbleTime-dev
 - **S3 + CloudFront:** the parent web app, and the characters' pictures and voice clips in a private bucket behind
   CloudFront signed URLs. The signing key pair is made by a custom resource, with the private key kept in **SSM
   Parameter Store**, like the Web Push key.
+- **Amazon Polly:** the TV's read-aloud and the characters' voices on AWS, in English, German and Spanish (no
+  Estonian on Polly, so Estonian lines that aren't recorded in the app stay silent there).
 - **Amazon Bedrock** (Claude Haiku 4.5 by default; IAM limited to that inference profile): the character pipeline
   (an art director, the drawing, a picture check). Blocked on our account (below). Puzzles come from banks written
   ahead of time and checked by code.
@@ -130,8 +133,8 @@ What we found:
     read the support case (Oct 5). This was our biggest blocker. While it lasts, our local setup draws characters and
     writes puzzle sets with Google's Gemini, and the voices come from Google's Gemini-TTS. Google's terms don't
     allow its generative AI in apps for under-18s, so that is a stand-in for the prototype, not how MarbleTime would
-    ship. On AWS the stack already sends characters to Bedrock, so they work there the day the block lifts; the
-    voices would need Polly, which has no Estonian.
+    ship. On AWS the stack already sends characters to Bedrock, so they work there the day the block lifts. The
+    voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
   - Cognito managed login (v2) shows an empty page without a branding resource (Oct 5).
   - `HttpLambdaIntegration` adds one Lambda permission per route (Oct 5).
   - A presigned S3 URL silently stops working when the Lambda's credentials expire, hours before its `expiresIn`

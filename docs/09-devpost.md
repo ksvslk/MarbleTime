@@ -21,15 +21,20 @@ drops new ones in, and extra jobs earn a talking character the kid invents.
 
 ### Inspiration
 
-In many homes TV time is a daily negotiation. Amazon Kids can set limits, but it gives kids no way to earn time, so
-parents keep score in their heads. We wanted the TV itself to show the deal: how much is left today, and what a job
-is worth.
+Letting your children watch TV without any restrictions gets out of hand pretty fast because of how addicting it is.
+
+When I grew up, we had five channels and two shows I wanted to watch. I would watch them and that was it. Today there's
+always another show. Parents of young kids argue about screens for
+[about 96 hours a year](https://talkerresearch.com/how-long-do-parents-spend-fighting-with-their-kids-over-screen-time/),
+and the [next biggest fight at home is chores](https://homeword.com/screen-time-overtakes-chores-as-americas-top-family-conflict/).
+A time limit can stop the TV, but it can't get a kid to do a chore. I wanted kids to earn their TV time by helping at
+home, so I built MarbleTime.
 
 ### What it does
 
 - **The jar is today's TV time.** Each kid has a jar of marbles on the TV, and one marble is 10 minutes. The jar's
-  size is the daily maximum from health guidance (60 minutes under 7, 90 from 7). Every day starts with it half
-  full: that half is given, never earned.
+  size is the daily maximum from health guidance (60 minutes under 7, 90 from 7). Every day starts with the jar half
+  full, and kids get that half without doing anything.
 - **Jobs fill the rest.** Parents write the jobs in the phone app ("Toys away"). The kid picks one with the remote
   and says "I did it!". The parent gets a notification with "Yes" and "Not yet", and on a yes the marbles drop into
   the jar on the big screen.
