@@ -32,9 +32,9 @@ date); what we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUES
 - **Needs work:**
   - Amazon Kids profiles aren't offered in Estonia, and nothing on the device or in the docs says so (Oct 5).
   - Usage access and display-over-other-apps can only be granted over ADB. There's no settings screen, so a normal
-    family can't set up a parental-control app (FEATURE_REQUESTS).
+    family can't set up a parental-control app (FRICTION_LOG, Oct 2; FEATURE_REQUESTS).
   - No way for an app to hear what is said to the remote. The phone app's microphone always goes to Alexa's search,
-    even over an open text field, and takes the child out of the app (Oct 12, Oct 13). Kids who can't type can't
+    also over an open text field, and takes the child out of the app (Oct 12, Oct 13). Kids who can't type can't
     describe their character by voice, so we dropped voice input.
   - The default text-to-speech engine (IVONA) has no voices for apps; Pico works only with a `<queries>` entry (Oct 5).
   - Screenshots of a playing video are black (Oct 5), and `am start -W` hangs while the screensaver runs.
@@ -128,20 +128,23 @@ What we found:
 - **Needs work:**
   - **Bedrock is blocked on our new account:** `Error 002: Access to Bedrock models is not allowed for this
     account`, for every model, Amazon's Nova included, for over two weeks now. Adding a payment method didn't lift
-    it. Nothing in the console says the account is restricted, and with the free support plan the CLI can't even
-    read the support case (Oct 5). This was our biggest blocker. While it lasts, our local setup draws characters and
-    writes puzzle sets with Google's Gemini, and the voices come from Google's Gemini-TTS. Google's terms don't
-    allow its generative AI in apps for under-18s, so that is a stand-in for the prototype, not how MarbleTime would
-    ship. On AWS the stack already sends characters to Bedrock, so they work there the day the block lifts. The
-    voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
+    it. Nothing in the console says the account is restricted, and with the free support plan the CLI can't read the
+    support case. The case we filed on Oct 5 hasn't lifted the block (still `Error 002` on Oct 23). This was
+    our biggest blocker. While it lasts, our local setup draws characters and writes puzzle sets with Google's
+    Gemini, and the voices come from Google's Gemini-TTS. Google's terms don't allow its generative AI in apps for
+    under-18s, so that is a stand-in for the prototype, not how MarbleTime would ship. On AWS the stack sends
+    characters to Bedrock, so making a new character doesn't work there, and the Bedrock calls are tested with
+    stand-ins only. The voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
+  - `aws login` sessions ran out several times a day. We ran it 12 times from Oct 5 to Oct 23, and once its page said
+    only "you may have used an outdated link" (FRICTION_LOG, Oct 5–23).
   - `HttpLambdaIntegration` adds one Lambda permission per route.
   - A presigned S3 URL stops working when the Lambda's credentials expire, hours before its `expiresIn`, and the
     presigner doesn't warn. We read it in the S3 guide and used CloudFront signed URLs instead.
   - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.
   - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update.
-- **Polly** (the first character build, until Oct 7): Polly needs two requests per line (the audio, then the lip-sync
-  marks) and returns no length for an MP3. It has no Estonian voice, so on Oct 7 we moved the voices to one provider
-  that covers all four of our languages (FEATURE_REQUESTS).
+- **Polly** (the first character build, until Oct 7): its neural voices sounded flat for cartoon characters, and it
+  has no Estonian voice. So on Oct 7 we moved the voices to Gemini, which covers all four of our languages
+  (FRICTION_LOG, Oct 7; FEATURE_REQUESTS).
 - **AWS MCP Server and AWS agent skills** (set up for Claude Code by the AWS CLI on Oct 5): the `signing-in-to-aws`
   skill checked our first `aws login` and set the region. The MCP server never connected. When the `aws login`
   session has expired it answers "Invalid request parameters", and the real message ("Please reauthenticate using

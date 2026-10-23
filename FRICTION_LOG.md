@@ -1,38 +1,45 @@
 # Friction log
 
-Where Amazon's tools and docs held us up while we built MarbleTime (Oct 5–22, 2026), worst first. Every entry is
-something we ran into ourselves. Severity: high blocks a feature, medium costs hours or fails without an error.
+Where Amazon's tools and docs held us up while we built MarbleTime (Oct 2–23, 2026), worst first. The first part is
+what I ran into myself as the developer, the second what our coding agent ran into. Every entry happened to us in a
+run, a build or a log. Severity: high blocks a feature, medium costs hours or fails without an error, low slows us
+down.
 
-### Bedrock: a new AWS account can't call any model · high · Oct 5
+## What I ran into
+
+### Bedrock: a new AWS account can't call any model, and the support case didn't help · high · Oct 5–23
 
 - **Task:** draw characters with Claude on Bedrock, from a new AWS account.
-- **Steps:** InvokeModel and Converse on Claude and Nova, as root and as an IAM role.
+- **Steps:** Converse and InvokeModel on Claude and Nova, as root, as an IAM role and with a Bedrock API key.
 - **Expected vs actual:** a reply; got `Error 002: Access to Bedrock models is not allowed for this account` for every
-  model, Oct 5–22. The console doesn't say the account is restricted.
-- **Workaround:** a support case, open since Oct 5. Gemini on a local server for the prototype.
+  model, Oct 5–23. The console doesn't say the account is restricted, so we first suspected billing, IAM and the key.
+- **Workaround:** none on AWS. The support case we filed on Oct 5 hasn't lifted the block. Gemini on a local server
+  for the prototype.
 - **Suggestion:** say in the error that the account is restricted, and how to lift it.
 
-### Vega: OK doesn't press buttons until the manifest asks for audio services · high · Oct 5
+### Fire OS: a family app can get usage access only over ADB · high · Oct 2, Oct 5
+
+- **Task:** count a kid's watching in every video app, from an app the parents install.
+- **Steps:** look for usage access and display over other apps in the Fire TV's settings; grant both for the
+  strict-mode test on the stick.
+- **Expected vs actual:** a settings screen where a parent allows them; there is none, only `adb shell appops`. So a
+  screen-time app that needs them can't ship through the Appstore.
+- **Workaround:** strict mode is a sideloaded prototype, set up with two adb commands. The Appstore path relies on
+  Amazon Kids' own limit.
+- **Suggestion:** a settings screen for trusted family apps' permissions, or the Earned Time API
+  ([FEATURE_REQUESTS.md](FEATURE_REQUESTS.md)).
+
+### Vega Virtual Device: clicking OK does nothing out of the box · high · Oct 5
 
 - **Task:** press a button with OK on the Vega Virtual Device, in an app made from the multi-TV starter.
-- **Steps:** focus a `Pressable`, press OK.
-- **Expected vs actual:** `onPress`; got only `onPressIn`. The click sound fails to bind `com.amazon.audio.system` and
-  the key-up is lost. No error points to the manifest.
+- **Steps:** focus a button, click OK on the simulator's remote.
+- **Expected vs actual:** the button's action; nothing happened. `Pressable` got only `onPressIn`: the click sound
+  fails to bind `com.amazon.audio.system` and the key-up is lost. No error points to the manifest.
 - **Workaround:** `com.amazon.audio.system` and `com.amazon.audio.control` under `[wants]` in `manifest.toml`. Scripts
   still can't press OK (Oct 19): `KEY_ENTER` arrives as `enter`, and `KEY_SELECT` and `KEY_OK` do nothing.
 - **Suggestion:** put both services in the starter's manifest, and don't let a failed click sound eat the key-up.
 
-### Fire TV: an app can't get the words said to the remote · high · Oct 12–13
-
-- **Task:** let a kid who can't type describe a new character by voice.
-- **Steps:** a text field with the system keyboard; hold the microphone on the remote, then on the Fire TV phone app.
-- **Expected vs actual:** the words in the field; got Alexa's search results over our app. The keyboard offers voice
-  typing only while it's on screen with a hardware remote connected, and the phone app's microphone never reaches it.
-- **Workaround:** none. Kids type, or a grown-up types in our phone app.
-- **Suggestion:** a dictation API for the app in front ([FEATURE_REQUESTS.md](FEATURE_REQUESTS.md)). Until then, a doc
-  page on keyboard voice typing.
-
-### Amazon Kids on Fire TV isn't offered in Estonia · high · Oct 5
+### Amazon Kids on Fire TV: no way to tell where it's offered · high · Oct 5
 
 - **Task:** test our Amazon Kids mode on a Fire TV Stick registered in Estonia.
 - **Steps:** Settings → Account & Profile Settings → Add Profile.
@@ -40,6 +47,49 @@ something we ran into ourselves. Severity: high blocks a feature, medium costs h
   it.
 - **Workaround:** the mode is built to the docs, untested.
 - **Suggestion:** list the countries in the docs, and let developers try Amazon Kids anywhere.
+
+### Fire TV: voice input never reaches the app · high · Oct 12–13
+
+- **Task:** let a kid who can't type describe a new character by voice.
+- **Steps:** a text field with the system keyboard; hold the microphone on the remote, then on the Fire TV phone app.
+- **Expected vs actual:** the words in the field; Alexa took them and opened a movie in Prime Video, or a show in
+  another app. The keyboard offers voice typing only while it's on screen with a hardware remote connected, and the
+  phone app's microphone never reaches it.
+- **Workaround:** none. Kids type, or a grown-up types in our phone app.
+- **Suggestion:** a dictation API for the app in front ([FEATURE_REQUESTS.md](FEATURE_REQUESTS.md)). Until then, a doc
+  page on keyboard voice typing.
+
+### Amazon Polly: no conversational voice for a cartoon character, and no Estonian · medium · Oct 7
+
+- **Task:** give the narrator and each cartoon character a voice kids like, in the family's language.
+- **Steps:** Polly's neural voices Ruth, Vicki and Lucia for English, German and Spanish, through SSML.
+- **Expected vs actual:** a lively, conversational voice; they sounded flat for cartoon characters, and Polly has no
+  Estonian voice.
+- **Workaround:** Gemini's voices on our local setup. On AWS, Polly's generative voices for English, German and Spanish.
+- **Suggestion:** conversational voices for characters, children's voices among them, and Estonian.
+
+### aws login: asks again several times a day · medium · Oct 5–23
+
+- **Task:** run the AWS CLI and the CDK with short-term credentials from `aws login`, without access keys.
+- **Steps:** `aws login` (us-east-1), then a day of deploys and checks.
+- **Expected vs actual:** one sign-in a day; the session kept running out, and every command then said `Your session
+  has expired`. We ran `aws login` 12 times from Oct 5 to Oct 23, three times on each of the last two days. Once,
+  after an interrupted sign-in, the page said only "you may have used an outdated link".
+- **Workaround:** run `aws login` again, from the start when the page says outdated link.
+- **Suggestion:** a session that refreshes itself through a working day, and a sign-in page that says what went wrong.
+
+### Vega SDK: 20 GB to download before the first simulator run · low · Oct 5
+
+- **Task:** try the Vega build on the Vega Virtual Device.
+- **Steps:** install the Vega SDK with its installer, then `vega virtual-device start`.
+- **Expected vs actual:** a small download for one simulator; the SDK takes about 20 GB of disk, and downloading and
+  unpacking it took about 20 minutes.
+- **Workaround:** none; it's a one-time cost.
+- **Suggestion:** a smaller download with only the simulator and the CLI, for trying an app.
+
+## What our coding agent ran into
+
+Claude Code did most of the building. These are snags it hit in builds, logs and tool calls.
 
 ### Multi-TV starter: release builds keep old shared code · medium · Oct 5
 
