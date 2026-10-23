@@ -135,10 +135,9 @@ What we found:
     allow its generative AI in apps for under-18s, so that is a stand-in for the prototype, not how MarbleTime would
     ship. On AWS the stack already sends characters to Bedrock, so they work there the day the block lifts. The
     voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
-  - Cognito managed login (v2) shows an empty page without a branding resource (Oct 5).
   - `HttpLambdaIntegration` adds one Lambda permission per route (Oct 5).
-  - A presigned S3 URL silently stops working when the Lambda's credentials expire, hours before its `expiresIn`
-    (Oct 7).
+  - A presigned S3 URL stops working when the Lambda's credentials expire, hours before its `expiresIn`, and the
+    presigner doesn't warn. We read it in the S3 guide and used CloudFront signed URLs instead.
   - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.
   - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update.
 - **Polly and Transcribe** (the first character build, until Oct 7): Polly needs two requests per line (the audio,

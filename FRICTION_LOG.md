@@ -1,7 +1,8 @@
 # Friction log
 
-Where Amazon's tools and docs held us up while we built MarbleTime (Oct 5–22, 2026), worst first. Severity: high
-blocks a feature, medium costs hours or fails without an error, low is a nuisance.
+Where Amazon's tools and docs held us up while we built MarbleTime (Oct 5–22, 2026), worst first. Every entry is
+something we ran into ourselves. Severity: high blocks a feature, medium costs hours or fails without an error, low is
+a nuisance.
 
 ### Bedrock: a new AWS account can't call any model · high · Oct 5
 
@@ -45,7 +46,7 @@ blocks a feature, medium costs hours or fails without an error, low is a nuisanc
 - **Task:** a Release build of the Vega app for the judges.
 - **Steps:** `react-native build-kepler --build-type Release`, then `vega run-app` on the Virtual Device.
 - **Expected vs actual:** the app starts, as the Debug build does; got `signal 6` 30 ms after start, no JavaScript error
-  in the log, and a crash report the developer shell can't read.
+  in the log, and a crash report the developer shell can't read. We never found the cause, which may be in our code.
 - **Workaround:** the judges get the Debug packages.
 - **Suggestion:** log the JavaScript error before aborting, and let developers read their app's crash reports.
 
@@ -78,8 +79,10 @@ blocks a feature, medium costs hours or fails without an error, low is a nuisanc
 ### Vega: no simple player for an app's own short sounds · medium · Oct 5
 
 - **Task:** play our own short sounds on Vega, as SoundPool does on Fire OS.
-- **Steps:** followed the docs to `@amazon-devices/keplerscript-audio-lib`.
-- **Expected vs actual:** load a bundled file and play it; got only system sounds and raw PCM streams.
+- **Steps:** the docs send short sounds to `com.amazon.audio.system`; we installed
+  `@amazon-devices/keplerscript-audio-lib`.
+- **Expected vs actual:** load a bundled file and play it; got only system sounds and raw PCM streams. The W3C media
+  player can play files, but it's built for media playback, and we haven't tried it for effects.
 - **Workaround:** none yet. The Vega build has no sound.
 - **Suggestion:** a SoundPool-like API, with an example for bundled files.
 
@@ -96,8 +99,9 @@ blocks a feature, medium costs hours or fails without an error, low is a nuisanc
 
 - **Task:** check a screen from a script, as `adb exec-out screencap` does on Fire OS.
 - **Steps:** looked in `vega device`; ran `screenshooter` through `vega exec vda shell`.
-- **Expected vs actual:** a PNG; got `Permission denied`. Capturing the Mac window works only while it's on screen.
-- **Workaround:** capture the window by its id (`scripts/vega.sh shot`).
+- **Expected vs actual:** a PNG; got `Permission denied` from `screenshooter`, and `vega device` has no screenshot
+  command.
+- **Workaround:** capture the simulator's Mac window by its id (`scripts/vega.sh shot`).
 - **Suggestion:** `vega device screenshot -o file.png`.
 
 ### Fire TV: screen captures leave out video and record at 12 fps · medium · Oct 5, Oct 20
@@ -108,23 +112,6 @@ blocks a feature, medium costs hours or fails without an error, low is a nuisanc
   because apps get only software encoders.
 - **Workaround:** software decoding in our test video app; scrcpy at 960×540 and 30 fps.
 - **Suggestion:** document what capture can do on each stick, and open the hardware encoder in developer mode.
-
-### Cognito managed login (v2) shows an empty page · medium · Oct 5
-
-- **Task:** a Cognito sign-in page for the phone app, from CDK.
-- **Steps:** a user pool, an app client and a managed-login (v2) domain.
-- **Expected vs actual:** a default sign-in page; got an empty one, after a deploy that succeeds.
-- **Workaround:** a `CfnManagedLoginBranding` with `useCognitoProvidedValues: true`.
-- **Suggestion:** make default branding, or fail the deploy with a clear message.
-
-### S3: a presigned URL stops working with the Lambda's credentials · medium · Oct 7
-
-- **Task:** a 48-hour link to a voice clip, signed in a Lambda.
-- **Steps:** `getSignedUrl(…, {expiresIn: 2 * 86400})` with the Lambda role's credentials.
-- **Expected vs actual:** 48 hours; got a few, until the role's session ended. The presigner accepts the longer expiry
-  without a word.
-- **Workaround:** CloudFront signed URLs in front of the private bucket.
-- **Suggestion:** warn when the credentials expire before the link does.
 
 ### AWS MCP Server: an expired sign-in shows up as "Invalid request parameters" · medium · Oct 20
 
