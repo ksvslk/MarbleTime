@@ -2,9 +2,9 @@
 
 MarbleTime was built Oct 5–22, 2026 by one developer with a coding agent (Claude Code) on an Apple Silicon Mac, and
 tested at home on a Fire TV Stick 4K Plus (Fire OS 8) and on the Vega Virtual Device. For each tool below: what we
-used it for, what worked, what needs work, how getting started went, and whether we'd build with it again. Every snag
-is written up with steps, a workaround and a suggestion in [FRICTION_LOG.md](FRICTION_LOG.md) (cited by date); what
-we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
+used it for, what worked, what needs work, how getting started went, and whether we'd build with it again. The main
+snags are written up with steps, a workaround and a suggestion in [FRICTION_LOG.md](FRICTION_LOG.md) (cited by
+date); what we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
 
 | Tool | Used for | Build with it again? |
 |---|---|---|
@@ -38,7 +38,7 @@ we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
     even over an open text field, and takes the child out of the app (Oct 12, Oct 13). Kids who can't type can't
     describe their character by voice, so we dropped voice input.
   - The default text-to-speech engine (IVONA) has no voices for apps; Pico works only with a `<queries>` entry (Oct 5).
-  - `am start -W` hangs while the screensaver runs, and screenshots of a playing video are black (Oct 5).
+  - Screenshots of a playing video are black (Oct 5), and `am start -W` hangs while the screensaver runs.
   - Recording the screen for a demo video is hard. The stick offers apps only software video encoders, so
     `screenrecord` gets about 12 fps at full HD while the TV shows 60. Our first cut looked jumpy because of it. It
     took scrcpy at 960×540 and a 30 fps cartoon to get a steady 30 fps, and nothing records the sound (Oct 20).
@@ -77,8 +77,8 @@ we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUESTS.md).
   - An app's own link scheme can't open it. Only `pkg://<component>?query` works, and the rule is written in a file
     in the SDK's header folder (Oct 19).
   - A custom font silently falls back to the system font unless it sits in `<app>/assets/fonts/` (Oct 19).
-  - No simple player for an app's own short sounds (Oct 5). `react-native-svg` needs a hand-made Metro alias (Oct 7).
-    `vda` stops working while a Fire TV stick is also connected (Oct 5).
+  - No simple player for an app's own short sounds (Oct 5). `react-native-svg` needs a hand-made Metro alias, and
+    `vda` stops working while a Fire TV stick is also connected.
 - **Getting started:** the install was easy: one script and about 20 GB of disk. Most of our Vega time went into
   things that fail without an error: buttons, links, fonts.
 - **Again?** Yes, for the Appstore path. A CLI screenshot and scripted presses that work would make it as quick to
@@ -139,12 +139,12 @@ What we found:
   - `HttpLambdaIntegration` adds one Lambda permission per route (Oct 5).
   - A presigned S3 URL silently stops working when the Lambda's credentials expire, hours before its `expiresIn`
     (Oct 7).
-  - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker (Oct 7).
-  - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update (Oct 5).
+  - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.
+  - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update.
 - **Polly and Transcribe** (the first character build, until Oct 7): Polly needs two requests per line (the audio,
-  then the lip-sync marks) and returns no length for an MP3 (Oct 7). Transcribe streaming takes raw PCM, not WAV
-  (Oct 7). Polly has no Estonian voice, so on Oct 7 we moved the voices and the listening to one provider that covers
-  all four of our languages (FEATURE_REQUESTS).
+  then the lip-sync marks) and returns no length for an MP3. Transcribe streaming takes raw PCM, not WAV. Polly has no
+  Estonian voice, so on Oct 7 we moved the voices and the listening to one provider that covers all four of our
+  languages (FEATURE_REQUESTS).
 - **AWS MCP Server and AWS agent skills** (set up for Claude Code by the AWS CLI on Oct 5): the `signing-in-to-aws`
   skill checked our first `aws login` and set the region. The MCP server never connected. When the `aws login`
   session has expired it answers "Invalid request parameters", and the real message ("Please reauthenticate using
