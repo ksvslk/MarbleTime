@@ -1,10 +1,11 @@
 # MarbleTime
 
 **TV time that kids earn with real-life jobs, on Fire TV.** The TV shows each kid a jar of marbles: the TV time they
-have left today. A kid picks a job with the remote ("Toys away") and says "I did it!"; a grown-up says yes on their
+have left today. A kid picks a job with the remote ("Toys away") and presses "I did it!"; a grown-up says yes on their
 phone, and the marbles drop into the jar on the big screen. A job done when the jar is already full, or five puzzle
 stars, earn a new character: the kid types what it should be ("a dragon who loves pancakes"), an AI draws it, and it
-waves and talks on the TV.
+waves and talks on the TV. On AWS, new characters can't be drawn yet, because Amazon Bedrock is blocked on our account
+(see [Try it without building](#try-it-without-building)).
 
 Built for the *Build, Ship, Shape* Amazon Developer Hackathon (Fire TV track). One React Native codebase runs on
 **Fire OS** and **Vega OS**.
@@ -31,6 +32,14 @@ How the TV time is enforced depends on the TV's mode, set per TV in the phone ap
 The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are on the
 [release page](https://github.com/ksvslk/MarbleTime/releases/latest).
 
+**On AWS, making a new character doesn't work.** Amazon Bedrock has been blocked on our AWS account since Oct 5
+("Error 002" for every model, in [FRICTION_LOG](FRICTION_LOG.md); a support case has been open since then). When a kid
+types an idea for a new character, the TV says "That didn't work right now. Try again later.", and the kid keeps the
+token. The demo video shows characters made in the local setup below, where Google's Gemini draws them.
+
+The voices on AWS are Amazon Polly's, in English, German and Spanish. Polly has no Estonian voice, so Estonian lines
+that aren't recorded in the app stay silent there.
+
 1. **Phone app:** open <https://d3uyrtcal2s4t9.cloudfront.net> on a phone (or a desktop browser) and sign up with an
    email address; Cognito sends a code to confirm it. Your family starts empty: add a kid and a job or two. Judges:
    the testing instructions on Devpost have a login for a ready family (two kids, jobs and a character).
@@ -45,7 +54,7 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
      `vega virtual-device start`, then `vega run-app MarbleTime-vega-aarch64.vpkg app.marbletime.tv.main -d VirtualDevice`
      (`-x86_64.vpkg` on an Intel computer). Use OK on the simulator's on-screen remote: a scripted `KEY_ENTER`
      doesn't press buttons ([FRICTION_LOG](FRICTION_LOG.md), Oct 5).
-3. **Pair:** the TV shows a QR code and a six-letter code. In the phone app, open TVs and scan the code, or type it and
+3. **Pair:** the TV shows a QR code and a six-character code. In the phone app, open TVs and scan the code, or type it and
    tap Go.
 4. **Try it:** on the TV, pick the kid and a job, and press "I did it!". Say yes on the phone (a notification, or
    Approvals) or on the TV under Grown-ups with the family PIN, and the marbles drop into the jar. The Puzzles card
@@ -60,14 +69,6 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
    own. To see a jar run out in seconds, turn on the demo clock (a second counts as a minute):
    `adb shell am start -a android.intent.action.VIEW -d 'marbletime://open?fast=1' app.marbletime.tv` (`fast=0` turns
    it off).
-
-On AWS, two things work differently from the demo video:
-
-- **New characters can't be drawn there yet.** Amazon Bedrock is blocked on our AWS account ("Error 002", in
-  [FRICTION_LOG](FRICTION_LOG.md); a support case has been open since Oct 5), so the TV says characters can't be made
-  right now and the kid keeps the token. They work in the local setup below, and on AWS once the block is lifted.
-- **Voices are Amazon Polly's**, in English, German and Spanish. Polly has no Estonian voice, so Estonian lines that
-  aren't recorded in the app stay silent there.
 
 ## Run it
 
