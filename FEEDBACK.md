@@ -73,12 +73,12 @@ date); what we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUES
   - OK never reached `onPress` until the manifest asked for `com.amazon.audio.system` and `com.amazon.audio.control`,
     and nothing pointed there (Oct 5, high). Scripted presses still can't reach `onPress` with SDK 0.24 (Oct 19), so
     screens can only be checked from a script by test link.
-  - No command-line screenshot of the VVD; capturing its window works only while the window is on screen (Oct 6).
-  - An app's own link scheme can't open it. Only `pkg://<component>?query` works, and the rule is written in a file
-    in the SDK's header folder (Oct 19).
-  - A custom font silently falls back to the system font unless it sits in `<app>/assets/fonts/` (Oct 19).
-  - No simple player for an app's own short sounds (Oct 5). `react-native-svg` needs a hand-made Metro alias, and
-    `vda` stops working while a Fire TV stick is also connected.
+  - No command-line screenshot of the VVD (Oct 6).
+  - Links into an app take the form `pkg://<component>?query`, a rule written only in a file in the SDK's header
+    folder.
+  - A custom font silently falls back to the system font unless it sits in `<app>/assets/fonts/`.
+  - No simple player for an app's own short sounds. `react-native-svg` needs a hand-made Metro alias, and `vda` stops
+    working while a Fire TV stick is also connected.
 - **Getting started:** the install was easy: one script and about 20 GB of disk. Most of our Vega time went into
   things that fail without an error: buttons, links, fonts.
 - **Again?** Yes, for the Appstore path. A CLI screenshot and scripted presses that work would make it as quick to
@@ -135,7 +135,7 @@ What we found:
     allow its generative AI in apps for under-18s, so that is a stand-in for the prototype, not how MarbleTime would
     ship. On AWS the stack already sends characters to Bedrock, so they work there the day the block lifts. The
     voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
-  - `HttpLambdaIntegration` adds one Lambda permission per route (Oct 5).
+  - `HttpLambdaIntegration` adds one Lambda permission per route.
   - A presigned S3 URL stops working when the Lambda's credentials expire, hours before its `expiresIn`, and the
     presigner doesn't warn. We read it in the S3 guide and used CloudFront signed URLs instead.
   - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.

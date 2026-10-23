@@ -1,8 +1,7 @@
 # Friction log
 
 Where Amazon's tools and docs held us up while we built MarbleTime (Oct 5–22, 2026), worst first. Every entry is
-something we ran into ourselves. Severity: high blocks a feature, medium costs hours or fails without an error, low is
-a nuisance.
+something we ran into ourselves. Severity: high blocks a feature, medium costs hours or fails without an error.
 
 ### Bedrock: a new AWS account can't call any model · high · Oct 5
 
@@ -37,25 +36,17 @@ a nuisance.
 
 - **Task:** test our Amazon Kids mode on a Fire TV Stick registered in Estonia.
 - **Steps:** Settings → Account & Profile Settings → Add Profile.
-- **Expected vs actual:** a kids profile, as in the docs; got none. Nothing says which countries have it.
+- **Expected vs actual:** a kids profile, as in the docs; got none. The docs we found don't say which countries have
+  it.
 - **Workaround:** the mode is built to the docs, untested.
 - **Suggestion:** list the countries in the docs, and let developers try Amazon Kids anywhere.
-
-### Vega: the Release build aborts at start · medium · Oct 20
-
-- **Task:** a Release build of the Vega app for the judges.
-- **Steps:** `react-native build-kepler --build-type Release`, then `vega run-app` on the Virtual Device.
-- **Expected vs actual:** the app starts, as the Debug build does; got `signal 6` 30 ms after start, no JavaScript error
-  in the log, and a crash report the developer shell can't read. We never found the cause, which may be in our code.
-- **Workaround:** the judges get the Debug packages.
-- **Suggestion:** log the JavaScript error before aborting, and let developers read their app's crash reports.
 
 ### Multi-TV starter: release builds keep old shared code · medium · Oct 5
 
 - **Task:** change a screen in `packages/shared` and build the Fire OS release APK.
 - **Steps:** `./gradlew assembleRelease`.
-- **Expected vs actual:** the new screen; got yesterday's, with no warning. The JS bundle task doesn't count
-  `packages/shared` as an input.
+- **Expected vs actual:** the new screen; got the old one, with no warning. Gradle reported the JS bundle task up to
+  date.
 - **Workaround:** `--rerun` on the bundle task (in `scripts/fire.sh build`).
 - **Suggestion:** add `packages/shared` to the bundle task's inputs in the starter.
 
@@ -75,25 +66,6 @@ a nuisance.
 - **Expected vs actual:** speech; got `LANG_NOT_SUPPORTED` from the default engine (IVONA), and every `speak` fails.
 - **Workaround:** ask for the Pico engine by name, with a `<queries>` entry for `TTS_SERVICE` in the manifest.
 - **Suggestion:** give apps the IVONA voices, or document the Pico route.
-
-### Vega: no simple player for an app's own short sounds · medium · Oct 5
-
-- **Task:** play our own short sounds on Vega, as SoundPool does on Fire OS.
-- **Steps:** the docs send short sounds to `com.amazon.audio.system`; we installed
-  `@amazon-devices/keplerscript-audio-lib`.
-- **Expected vs actual:** load a bundled file and play it; got only system sounds and raw PCM streams. The W3C media
-  player can play files, but it's built for media playback, and we haven't tried it for effects.
-- **Workaround:** none yet. The Vega build has no sound.
-- **Suggestion:** a SoundPool-like API, with an example for bundled files.
-
-### Vega: an app's own link scheme can't open it · medium · Oct 19
-
-- **Task:** open a test screen with a link, as on Fire OS (`marbletime://open?screen=board`).
-- **Steps:** `vmsgr launch-app 'marbletime://open?…'` on the Virtual Device.
-- **Expected vs actual:** the app on that screen; got `Failed to launch (-1)`. Only
-  `pkg://app.marbletime.tv.main?screen=board` works, a rule written only in a file in the SDK's header folder.
-- **Workaround:** the app turns `pkg://…?query` into its own link.
-- **Suggestion:** accept the app's declared scheme, and add a linking page to the React Native for Vega docs.
 
 ### Vega Virtual Device: no screenshot command · medium · Oct 6
 
@@ -130,20 +102,3 @@ a nuisance.
   SDK version. The key reference calls `KEY_ENTER` Select, but a scripted `KEY_ENTER` doesn't press buttons.
 - **Workaround:** the npm package's README and type files.
 - **Suggestion:** drop the menu before cutting a page to length, list each page once, and fix the `KEY_ENTER` row.
-
-### Vega: a custom font falls back to the system font without a warning · low · Oct 19
-
-- **Task:** use our typeface (Fredoka) in the Vega build.
-- **Steps:** `fontFamily: 'Fredoka-SemiBold'` in the shared styles.
-- **Expected vs actual:** the font, or an error; got the system font. Fonts load only from `<app>/assets/fonts/`,
-  found by trial.
-- **Workaround:** the fonts copied there.
-- **Suggestion:** a fonts page for React Native on Vega, and a log line when a font isn't found.
-
-### CDK: `HttpLambdaIntegration` adds one Lambda permission per route · low · Oct 5
-
-- **Task:** one Lambda behind an HTTP API with 29 routes.
-- **Steps:** one `HttpLambdaIntegration` shared by every route.
-- **Expected vs actual:** one invoke permission; got 29, which grows the function's policy toward its 20 KB limit.
-- **Workaround:** `scopePermissionToRoute: false`.
-- **Suggestion:** one API-wide permission by default for a shared integration.
