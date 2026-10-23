@@ -13,8 +13,8 @@ down.
 - **Steps:** Converse and InvokeModel on Claude and Nova, as root, as an IAM role and with a Bedrock API key.
 - **Expected vs actual:** a reply; got `Error 002: Access to Bedrock models is not allowed for this account` for every
   model, Oct 5–23. The console doesn't say the account is restricted, so we first suspected billing, IAM and the key.
-- **Workaround:** none on AWS. The support case we filed on Oct 5 hasn't lifted the block. Gemini on a local server
-  for the prototype.
+- **Workaround:** none on AWS. The support case we filed on Oct 5 hasn't lifted the block. Another LLM on a local
+  server for the prototype.
 - **Suggestion:** say in the error that the account is restricted, and how to lift it.
 
 ### Fire OS: a family app can get usage access only over ADB · high · Oct 2, Oct 5
@@ -65,7 +65,8 @@ down.
 - **Steps:** Polly's neural voices Ruth, Vicki and Lucia for English, German and Spanish, through SSML.
 - **Expected vs actual:** a lively, conversational voice; they sounded flat for cartoon characters, and Polly has no
   Estonian voice.
-- **Workaround:** Gemini's voices on our local setup. On AWS, Polly's generative voices for English, German and Spanish.
+- **Workaround:** another provider's voices on our local setup. On AWS, Polly's generative voices for English, German
+  and Spanish.
 - **Suggestion:** conversational voices for characters, children's voices among them, and Estonian.
 
 ### aws login: asks again several times a day · medium · Oct 5–23

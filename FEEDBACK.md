@@ -130,9 +130,9 @@ What we found:
     account`, for every model, Amazon's Nova included, for over two weeks now. Adding a payment method didn't lift
     it. Nothing in the console says the account is restricted, and with the free support plan the CLI can't read the
     support case. The case we filed on Oct 5 hasn't lifted the block (still `Error 002` on Oct 23). This was
-    our biggest blocker. While it lasts, our local setup draws characters and writes puzzle sets with Google's
-    Gemini, and the voices come from Google's Gemini-TTS. Google's terms don't allow its generative AI in apps for
-    under-18s, so that is a stand-in for the prototype, not how MarbleTime would ship. On AWS the stack sends
+    our biggest blocker. While it lasts, our local setup draws characters and writes puzzle sets with another
+    LLM, and its voices come from another provider. That is a stand-in for the prototype, not how MarbleTime would
+    ship. On AWS the stack sends
     characters to Bedrock, so making a new character doesn't work there, and the Bedrock calls are tested with
     stand-ins only. The voices there are Polly's, in English, German and Spanish; Polly has no Estonian.
   - `aws login` sessions ran out several times a day. We ran it 12 times from Oct 5 to Oct 23, and once its page said
@@ -143,7 +143,7 @@ What we found:
   - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.
   - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update.
 - **Polly** (the first character build, until Oct 7): its neural voices sounded flat for cartoon characters, and it
-  has no Estonian voice. So on Oct 7 we moved the voices to Gemini, which covers all four of our languages
+  has no Estonian voice. So on Oct 7 we moved the voices to another provider that covers all four of our languages
   (FRICTION_LOG, Oct 7; FEATURE_REQUESTS).
 - **AWS MCP Server and AWS agent skills** (set up for Claude Code by the AWS CLI on Oct 5): the `signing-in-to-aws`
   skill checked our first `aws login` and set the region. The MCP server never connected. When the `aws login`

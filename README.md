@@ -35,7 +35,7 @@ The backend and the phone app run on AWS until Nov 20, 2026. The TV builds are o
 **On AWS, making a new character doesn't work.** Amazon Bedrock has been blocked on our AWS account since Oct 5
 ("Error 002" for every model, in [FRICTION_LOG](FRICTION_LOG.md); a support case has been open since then). When a kid
 types an idea for a new character, the TV says "That didn't work right now. Try again later.", and the kid keeps the
-token. The demo video shows characters made in the local setup below, where Google's Gemini draws them.
+token. The demo video shows characters made in the local setup below, where another LLM draws them.
 
 The voices on AWS are Amazon Polly's, in English, German and Spanish. Polly has no Estonian voice, so Estonian lines
 that aren't recorded in the app stay silent there.
@@ -86,8 +86,8 @@ MODEL_ID=fake scripts/dev.sh --seed    # the same without a Google Cloud sign-in
 
 Open the printed `https://<computer>:5173` on your phone and sign in with any name (`demo` for the demo family). The
 certificate comes from [mkcert](https://github.com/FiloSottile/mkcert); install its root certificate on the phone
-once. Characters are drawn by the model in `MODEL_ID`: `fake` (a stand-in drawing, no AI, no account) or a
-Gemini model on Vertex AI with your `gcloud` sign-in (the default; on AWS, a Bedrock model). See [backend/README.md](backend/README.md).
+once. Characters are drawn by the model in `MODEL_ID`: `fake` (a stand-in drawing, no AI, no account) or an LLM on
+Vertex AI with your `gcloud` sign-in (the default; on AWS, a Bedrock model). See [backend/README.md](backend/README.md).
 
 **2. The TV (Fire OS):**
 
