@@ -10,13 +10,10 @@ On a shared TV an app can't know who is watching, so a time-budget app has to as
 A kid who can't type should be able to say what their new character is. Today the only way spoken words reach an app is the system keyboard's voice typing, and only from the hardware remote's microphone key (the Video Skills Kit, the one API that passes on what was said, takes no new partners and is for video search): the Fire TV phone app's microphone always goes to Alexa, which answers with a search page over the app (FRICTION_LOG, Oct 12). Ask: (1) a dictation API for the foreground app (hold the voice button → the app receives the transcript, with its own on-screen prompt, no keyboard over the screen), on Fire OS and Vega, with the family's language among the supported ones; (2) the phone app's microphone dictating into the keyboard whenever the keyboard offers voice typing; (3) the microphone key staying in the app whenever one of its text fields is selected, keyboard open or not (today a closed keyboard sends it to Alexa search); (4) documentation of when voice typing is offered (plain text fields only, supported locales, a connected voice remote, the keyboard open, not in Amazon Kids…).
 
 ## Important: a settings UI for trusted family apps' permissions on Fire OS
-Usage access, display-over-other-apps and accessibility can only be granted over ADB today, so normal parents can't set up a family app that needs them.
+Usage access, display-over-other-apps and accessibility can only be granted over ADB today, so parents can't set up a family app that needs them without a computer.
 
-## Nice to have: a keep-awake API for non-media Vega apps
-A chore board that stays on screen in the living room shouldn't need to pretend to play media to keep the TV awake.
-
-## Important: Amazon Polly voices in Estonian (and Latvian, Lithuanian)
-Polly has 40 languages, Finnish among them, but no Estonian, Latvian or Lithuanian. MarbleTime reads every line aloud for kids who can't read yet, in the family's language. With no Estonian voice on Polly, we moved all four languages (English, Estonian, German, Spanish) to another provider, so that the TV keeps one narrator's voice. Small languages are where a family app most needs a good voice, because few other options exist.
+## Important: Amazon Polly voices in Estonian
+Polly has Finnish but no Estonian. MarbleTime reads its lines aloud for kids who can't read yet, in the family's language. With no Estonian voice on Polly, our local setup uses another provider for all four languages (English, Estonian, German, Spanish), so that the TV keeps one narrator's voice.
 
 ## Important: Amazon Kids on Fire TV in more countries
-Amazon Kids profiles aren't offered on Fire TV in Estonia (and, it seems, most countries). MarbleTime's Amazon Kids mode builds on them; outside the supported countries families need a sideloaded strict mode instead. At least a list of countries in the docs, and a way for developers to test Amazon Kids anywhere.
+Amazon Kids profiles aren't offered on Fire TV in Estonia. MarbleTime's Amazon Kids mode builds on them; where they aren't offered, families need a sideloaded strict mode instead. At least a list of countries in the docs, and a way for developers to test Amazon Kids anywhere.

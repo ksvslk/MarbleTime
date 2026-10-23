@@ -10,12 +10,11 @@ date); what we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUES
 |---|---|---|
 | Fire TV Stick 4K Plus, Fire OS 8, ADB | The main device: the app, strict mode, every device check | Yes |
 | React Native multi-TV starter, Expo TV | One codebase for Fire OS and Vega | Yes |
-| Vega SDK, CLI and Virtual Device | The Vega build | Yes, once presses, links and fonts stop failing silently |
+| Vega SDK, CLI and Virtual Device | The Vega build | Yes, once presses and fonts stop failing silently |
 | Amazon Kids | The Appstore mode's time limit | Couldn't try it: not offered in Estonia |
 | AWS: CDK, Lambda, API Gateway, DynamoDB, Cognito, S3, CloudFront | The backend for both apps | Yes |
 | Amazon Bedrock | Drawing characters | Yes, the day our account may call it |
 | Amazon Polly | The voices on AWS: read-aloud and characters, in English, German and Spanish | Yes, and in Estonian once Polly has it |
-| Amazon Transcribe | Listening to a kid's idea, in the first build (until Oct 7) | Not needed since kids type their ideas |
 | AWS MCP Server, AWS agent skills | Help for the coding agent with AWS | The skills, yes; the server once it says when the sign-in has expired |
 | Amazon Devices Builder Tools | Vega docs search for the coding agent (from Oct 20) | Yes, from day one |
 
@@ -80,7 +79,7 @@ date); what we'd like Amazon to build is in [FEATURE_REQUESTS.md](FEATURE_REQUES
   - No simple player for an app's own short sounds. `react-native-svg` needs a hand-made Metro alias, and `vda` stops
     working while a Fire TV stick is also connected.
 - **Getting started:** the install was easy: one script and about 20 GB of disk. Most of our Vega time went into
-  things that fail without an error: buttons, links, fonts.
+  things that fail without an error: buttons and fonts.
 - **Again?** Yes, for the Appstore path. A CLI screenshot and scripted presses that work would make it as quick to
   develop for as Fire OS.
 
@@ -140,10 +139,9 @@ What we found:
     presigner doesn't warn. We read it in the S3 guide and used CloudFront signed URLs instead.
   - `NodejsFunction` has no documented way to bundle a native module for Lambda from a Mac without Docker.
   - `npm audit` flags a high advisory inside aws-cdk-lib's bundled dependencies, which users can't update.
-- **Polly and Transcribe** (the first character build, until Oct 7): Polly needs two requests per line (the audio,
-  then the lip-sync marks) and returns no length for an MP3. Transcribe streaming takes raw PCM, not WAV. Polly has no
-  Estonian voice, so on Oct 7 we moved the voices and the listening to one provider that covers all four of our
-  languages (FEATURE_REQUESTS).
+- **Polly** (the first character build, until Oct 7): Polly needs two requests per line (the audio, then the lip-sync
+  marks) and returns no length for an MP3. It has no Estonian voice, so on Oct 7 we moved the voices to one provider
+  that covers all four of our languages (FEATURE_REQUESTS).
 - **AWS MCP Server and AWS agent skills** (set up for Claude Code by the AWS CLI on Oct 5): the `signing-in-to-aws`
   skill checked our first `aws login` and set the region. The MCP server never connected. When the `aws login`
   session has expired it answers "Invalid request parameters", and the real message ("Please reauthenticate using
@@ -183,5 +181,5 @@ What we found:
 ## Not from Amazon, but part of how it was built
 
 **Claude Code** wrote nearly all the code and docs, and ran the device checks through ADB and the Vega CLI. Tools
-with a CLI and clear errors (ADB, the AWS CLI, CDK) worked best with it. Silent failures (Vega presses, links, fonts)
-cost the most time.
+with a CLI and clear errors (ADB, the AWS CLI, CDK) worked best with it. Silent failures (Vega presses and fonts) cost
+the most time.
