@@ -12,8 +12,8 @@ A kid who can't type should be able to say what their new character is. Today th
 ## Important: a settings UI for trusted family apps' permissions on Fire OS
 Usage access, display-over-other-apps and accessibility can only be granted over ADB today, so parents can't set up a family app that needs them without a computer.
 
-## Important: Amazon Polly voices in Estonian
-Polly has Finnish but no Estonian. MarbleTime reads its lines aloud for kids who can't read yet, in the family's language. With no Estonian voice on Polly, our local setup uses another provider for all four languages (English, Estonian, German, Spanish), so that the TV keeps one narrator's voice.
+## Important: Amazon Polly voices in Estonian, and conversational voices for characters
+Polly has Finnish but no Estonian. MarbleTime reads its lines aloud for kids who can't read yet, in the family's language, and its cartoon characters talk. With no Estonian voice on Polly, our local setup uses another provider for all four languages (English, Estonian, German, Spanish), so that the TV keeps one narrator's voice. Polly's neural voices also sounded flat for cartoon characters (FRICTION_LOG, Oct 7). Lively, conversational character voices, children's among them, would let the characters use Polly too.
 
 ## Important: Amazon Kids on Fire TV in more countries
 Amazon Kids profiles aren't offered on Fire TV in Estonia. MarbleTime's Amazon Kids mode builds on them; where they aren't offered, families need a sideloaded strict mode instead. At least a list of countries in the docs, and a way for developers to test Amazon Kids anywhere.
